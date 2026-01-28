@@ -28,7 +28,7 @@ VIDEO. Include a demo video of your game here (you don't have to wait until the 
 ![Group 17 team photo](/images/group_photo.jpg)
 
 - Nikolay Slavov, ji25441@bristol.ac.uk, Dozuu-Touryou
-- Group member 2, name, email, role
+- Shiho Morimatsu, rz25939@bristol.ac.uk, shiho1008
 - Group member 3, name, email, role
 - Group member 4, name, email, role
 - Group member 5, name, email, role
