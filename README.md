@@ -23,9 +23,9 @@ LINK. Add a link here to your deployed game, you can also make the image above l
 
 VIDEO. Include a demo video of your game here (you don't have to wait until the end, you can insert a work in progress video)
 
-## Your Group
+## Development Team
 
-GROUP PHOTO. Add a group photo here.
+![Group 17 team photo](/images/group_photo.jpg)
 
 - Nikolay Slavov, ji25441@bristol.ac.uk, Dozuu-Touryou
 - Group member 2, name, email, role
