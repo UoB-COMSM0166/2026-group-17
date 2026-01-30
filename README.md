@@ -31,7 +31,7 @@ VIDEO. Include a demo video of your game here (you don't have to wait until the 
 - Shiho Morimatsu, rz25939@bristol.ac.uk, shiho1008
 - Yinuo Li, cs25733@bristol.ac.uk, Liyinuo123
 - Hsin-Man Liu, cw25376@bristol.ac.uk, hsinmanliu
-- Group member 5, name, email, role
+- Yuqi Guo, rr24582@bristol.ac.uk, Allison-coder
 - Group member 6, name, email, role
 
 ## Project Report
