@@ -27,7 +27,7 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 
 ## Development Team
 
-![Group 17 team photo](/images/group_photo.jpg)
+![Group 17 team photo](/images/group_newphoto.jpg)
 
 - Nikolay Slavov, ji25441@bristol.ac.uk, Dozuu-Touryou
 - Shiho Morimatsu, rz25939@bristol.ac.uk, shiho1008
