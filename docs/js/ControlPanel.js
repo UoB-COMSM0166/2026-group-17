@@ -15,15 +15,12 @@ class ControlPanel {
         this.#shootButton.drawButton();
     }
 
+    get altitude() { return this.#altitude; }
+    get angleDial() { return this.#angleDial; }
+
     #drawBackground() {
         fill(this.#backgroundColor);
         rectMode(CORNER);
         rect(0, height - this.#altitude, width, this.#altitude);
-    }
-    get altitude() {
-        return this.#altitude;
-    }
-    get angleDial() {
-        return this.#angleDial
     }
 }

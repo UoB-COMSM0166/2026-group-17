@@ -1,10 +1,13 @@
+let gravity;
 let bgTop;
 let bgBottom;
 let player1;
 let controlPanel;
 let lastButtonClicked;
+let currentShot = null;
 
 function setup() {
+    gravity = createVector(0, 400);
     bgTop = color(0);
     bgBottom = color(0, 80, 100);
     createCanvas(1280, 700);
@@ -19,7 +22,12 @@ function setup() {
 }
 
 function draw() {
+    if (currentShot?.isActive || currentShot?.isExploding) {
+        currentShot?.updatePhysics(deltaTime / 1000);
+        currentShot?.drawShotSequence();
+    }
     drawLinearGradient(bgTop, bgBottom);
+    player1.barrelAngle = controlPanel.angleDial.needleRotation - 90;
     player1.drawPlayer();
     controlPanel.drawCtrlPanel();
 }
@@ -34,6 +42,12 @@ function mouseReleased() {
         lastButtonClicked)
         controlPanel.angleDial.isFollowing = true;
     else controlPanel.angleDial.isFollowing = false;
+}
+
+function keyReleased() {
+    if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
+        currentShot = player1.fireShot(4);
+    }
 }
 
 function drawLinearGradient(colorA, colorB) {
