@@ -3,16 +3,19 @@ class ControlPanel {
     #backgroundColor;
     #angleDial;
     #shootButton;
+    #powerAdjust;
     constructor(bgColor) {
         this.#backgroundColor = bgColor;
         this.#angleDial = new AngleDialWidget(createVector(width / 6, height - this.#altitude / 2));
         this.#shootButton = new ShootButton();
+        this.#powerAdjust = new PowerAdjustWidget();
     }
 
     drawCtrlPanel() {
         this.#drawBackground();
         this.#angleDial.drawAngleDial();
         this.#shootButton.drawButton();
+        this.#powerAdjust.drawPowerAdjust();
     }
 
     #drawBackground() {
