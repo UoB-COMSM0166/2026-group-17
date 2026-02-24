@@ -18,6 +18,9 @@ class ControlPanel {
         this.#powerAdjust.drawPowerAdjust();
     }
 
+    get altitude() { return this.#altitude; }
+    get angleDial() { return this.#angleDial; }
+
     #drawBackground() {
         fill(this.#backgroundColor);
         rectMode(CORNER);

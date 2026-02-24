@@ -1,14 +1,25 @@
+let gravity;
 let bgTop;
 let bgBottom;
 let player1;
 let controlPanel;
 let lastButtonClicked;
+//new
+let terrain;
+let currentShot = null;
 
 function setup() {
+    gravity = createVector(0, 400);
     bgTop = color(0);
     bgBottom = color(0, 80, 100);
     createCanvas(1280, 700);
     controlPanel = new ControlPanel(color(20));
+    terrain = new Terrain(width,height,color(255,0,0));
+      console.log("terrain create:", terrain);
+        terrainSeed = floor(random(99999));
+        console.log("seed:", terrainSeed);
+        terrain.generateInitialTerrain(terrainSeed);
+       console.log("columns number:", terrain.columns.length);
     const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
     player1 = new PlayerCannon(createVector(
         random(wheelRadius, width - wheelRadius),
@@ -20,6 +31,12 @@ function setup() {
 
 function draw() {
     drawLinearGradient(bgTop, bgBottom);
+    terrain.drawTerrain();
+    if (currentShot?.isActive || currentShot?.isExploding) {
+        currentShot?.updatePhysics(deltaTime / 1000);
+        currentShot?.drawShotSequence();
+    }
+    player1.barrelAngle = controlPanel.angleDial.needleRotation - 90;
     player1.drawPlayer();
     controlPanel.drawCtrlPanel();
 }
@@ -34,6 +51,12 @@ function mouseReleased() {
         lastButtonClicked)
         controlPanel.angleDial.isFollowing = true;
     else controlPanel.angleDial.isFollowing = false;
+}
+
+function keyReleased() {
+    if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
+        currentShot = player1.fireShot(4);
+    }
 }
 
 function drawLinearGradient(colorA, colorB) {
