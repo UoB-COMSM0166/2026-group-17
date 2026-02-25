@@ -4,22 +4,26 @@ let bgBottom;
 let player1;
 let controlPanel;
 let lastButtonClicked;
+//add wind
+let wind;
 //new
 let terrain;
 let currentShot = null;
 
 function setup() {
     gravity = createVector(0, 400);
+    //set wind
+    wind = new WindSystem();
     bgTop = color(0);
     bgBottom = color(0, 80, 100);
     createCanvas(1280, 700);
     controlPanel = new ControlPanel(color(20));
-    terrain = new Terrain(width,height,color(255,0,0));
-      console.log("terrain create:", terrain);
-        terrainSeed = floor(random(99999));
-        console.log("seed:", terrainSeed);
-        terrain.generateInitialTerrain(terrainSeed);
-       console.log("columns number:", terrain.columns.length);
+    terrain = new Terrain(width, height, color(255, 0, 0));
+    console.log("terrain create:", terrain);
+    terrainSeed = floor(random(99999));
+    console.log("seed:", terrainSeed);
+    terrain.generateInitialTerrain(terrainSeed);
+    console.log("columns number:", terrain.columns.length);
     const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
     player1 = new PlayerCannon(createVector(
         random(wheelRadius, width - wheelRadius),
@@ -32,6 +36,8 @@ function setup() {
 function draw() {
     drawLinearGradient(bgTop, bgBottom);
     terrain.drawTerrain();
+    //draw wind
+    wind.draw();
     if (currentShot?.isActive || currentShot?.isExploding) {
         currentShot?.updatePhysics(deltaTime / 1000);
         currentShot?.drawShotSequence();
@@ -54,6 +60,19 @@ function mouseReleased() {
 }
 
 function keyReleased() {
+
+    // press W
+    if (key === 'w' || key === 'W') {
+
+        wind.newTurn();
+        wind.isActive = true;
+
+        // 5 second close
+        setTimeout(() => {
+            wind.isActive = false;
+        }, 5000);
+    }
+
     if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
         currentShot = player1.fireShot(4);
     }
