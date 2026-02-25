@@ -49,6 +49,11 @@ function draw() {
 
 function mousePressed() {
     lastButtonClicked = mouseButton.left;
+
+    const shotFree = (!currentShot?.isActive && !currentShot?.isExploding);
+    if (lastButtonClicked && controlPanel.shootButton.isHovered && shotFree) {
+        currentShot = player1.fireShot(4);
+    }
 }
 
 function mouseReleased() {
@@ -63,13 +68,14 @@ function mouseReleased() {
         lastButtonClicked)
         controlPanel.powerAdjust.isFollowing = true;
     else controlPanel.powerAdjust.isFollowing = false;
+
 }
 
-function keyReleased() {
+/*function keyReleased() {
     if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
         currentShot = player1.fireShot(4);
     }
-}
+}*/
 
 function drawLinearGradient(colorA, colorB) {
     strokeWeight(1);
