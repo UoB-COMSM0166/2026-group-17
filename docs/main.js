@@ -4,7 +4,6 @@ let bgBottom;
 let player1;
 let controlPanel;
 let lastButtonClicked;
-//new
 let terrain;
 let currentShot = null;
 
@@ -21,10 +20,6 @@ function setup() {
         terrain.generateInitialTerrain(terrainSeed);
        console.log("columns number:", terrain.columns.length);
     const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
-    /*player1 = new PlayerCannon(createVector(
-        random(wheelRadius, width - wheelRadius),
-        height - controlPanel.altitude - wheelRadius),
-        wheelRadius, barrelSizeVector, color('silver'), color('lightslategray'));*/
     let cannonX = random(wheelRadius, width - wheelRadius);
     let groundHeight = terrain.getHeightAt(cannonX);
     let cannonY = height - groundHeight -wheelRadius;
@@ -47,6 +42,7 @@ function draw() {
         currentShot?.drawShotSequence();
     }
     player1.barrelAngle = controlPanel.angleDial.needleRotation - 90;
+    player1.barrelPower = controlPanel.powerAdjust.power * 5;
     player1.drawPlayer();
     controlPanel.drawCtrlPanel();
 }
@@ -61,6 +57,12 @@ function mouseReleased() {
         lastButtonClicked)
         controlPanel.angleDial.isFollowing = true;
     else controlPanel.angleDial.isFollowing = false;
+
+    if (controlPanel.powerAdjust.isHovered &&
+        !controlPanel.powerAdjust.isFollowing &&
+        lastButtonClicked)
+        controlPanel.powerAdjust.isFollowing = true;
+    else controlPanel.powerAdjust.isFollowing = false;
 }
 
 function keyReleased() {
