@@ -14,17 +14,27 @@ function setup() {
     bgBottom = color(0, 80, 100);
     createCanvas(1280, 700);
     controlPanel = new ControlPanel(color(20));
-    terrain = new Terrain(width,height,color(255,0,0));
+    terrain = new Terrain(createVector(width, height), color(255, 0, 0));
       console.log("terrain create:", terrain);
         terrainSeed = floor(random(99999));
         console.log("seed:", terrainSeed);
         terrain.generateInitialTerrain(terrainSeed);
        console.log("columns number:", terrain.columns.length);
     const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
-    player1 = new PlayerCannon(createVector(
+    /*player1 = new PlayerCannon(createVector(
         random(wheelRadius, width - wheelRadius),
         height - controlPanel.altitude - wheelRadius),
-        wheelRadius, barrelSizeVector, color('silver'), color('lightslategray'));
+        wheelRadius, barrelSizeVector, color('silver'), color('lightslategray'));*/
+    let cannonX = random(wheelRadius, width - wheelRadius);
+    let groundHeight = terrain.getHeightAt(cannonX);
+    let cannonY = height - groundHeight -wheelRadius;
+    player1 = new PlayerCannon(
+    createVector(cannonX,cannonY),
+    wheelRadius,
+    barrelSizeVector,
+    color('silver'),
+    color('lightslategray')
+    );
     ellipseMode(RADIUS);
     angleMode(DEGREES);
 }

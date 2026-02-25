@@ -16,10 +16,10 @@ class PlayerCannon {
 
     fireShot(shotRadius) {
         // this value can be used for the power
-        const SPEED = 300;
+        let speed = 600;
         // offset of muzzle tip from positionVector
         let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
-        let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(SPEED);
+        let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(speed);
         offset.rotate(this.#barrelAngle);
         return new Projectile(p5.Vector.add(this.#positionVector, offset), velocity, shotRadius);
     }
