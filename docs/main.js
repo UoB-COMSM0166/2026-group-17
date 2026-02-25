@@ -37,6 +37,7 @@ function draw() {
         currentShot?.drawShotSequence();
     }
     player1.barrelAngle = controlPanel.angleDial.needleRotation - 90;
+    player1.barrelPower = controlPanel.powerAdjust.power * 5;
     player1.drawPlayer();
     controlPanel.drawCtrlPanel();
 }
@@ -51,6 +52,12 @@ function mouseReleased() {
         lastButtonClicked)
         controlPanel.angleDial.isFollowing = true;
     else controlPanel.angleDial.isFollowing = false;
+
+    if (controlPanel.powerAdjust.isHovered &&
+        !controlPanel.powerAdjust.isFollowing &&
+        lastButtonClicked)
+        controlPanel.powerAdjust.isFollowing = true;
+    else controlPanel.powerAdjust.isFollowing = false;
 }
 
 function keyReleased() {

@@ -20,6 +20,7 @@ class ControlPanel {
 
     get altitude() { return this.#altitude; }
     get angleDial() { return this.#angleDial; }
+    get powerAdjust() { return this.#powerAdjust; }
 
     #drawBackground() {
         fill(this.#backgroundColor);
