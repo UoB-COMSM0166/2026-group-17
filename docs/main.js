@@ -82,7 +82,18 @@ function draw() {
 
 function mousePressed() {
     lastButtonClicked = mouseButton.left;
+
+    let shotRadius = 4;
+    if (lastButtonClicked && turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
+        currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
+    }
+
+    /*const shotFree = (!currentShot?.isActive && !currentShot?.isExploding);
+    if (lastButtonClicked && controlPanel.shootButton.isHovered && shotFree) {
+        currentShot = player1.fireShot(4);
+    }*/
 }
+
 
 function mouseReleased() {
     if (controlPanel.angleDial.isHovered &&
@@ -96,13 +107,14 @@ function mouseReleased() {
         lastButtonClicked)
         controlPanel.powerAdjust.isFollowing = true;
     else controlPanel.powerAdjust.isFollowing = false;
+
 }
 
 function keyReleased() {
-    let shotRadius = 4;
+    /*let shotRadius = 4;
     if (key === 'Enter' && turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
         currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
-    }
+    }*/
 }
 
 function drawLinearGradient(colorA, colorB) {
