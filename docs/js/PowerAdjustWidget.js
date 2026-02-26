@@ -53,22 +53,24 @@ class PowerAdjustWidget {
     //move
     if (this.#isHovered() && this.#isFollowing) {
       //fill('darkturquoise');
-      stroke(this.#plateOutlineColor);
+      stroke(250);
       strokeWeight(4);
+      drawingContext.shadowBlur = 15;
+      drawingContext.shadowColor = 'rgb(234, 240, 241)';
     } else {
-      stroke(this.#plateOutlineColor);
+      stroke(250);
       strokeWeight(2);
     }
     
     triangle(this.#p1.x, this.#p1.y, this.#p2.x, this.#p2.y, this.#p3.x, this.#p3.y);
 
     beginShape();
-    fill(this.#plateFillColor);
+    fill(10, 220);
     noStroke();
-    vertex(this.#p3.x, this.#p3.y);
-    vertex(this.#p2.x, this.#p2.y);
-    vertex(this.#sliderX, this.yOnLineByX(this.#sliderX, this.#p1, this.#p2));
-    vertex(this.#sliderX, this.#p3.y);
+    vertex(this.#p3.x - 1, this.#p3.y -1);
+    vertex(this.#p2.x - 1, this.#p2.y + 1);
+    vertex(this.#sliderX, this.yOnLineByX(this.#sliderX, this.#p1, this.#p2) + 1);
+    vertex(this.#sliderX, this.#p3.y - 1);
     endShape();
 
     pop();

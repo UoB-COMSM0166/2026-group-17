@@ -1,2 +1,11 @@
 **/.DS_Store
 **/.idea/
+Game.js
+HUD.js
+Projectile.js
+Tank.js
+UIControls.js
+Weapon.js
+index.html
+sketch.js
+style.css

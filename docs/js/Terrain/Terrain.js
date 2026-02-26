@@ -38,6 +38,7 @@ generateInitialTerrain(seed) {
 
   applyExplosion(center, radius) {
   //loop each cols which is under the area of explosion
+   console.log("applyExplosion called at", center, "radius:", radius);
     for (let x = center.x - radius; x < center.x + radius; x++) {
     // the distance from this col to the center of explosion
       let dx = x - center.x;
@@ -46,7 +47,9 @@ generateInitialTerrain(seed) {
       let col = this.columns[floor(x)];
       if (col) {
       //change the height
-        col.setHeight(col.height - craterDepth);
+       console.log("before:", col.height, "craterDepth:", craterDepth);
+       col.setHeight(col.height - craterDepth);
+       console.log("after:", col.height); 
       }
     }
   }

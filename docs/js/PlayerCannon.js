@@ -32,10 +32,12 @@ class PlayerCannon {
         this.#drawWheel();
     }
 
-
     get barrelAngle() { return this.#barrelAngle; }
     get barrelPower() { return this.#barrelPower; }
     set barrelAngle(needleAngle) { this.#barrelAngle = needleAngle; }
+    //new added for update the position
+    get positionVector() { return this.#positionVector; }
+    get wheelRadius() { return this.#wheelRadius; }
     set barrelPower(power) { this.#barrelPower = power; }
 
     #drawWheel() {
