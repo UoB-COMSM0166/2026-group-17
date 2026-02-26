@@ -31,6 +31,9 @@ class PlayerCannon {
     }
 
     set barrelAngle(needleAngle) { this.#barrelAngle = needleAngle; }
+    //new added for update the position
+    get positionVector() { return this.#positionVector; }
+    get wheelRadius() { return this.#wheelRadius; }
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);

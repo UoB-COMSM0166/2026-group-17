@@ -42,6 +42,8 @@ function setup() {
 function draw() {
     drawLinearGradient(bgTop, bgBottom);
     terrain.drawTerrain();
+    //update the location each time
+    player1.positionVector.y = height - terrain.getHeightAt(player1.positionVector.x) - player1.wheelRadius;
     if (currentShot?.isActive || currentShot?.isExploding) {
         currentShot?.updatePhysics(deltaTime / 1000);
         currentShot?.drawShotSequence();
