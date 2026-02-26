@@ -8,11 +8,16 @@ class Projectile {
     #explosionStartTime;
     #maxExplosionRadius = 50;
 
+    //Added
+    #hasAppliedExplosion;
+
     constructor(muzzlePos, vel, rad) {
         this.#position = muzzlePos;
         this.#velocity = vel;
         this.#radius = rad;
         this.#isActive = true;
+        //Added
+        this.#hasAppliedExplosion = false;
     }
 
     updatePhysics(dt) {
@@ -26,6 +31,23 @@ class Projectile {
             this.#explosionStartTime = frameCount;
         }
         else if (this.#position.x <= 0 || this.#position.x >= width) this.#isActive = false;
+        //TestExplosion
+        if (terrain.isColliding(this.#position.x, this.#position.y)) {
+
+    this.#isActive = false;
+    let groundHeight = terrain.getHeightAt(this.#position.x);
+    let groundY = height - groundHeight;
+    this.#impactPosition = createVector(this.#position.x, groundY);
+    this.#isExploding = true;
+    this.#explosionStartTime = frameCount;
+
+    currentExplosion = new Explosion(
+        this.#impactPosition.x,
+        this.#impactPosition.y,
+    );
+}
+    
+    
     }
 
     drawShotSequence() {
@@ -61,4 +83,7 @@ class Projectile {
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }
+    //Added
+    get hasAppliedExplosion(){ return this.#hasAppliedExplosion;}
+    set hasAppliedExplosion(val){ this.#hasAppliedExplosion = val;}
 }

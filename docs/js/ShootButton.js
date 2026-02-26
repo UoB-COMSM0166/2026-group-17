@@ -10,11 +10,18 @@ class ShootButton {
         this.#outlineColor = outColor;
     }
 
+    get isHovered() { return this.#isHovered() }
+
     drawButton() {
         rectMode(CENTER);
         fill(this.#fillColor);
-        stroke(this.#outlineColor);
-        strokeWeight(4);
+        if (this.#isHovered()) {
+            stroke(this.#outlineColor);
+            strokeWeight(4);
+        } else {
+            strokeWeight(2);
+        }
+        
         rect(this.#positionVector.x, this.#positionVector.y, width / 9, controlPanel.altitude / 3);
         this.#drawText();
     }
@@ -27,5 +34,18 @@ class ShootButton {
         textAlign(CENTER, CENTER);
         text("SHOOT", this.#positionVector.x, this.#positionVector.y);
         pop();
+    }
+
+    #isHovered() {
+    let mouseVector = createVector(mouseX, mouseY);
+    const w = width / 9;
+    const h = controlPanel.altitude / 3;
+
+    return (
+        mouseX >= this.#positionVector.x - w / 2 &&
+        mouseX <= this.#positionVector.x + w / 2 &&
+        mouseY >= this.#positionVector.y - h / 2 &&
+        mouseY <= this.#positionVector.y + h / 2
+    );
     }
 }
