@@ -2,11 +2,15 @@ let gravity;
 let bgTop;
 let bgBottom;
 let player1;
+let player2;
+let players = { player1, player2 };
+let turnController = new TurnController();
+let turnCounter;
 let controlPanel;
 let lastButtonClicked;
-//new
 let terrain;
 let currentShot = null;
+let randomWinner;
 
 function setup() {
     gravity = createVector(0, 400);
@@ -15,42 +19,65 @@ function setup() {
     createCanvas(1280, 700);
     controlPanel = new ControlPanel(color(20));
     terrain = new Terrain(createVector(width, height), color(255, 0, 0));
-      console.log("terrain create:", terrain);
-        terrainSeed = floor(random(99999));
-        console.log("seed:", terrainSeed);
-        terrain.generateInitialTerrain(terrainSeed);
-       console.log("columns number:", terrain.columns.length);
+    console.log("terrain create:", terrain);
+    terrainSeed = floor(random(99999));
+    console.log("seed:", terrainSeed);
+    terrain.generateInitialTerrain(terrainSeed);
+    console.log("columns number:", terrain.columns.length);
+    turnCounter = new TurnCounter(createVector(width / 2, height / 20));
     const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
-    /*player1 = new PlayerCannon(createVector(
-        random(wheelRadius, width - wheelRadius),
-        height - controlPanel.altitude - wheelRadius),
-        wheelRadius, barrelSizeVector, color('silver'), color('lightslategray'));*/
-    let cannonX = random(wheelRadius, width - wheelRadius);
-    let groundHeight = terrain.getHeightAt(cannonX);
-    let cannonY = height - groundHeight -wheelRadius;
-    player1 = new PlayerCannon(
-    createVector(cannonX,cannonY),
-    wheelRadius,
-    barrelSizeVector,
-    color('silver'),
-    color('lightslategray')
-    );
-    ellipseMode(RADIUS);
+    let cannon1X = random(wheelRadius, width / 4);
+    let cannon1Position = createVector(cannon1X, height - terrain.getHeightAt(cannon1X) - wheelRadius);
+    let cannon2X = random(width - width / 5, width - wheelRadius);
+    let cannon2Position = createVector(cannon2X, height - terrain.getHeightAt(cannon2X) - wheelRadius);
     angleMode(DEGREES);
+    players[0] = new PlayerCannon(
+        cannon1Position,
+        wheelRadius,
+        barrelSizeVector,
+        -45,
+        color('silver'),
+        color('lightslategray')
+    );
+    players[1] = new PlayerCannon(
+        cannon2Position,
+        wheelRadius,
+        barrelSizeVector,
+        220,
+        color('moccasin'),
+        color('navajowhite')
+    );
+    randomWinner = round(random(0, 1));
+    ellipseMode(RADIUS);
 }
 
 function draw() {
     drawLinearGradient(bgTop, bgBottom);
     terrain.drawTerrain();
     //update the location each time
-    player1.positionVector.y = height - terrain.getHeightAt(player1.positionVector.x) - player1.wheelRadius;
-    if (currentShot?.isActive || currentShot?.isExploding) {
+    let currentPlayerId = turnController.activePlayerId;
+    players[currentPlayerId].positionVector.y = 
+        height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius;
+    if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
         currentShot?.updatePhysics(deltaTime / 1000);
         currentShot?.drawShotSequence();
+
     }
-    player1.barrelAngle = controlPanel.angleDial.needleRotation - 90;
-    player1.drawPlayer();
+    else {
+        if (controlPanel.angleDial.isFollowing)
+        players[currentPlayerId].barrelAngle = controlPanel.angleDial.needleRotation - 90;
+        players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 5;
+    }
+    players[0].drawPlayer();
+    players[1].drawPlayer();
     controlPanel.drawCtrlPanel();
+    turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns);
+    if (turnController.isGameOver()) {
+        background('black');
+        textFont('MS Trebuchet', 36);
+        text(`Winner: Player ${randomWinner}\n\nPress 'R' to restart`, width / 2, height / 2);
+        if (key === "r" || key === "R") window.location.reload();
+    }
 }
 
 function mousePressed() {
@@ -63,11 +90,18 @@ function mouseReleased() {
         lastButtonClicked)
         controlPanel.angleDial.isFollowing = true;
     else controlPanel.angleDial.isFollowing = false;
+
+    if (controlPanel.powerAdjust.isHovered &&
+        !controlPanel.powerAdjust.isFollowing &&
+        lastButtonClicked)
+        controlPanel.powerAdjust.isFollowing = true;
+    else controlPanel.powerAdjust.isFollowing = false;
 }
 
 function keyReleased() {
-    if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
-        currentShot = player1.fireShot(4);
+    let shotRadius = 4;
+    if (key === 'Enter' && turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
+        currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
     }
 }
 

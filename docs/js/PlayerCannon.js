@@ -3,23 +3,25 @@ class PlayerCannon {
     #wheelRadius;
     #barrelSize;
     #barrelAngle = 0;
+    #barrelPower = 0;
     #fillColor;
     #outlineColor;
 
-    constructor(posVec, wheelRad, barrelSz, fillColor, outColor) {
+    constructor(posVec, wheelRad, barrelSz, barrAngle, fillColor, outColor) {
         this.#positionVector = posVec;
         this.#wheelRadius = wheelRad;
         this.#barrelSize = barrelSz;
+        this.#barrelAngle = barrAngle;
         this.#fillColor = fillColor;
         this.#outlineColor = outColor;
     }
 
     fireShot(shotRadius) {
         // this value can be used for the power
-        let speed = 600;
+        //const SPEED = 300;
         // offset of muzzle tip from positionVector
         let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
-        let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(speed);
+        let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(this.#barrelPower);
         offset.rotate(this.#barrelAngle);
         return new Projectile(p5.Vector.add(this.#positionVector, offset), velocity, shotRadius);
     }
@@ -30,10 +32,13 @@ class PlayerCannon {
         this.#drawWheel();
     }
 
+    get barrelAngle() { return this.#barrelAngle; }
+    get barrelPower() { return this.#barrelPower; }
     set barrelAngle(needleAngle) { this.#barrelAngle = needleAngle; }
     //new added for update the position
     get positionVector() { return this.#positionVector; }
     get wheelRadius() { return this.#wheelRadius; }
+    set barrelPower(power) { this.#barrelPower = power; }
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);
