@@ -1,7 +1,9 @@
 let gravity;
 let bgTop;
 let bgBottom;
-let player1;
+let players = [];
+let turnController = new TurnController();
+let turnCounter;
 let controlPanel;
 let lastButtonClicked;
 
@@ -10,6 +12,7 @@ let wind;
 //new
 let terrain;
 let currentShot = null;
+let randomWinner;
 
 function setup() {
     gravity = createVector(0, 400);
@@ -19,13 +22,8 @@ function setup() {
     bgBottom = color(0, 80, 100);
     createCanvas(1280, 700);
     controlPanel = new ControlPanel(color(20));
+    turnCounter = new TurnCounter();
 
-    terrain = new Terrain(width, height, color(255, 0, 0));
-    console.log("terrain create:", terrain);
-    terrainSeed = floor(random(99999));
-    console.log("seed:", terrainSeed);
-    terrain.generateInitialTerrain(terrainSeed);
-    console.log("columns number:", terrain.columns.length);
     terrain = new Terrain(createVector(width, height), color(255, 0, 0));
     console.log("terrain create:", terrain);
     terrainSeed = floor(random(99999));
@@ -36,30 +34,50 @@ function setup() {
     let cannonX = random(wheelRadius, width - wheelRadius);
     let groundHeight = terrain.getHeightAt(cannonX);
     let cannonY = height - groundHeight - wheelRadius;
-    player1 = new PlayerCannon(
+    players[0] = new PlayerCannon(
         createVector(cannonX, cannonY),
         wheelRadius,
         barrelSizeVector,
         color('silver'),
         color('lightslategray')
     );
+    let cannon2X = random(wheelRadius, width - wheelRadius);
+    let cannon2GroundHeight = terrain.getHeightAt(cannon2X);
+    let cannon2Y = height - cannon2GroundHeight - wheelRadius;
+    players[1] = new PlayerCannon(
+        createVector(cannon2X, cannon2Y),
+        wheelRadius,
+        barrelSizeVector,
+        color('moccasin'),
+        color('navajowhite')
+    );
+    randomWinner = round(random(0, 1));
     ellipseMode(RADIUS);
-    angleMode(DEGREES);
 }
 
 function draw() {
     drawLinearGradient(bgTop, bgBottom);
     terrain.drawTerrain();
-    //draw wind
-    wind.draw();
     if (currentShot?.isActive || currentShot?.isExploding) {
         currentShot?.updatePhysics(deltaTime / 1000);
         currentShot?.drawShotSequence();
+
     }
-    player1.barrelAngle = controlPanel.angleDial.needleRotation - 90;
-    player1.barrelPower = controlPanel.powerAdjust.power * 5;
-    player1.drawPlayer();
+    else {
+        if (controlPanel.angleDial.isFollowing)
+            players[turnController.activePlayerId].barrelAngle = controlPanel.angleDial.needleRotation - 90;
+        players[turnController.activePlayerId].barrelPower = controlPanel.powerAdjust.power * 5;
+    }
+    players[0].drawPlayer();
+    players[1].drawPlayer();
     controlPanel.drawCtrlPanel();
+    turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns);
+    if (turnController.isGameOver()) {
+        background('black');
+        textFont('MS Trebuchet', 36);
+        text(`Winner: Player ${randomWinner}\n\nPress 'R' to restart`, width / 2, height / 2);
+        if (key === "r" || key === "R") window.location.reload();
+    }
 }
 
 function mousePressed() {
@@ -81,21 +99,8 @@ function mouseReleased() {
 }
 
 function keyReleased() {
-
-    // press W
-    if (key === 'w' || key === 'W') {
-
-        wind.newTurn();
-        wind.isActive = true;
-
-        // 5 second close
-        setTimeout(() => {
-            wind.isActive = false;
-        }, 5000);
-    }
-
     if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
-        currentShot = player1.fireShot(4);
+        currentShot = players[turnController.activePlayerId].fireShot(4);
     }
 }
 
