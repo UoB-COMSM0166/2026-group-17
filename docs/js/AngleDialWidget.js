@@ -14,7 +14,6 @@ class AngleDialWidget {
         this.#radius = rad;
         this.#plateFillColor = plateInColor;
         this.#plateOutlineColor = plateOutColor;
-        //THIS.??
         AngleDialWidget.#needleColor = color('crimson');
     }
 
