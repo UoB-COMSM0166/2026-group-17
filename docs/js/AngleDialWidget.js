@@ -10,7 +10,7 @@ class AngleDialWidget {
     constructor(posV = createVector(width / 6, height - height / 5), rad = 60,
         plateInColor = color('paleturquoise'),
         plateOutColor = color('teal')) {
-        this.#positionVector = posV;''
+        this.#positionVector = posV;
         this.#radius = rad;
         this.#plateFillColor = plateInColor;
         this.#plateOutlineColor = plateOutColor;
@@ -77,4 +77,5 @@ class AngleDialWidget {
         if (this.#isFollowing)
             this.#needleRotation = 90 + atan2(mouseY - this.#positionVector.y, mouseX - this.#positionVector.x);
     }
+
 }
