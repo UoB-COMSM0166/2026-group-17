@@ -13,22 +13,21 @@ class WindSystem {
         this.windForce = random(-3, 3);
     }
 
-    applyTo(projectile) {
-
+    applyTo(projectile, dt) {
         if (!this.isActive) return;
+        let windEffect = this.windForce * 50;
 
-        projectile.vel.x += this.windForce;
+        projectile.vel.x += windEffect * dt;
 
         let speed = projectile.vel.mag();
-        let dragMagnitude = this.dragCoefficient * speed * speed;
-
-        let drag = projectile.vel.copy();
-        drag.normalize();
-        drag.mult(-dragMagnitude);
-
-        projectile.vel.add(drag);
+        if (speed > 0) {
+            let dragMag = this.dragCoefficient * speed * speed;
+            let dragVec = projectile.vel.copy();
+            dragVec.normalize();
+            dragVec.mult(-dragMag * dt);
+            projectile.vel.add(dragVec);
+        }
     }
-
     draw() {
 
         if (!this.isActive) return;
