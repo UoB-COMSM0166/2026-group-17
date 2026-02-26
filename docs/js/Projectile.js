@@ -18,6 +18,11 @@ class Projectile {
     updatePhysics(dt) {
         if (this.#isExploding) return;
         this.#velocity.add(gravity.copy().mult(dt));
+        // add wind
+        if (typeof wind !== "undefined") {
+            //add dt
+            wind.applyTo(this, dt);
+        }
         this.#position.add(this.#velocity.copy().mult(dt));
         //new:using real terrain height for collision detection
         let groundY = height - terrain.getHeightAt(this.#position.x);
@@ -75,6 +80,8 @@ class Projectile {
     }
 
     get position() { return this.#position; }
+    //because velocity is private
+    get vel() { return this.#velocity; }
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }
