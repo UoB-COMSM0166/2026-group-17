@@ -24,7 +24,7 @@ class PowerAdjustWidget {
   }
 
   get isFollowing() { return this.#isFollowing; }
-  get isHovered() { return this.#isHovered() }
+  get isHovered() { return this.#isHovered; } 
   set isFollowing(track) { this.#isFollowing = track; }
   get power() { return this.#power; }
 
@@ -52,23 +52,36 @@ class PowerAdjustWidget {
 
     //move
     if (this.#isHovered() && this.#isFollowing) {
-      //fill('darkturquoise');
-      stroke(this.#plateOutlineColor);
-      strokeWeight(4);
-    } else {
-      stroke(this.#plateOutlineColor);
-      strokeWeight(2);
-    }
+  stroke(this.#plateOutlineColor);
+  strokeWeight(4);
+} else if (this.#isHovered() || this.#isFollowing) {
+  stroke(this.#plateOutlineColor);
+  strokeWeight(4);
+  drawingContext.shadowBlur = 15;
+  drawingContext.shadowColor = 'rgb(234, 240, 241)';
+} else {
+  stroke(250);
+  strokeWeight(2);
+}
     
     triangle(this.#p1.x, this.#p1.y, this.#p2.x, this.#p2.y, this.#p3.x, this.#p3.y);
 
     beginShape();
+
     fill(this.#plateFillColor);
     noStroke();
     vertex(this.#p3.x, this.#p3.y);
     vertex(this.#p2.x, this.#p2.y);
     vertex(this.#sliderX, this.yOnLineByX(this.#sliderX, this.#p1, this.#p2));
     vertex(this.#sliderX, this.#p3.y);
+
+    fill(10, 220);
+    noStroke();
+    vertex(this.#p3.x - 1, this.#p3.y -1);
+    vertex(this.#p2.x - 1, this.#p2.y + 1);
+    vertex(this.#sliderX, this.yOnLineByX(this.#sliderX, this.#p1, this.#p2) + 1);
+    vertex(this.#sliderX, this.#p3.y - 1);
+
     endShape();
 
     pop();

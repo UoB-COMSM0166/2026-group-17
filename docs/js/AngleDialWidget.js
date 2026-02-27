@@ -10,10 +10,11 @@ class AngleDialWidget {
     constructor(posV = createVector(width / 6, height - height / 5), rad = 60,
         plateInColor = color('paleturquoise'),
         plateOutColor = color('teal')) {
-        this.#positionVector = posV;
+        this.#positionVector = posV;''
         this.#radius = rad;
         this.#plateFillColor = plateInColor;
         this.#plateOutlineColor = plateOutColor;
+        //THIS.??
         AngleDialWidget.#needleColor = color('crimson');
     }
 

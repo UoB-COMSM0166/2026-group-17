@@ -26,13 +26,20 @@ class Projectile {
         this.#position.add(this.#velocity.copy().mult(dt));
         if (this.#position.y >= height - controlPanel.altitude) {
             this.#isActive = false;
-            this.#impactPosition = this.#position;
-            this.#isExploding = true;
-            this.#explosionStartTime = frameCount;
-        }
-        else if (this.#position.x <= 0 || this.#position.x >= width) this.#isActive = false;
+             let groundY = height - controlPanel.altitude;
+
+         this.#impactPosition = createVector(this.#position.x, groundY);
+    this.#isExploding = true;
+    this.#explosionStartTime = frameCount;
+    currentExplosion = new Explosion(
+        this.#impactPosition.x,
+        this.#impactPosition.y,
+        terrain
+    );
+}
+
         //TestExplosion
-        if (terrain.isColliding(this.#position.x, this.#position.y)) {
+        else if (terrain.isColliding(this.#position.x, this.#position.y)) {
 
     this.#isActive = false;
     let groundHeight = terrain.getHeightAt(this.#position.x);
@@ -44,17 +51,20 @@ class Projectile {
     currentExplosion = new Explosion(
         this.#impactPosition.x,
         this.#impactPosition.y,
+        terrain
     );
 }
-    
-    
+        else if (this.#position.x <= 0 || this.#position.x >= width) {
+            this.#isActive = false;
+            turnController.advancePhase();
+        }
     }
 
     drawShotSequence() {
-        console.log("Projectile state:", {
-            isActive: this.#isActive,
-            isExploding: this.#isExploding,
-        });
+        //console.log("Projectile state:", {   // debugging code
+        //    isActive: this.#isActive,
+        //    isExploding: this.#isExploding,
+        //});
         if (this.#isActive) this.#drawShot();
         else if (this.#isExploding) {
             this.#drawExplosion();
@@ -72,6 +82,7 @@ class Projectile {
         let explosionRadius = this.#maxExplosionRadius * progress;
         if (explosionRadius >= this.#maxExplosionRadius) {
             this.#isExploding = false;
+            turnController.advancePhase();
             return;
         }
         stroke('orange');

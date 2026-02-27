@@ -77,9 +77,4 @@ class ScoreBoard{
     this.score1 = 0;
     this.score2 = 0;
   }
-/*
-windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-*/
 }
