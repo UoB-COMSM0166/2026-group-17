@@ -8,53 +8,52 @@ class Projectile {
     #explosionStartTime;
     #maxExplosionRadius = 50;
 
-    //Added
-    #hasAppliedExplosion;
-
     constructor(muzzlePos, vel, rad) {
         this.#position = muzzlePos;
         this.#velocity = vel;
         this.#radius = rad;
         this.#isActive = true;
-        //Added
-        this.#hasAppliedExplosion = false;
     }
 
     updatePhysics(dt) {
         if (this.#isExploding) return;
         this.#velocity.add(gravity.copy().mult(dt));
+        // add wind
+        if (typeof wind !== "undefined") {
+            //add dt
+            wind.applyTo(this, dt);
+        }
         this.#position.add(this.#velocity.copy().mult(dt));
-        if (this.#position.y >= height - controlPanel.altitude) {
+        //new:using real terrain height for collision detection
+        let groundY = height - terrain.getHeightAt(this.#position.x);
+       /* if (this.#position.y >= height - controlPanel.altitude) {
             this.#isActive = false;
             this.#impactPosition = this.#position;
             this.#isExploding = true;
             this.#explosionStartTime = frameCount;
         }
+<<<<<<< HEAD
         else if (this.#position.x <= 0 || this.#position.x >= width) this.#isActive = false;
-        //TestExplosion
-        if (terrain.isColliding(this.#position.x, this.#position.y)) {
-
-    this.#isActive = false;
-    let groundHeight = terrain.getHeightAt(this.#position.x);
-    let groundY = height - groundHeight;
-    this.#impactPosition = createVector(this.#position.x, groundY);
-    this.#isExploding = true;
-    this.#explosionStartTime = frameCount;
-
-    currentExplosion = new Explosion(
-        this.#impactPosition.x,
-        this.#impactPosition.y,
-    );
+    */
+    if (this.#position.y >= groundY) {
+        this.#isActive = false;
+        this.#impactPosition = this.#position.copy();
+        this.#isExploding = true;
+        this.#explosionStartTime = frameCount;
+        //use applyExplosion method to modify the terrain
+        terrain.applyExplosion(this.#impactPosition, this.#maxExplosionRadius);
+   }
+   else if (this.#position.x <= 0 || this.#position.x >= width) {
+        this.#isActive = false;
+        turnController.advancePhase();
+        }
 }
-    
-    
-    }
 
     drawShotSequence() {
-        console.log("Projectile state:", {
-            isActive: this.#isActive,
-            isExploding: this.#isExploding,
-        });
+        //console.log("Projectile state:", {   // debugging code
+        //    isActive: this.#isActive,
+        //    isExploding: this.#isExploding,
+        //});
         if (this.#isActive) this.#drawShot();
         else if (this.#isExploding) {
             this.#drawExplosion();
@@ -72,6 +71,7 @@ class Projectile {
         let explosionRadius = this.#maxExplosionRadius * progress;
         if (explosionRadius >= this.#maxExplosionRadius) {
             this.#isExploding = false;
+            turnController.advancePhase();
             return;
         }
         stroke('orange');
@@ -80,10 +80,9 @@ class Projectile {
     }
 
     get position() { return this.#position; }
+    //because velocity is private
+    get vel() { return this.#velocity; }
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }
-    //Added
-    get hasAppliedExplosion(){ return this.#hasAppliedExplosion;}
-    set hasAppliedExplosion(val){ this.#hasAppliedExplosion = val;}
 }

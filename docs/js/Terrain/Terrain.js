@@ -1,8 +1,9 @@
 // terrain/Terrain.js
 class Terrain {
-  constructor(w, h, baseColor) {
-    this.width = w;
-    this.height = h;
+  //colsizevector
+  //replace w,h
+  constructor(sizeVec, baseColor) {
+    this.sizeVector = createVector(sizeVec.x, sizeVec.y);
     this.baseColor = baseColor;
     this.columns = [];
   }
@@ -12,14 +13,16 @@ generateInitialTerrain(seed) {
     randomSeed(seed);
     noiseSeed(seed);
 //use global var height, make a different name
-    let panelHeight = 700 * 0.25; //because the control panel is 175px
+    let panelHeight = this.sizeVector.y * 0.25;
 
-    for (let x = 0; x < this.width; x++) {
+    for (let x = 0; x < this.sizeVector.x; x++) {
         let terrainHeight = map(noise(x * 0.005), 0, 1,
             panelHeight + 20,   // min
             panelHeight + 200   // max
         );
-        this.columns.push(new TerrainColumn(x, terrainHeight));
+        //this.columns.push(new TerrainColumn(x, terrainHeight));
+        this.columns.push(new TerrainColumn(x, terrainHeight, this.sizeVector.y)
+);
     }
 }
   getHeightAt(x) {
@@ -35,6 +38,7 @@ generateInitialTerrain(seed) {
 
   applyExplosion(center, radius) {
   //loop each cols which is under the area of explosion
+   console.log("applyExplosion called at", center, "radius:", radius);
     for (let x = center.x - radius; x < center.x + radius; x++) {
     // the distance from this col to the center of explosion
       let dx = x - center.x;
@@ -43,7 +47,9 @@ generateInitialTerrain(seed) {
       let col = this.columns[floor(x)];
       if (col) {
       //change the height
-        col.setHeight(col.height - craterDepth);
+       console.log("before:", col.height, "craterDepth:", craterDepth);
+       col.setHeight(col.height - craterDepth);
+       console.log("after:", col.height); 
       }
     }
   }
@@ -52,11 +58,11 @@ generateInitialTerrain(seed) {
     fill(this.baseColor);
     noStroke();
     beginShape();
-    vertex(0, height);
+    vertex(0, this.sizeVector.y);
     for (let col of this.columns) {
-      vertex(col.xIndex, col.getTopY());
+        vertex(col.xIndex, col.getTopY());
     }
-    vertex(this.width, height);
+    vertex(this.sizeVector.x, this.sizeVector.y);
     endShape(CLOSE);
-  }
+}
 }

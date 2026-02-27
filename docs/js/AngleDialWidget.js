@@ -76,4 +76,5 @@ class AngleDialWidget {
         if (this.#isFollowing)
             this.#needleRotation = 90 + atan2(mouseY - this.#positionVector.y, mouseX - this.#positionVector.x);
     }
+
 }
