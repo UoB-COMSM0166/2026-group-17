@@ -19,32 +19,34 @@ class ScoreBoard{
   }
 
   drawScoreBoard() {
-
+  const margin = 20;
+  textAlign(LEFT, TOP);
   textSize(18);
   noStroke();
 
   // Player1
   fill(255, 80, 80);
-  text("PLAYER 1", 20, 15);
+  text("PLAYER 1", margin, 15);
 
   fill(255);
   textSize(26);
-  text(this.score1, 20, 40);
+  text(this.score1, margin, 40);
 
   // Player2
   //let label = "PLAYER 2";
   //let labelWidth = textWidth(label);
-
-  
-  fill(80, 180, 255);
+  textAlign(RIGHT, TOP);
+  const label = "PLAYER 2";
   textSize(18);
-  text("PLAYER2", width - 120, 15);
+  fill(80, 180, 255);
+  //const labelWidth = textWidth(label);
+  text(label, width - margin, 15);
 
   textSize(26);
   fill(255);
-  //let scoreText = this.score2.toString();
-  //let scoreWidth = textWidth(scoreText);
-  text(this.score2, width - 120, 40);
+  //const scoreText = this.score2.toString();
+  //const scoreWidth = textWidth(scoreText);
+  text(this.score2, width - margin, 40);
   }
 
 // A Player1 
