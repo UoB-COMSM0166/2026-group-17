@@ -5,8 +5,8 @@ class MovePadWidget {
   #isFollowing = false;
   #step = 5;
   #gap = 10;
-  #btnWidth = 40;
-  #btnHeight = 30;
+  #btnWidth = 60;
+  #btnHeight = 60;
 
   constructor(posV = createVector(width * 0.65, height * 0.85),
     plateInColor = color('paleturquoise'),
@@ -14,18 +14,17 @@ class MovePadWidget {
     this.#positionVector = posV;
     this.#plateFillColor = plateInColor;
     this.#plateOutlineColor = plateOutColor;
-
-    
   }
 
   get isFollowing() { return this.#isFollowing; }
-  //get isHovered() { return this.#isHovered() }
+  isHovered() { return this.#isHovered() }
   set isFollowing(track) { this.#isFollowing = track; }
 
 
   drawMovePad() {
     this.#drawBoard();
-    this.#drawButtons();
+    this.#drawButtons(-1);
+    this.#drawButtons(1);
     //this.#drawStepsText();
   }
 
@@ -42,26 +41,21 @@ class MovePadWidget {
     pop();
   }
 
-  #drawButtons() {
-    const leftRect = this.#getRect(-1);
-    const rightRect =  this.#getRect(1);
+  #drawButtons(dir) {
+    const buttonRect = this.#getRect(dir);
 
     push();
     rectMode(CENTER);
     stroke(this.#plateOutlineColor);
-    strokeWeight(2);
+    if(this.#isHovered(buttonRect)) {
+        strokeWeight(4);    
+    } else {
+        strokeWeight(2);
+    }
+    
     fill(this.#plateFillColor);
-    rect(leftRect.cx, leftRect.cy, leftRect.w, leftRect.h);
-    this.#drawArrow(leftRect.cx, leftRect.cy, -1);
-    pop();
-
-    push();
-    rectMode(CENTER);
-    stroke(this.#plateOutlineColor);
-    strokeWeight(2);
-    fill(this.#plateFillColor);
-    rect(rightRect.cx, rightRect.cy, rightRect.w, rightRect.h);
-    this.#drawArrow(rightRect.cx, rightRect.cy, 1);
+    rect(buttonRect.cx, buttonRect.cy, buttonRect.w, buttonRect.h);
+    this.#drawArrow(buttonRect.cx, buttonRect.cy, dir);
     pop();
   }
 
@@ -97,12 +91,30 @@ class MovePadWidget {
     }
   }
 
-  /*#isHovered() {
-    
-  }*/
+  #isHovered(r) {
+    const mx = mouseX, my = mouseY;
+    return (
+        mx >= r.cx - r.w / 2 &&
+        mx <= r.cx + r.w / 2 &&
+        my >= r.cy - r.h / 2 &&
+        my <= r.cy + r.h / 2
+    );
+  }
 
-    
+  mousePressed() {
+    lastButtonClicked = mouseButton.left;
 
+    if (this.#isHovered(this.#getRect(-1))) {
+        this.#isFollowing = true;
+        return 'left';
+    }
+
+    if (this.#isHovered(this.#getRect(1))) {
+        this.#isFollowing = true;
+        return 'right';
+    }
+    return null;
+}
   
   /*#drawPowerText() {
 

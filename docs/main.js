@@ -7,6 +7,7 @@ let players = { player1, player2 };
 let turnController = new TurnController();
 let turnCounter;
 let controlPanel;
+let movePad;
 let lastButtonClicked;
 let terrain;
 let currentShot = null;
@@ -31,6 +32,7 @@ function setup() {
     let cannon2X = random(width - width / 5, width - wheelRadius);
     let cannon2Position = createVector(cannon2X, height - terrain.getHeightAt(cannon2X) - wheelRadius);
     angleMode(DEGREES);
+    movePad = new MovePadWidget();
     players[0] = new PlayerCannon(
         cannon1Position,
         wheelRadius,
@@ -54,8 +56,13 @@ function setup() {
 function draw() {
     drawLinearGradient(bgTop, bgBottom);
     terrain.drawTerrain();
+    movePad.drawMovePad();
     //update the location each time
     let currentPlayerId = turnController.activePlayerId;
+
+
+    players[currentPlayerId].updateMove(0.18);
+
     players[currentPlayerId].positionVector.y = 
         height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius;
     if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
@@ -84,11 +91,25 @@ function mousePressed() {
     lastButtonClicked = mouseButton.left;
 
     const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
+    const currentPlayerId = turnController.activePlayerId;
+
     let shotRadius = 4;
     if (lastButtonClicked && controlPanel.shootButton.isHovered  && shotFree) {
         currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
     }
 
+    const res = movePad.mousePressed();
+    if (res === 'left') {
+        players[currentPlayerId].targetX -= 100;
+    }
+    else if (res === 'right') {
+        players[currentPlayerId].targetX += 100;
+    }
+    players[currentPlayerId].targetX = constrain(
+    players[currentPlayerId].targetX,
+    players[currentPlayerId].wheelRadius,
+    width - players[currentPlayerId].wheelRadius
+    );
 }
 
 

@@ -6,6 +6,7 @@ class PlayerCannon {
     #barrelPower = 0;
     #fillColor;
     #outlineColor;
+    #targetX;
 
     constructor(posVec, wheelRad, barrelSz, barrAngle, fillColor, outColor) {
         this.#positionVector = posVec;
@@ -14,6 +15,11 @@ class PlayerCannon {
         this.#barrelAngle = barrAngle;
         this.#fillColor = fillColor;
         this.#outlineColor = outColor;
+        this.#targetX = posVec.x; // for smooth movement
+    }
+
+    updateMove(follow = 0.30) {
+      this.#positionVector.x = lerp(this.#positionVector.x, this.#targetX, follow);
     }
 
     fireShot(shotRadius) {
@@ -39,6 +45,8 @@ class PlayerCannon {
     get positionVector() { return this.#positionVector; }
     get wheelRadius() { return this.#wheelRadius; }
     set barrelPower(power) { this.#barrelPower = power; }
+    get targetX() { return this.#targetX; }
+    set targetX(x) { this.#targetX = x; } 
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);
