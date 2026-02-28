@@ -4,13 +4,18 @@ class ControlPanel {
     #angleDial;
     #shootButton;
     #powerAdjust;
+
     #movePad;
+
     constructor(bgColor) {
         this.#backgroundColor = bgColor;
         this.#angleDial = new AngleDialWidget(createVector(width / 6, height - this.#altitude / 2));
         this.#shootButton = new ShootButton();
         this.#powerAdjust = new PowerAdjustWidget();
+
+
         this.#movePad = new MovePadWidget();
+
     }
 
     drawCtrlPanel() {
@@ -56,6 +61,7 @@ class ControlPanel {
         this.#angleDial.drawAngleDial();
         this.#shootButton.drawButton();
         this.#powerAdjust.drawPowerAdjust();
+
         this.#movePad.drawMovePad();
     }
 

@@ -2,31 +2,29 @@ class MovePadWidget {
   #positionVector;
   #plateOutlineColor;
   #plateFillColor;
+
   #isFollowing = false;
-  #step = 5;
+  #step = 5;    
   #gap = 10;
   #btnWidth = 40;
   #btnHeight = 30;
 
-  constructor(posV = createVector(width * 0.65, height * 0.85),
+  constructor(
+    posV = createVector(width * 0.65, height * 0.85),
     plateInColor = color('paleturquoise'),
-    plateOutColor = color('teal')) {
+    plateOutColor = color('teal')
+  ) {
     this.#positionVector = posV;
     this.#plateFillColor = plateInColor;
     this.#plateOutlineColor = plateOutColor;
-
-    
   }
 
   get isFollowing() { return this.#isFollowing; }
-  //get isHovered() { return this.#isHovered() }
   set isFollowing(track) { this.#isFollowing = track; }
-
 
   drawMovePad() {
     this.#drawBoard();
     this.#drawButtons();
-    //this.#drawStepsText();
   }
 
   #drawBoard() {
@@ -44,7 +42,7 @@ class MovePadWidget {
 
   #drawButtons() {
     const leftRect = this.#getRect(-1);
-    const rightRect =  this.#getRect(1);
+    const rightRect = this.#getRect(1);
 
     push();
     rectMode(CENTER);
@@ -88,23 +86,11 @@ class MovePadWidget {
   }
 
   #getRect(dir) {
-    //dir: -1 left, +1 right
     return {
-        cx: this.#positionVector.x + dir * (this.#gap / 2 + this.#btnWidth / 2 ),
-        cy: this.#positionVector.y,
-        w: this.#btnWidth,
-        h: this.#btnHeight
-    }
+      cx: this.#positionVector.x + dir * (this.#gap / 2 + this.#btnWidth / 2),
+      cy: this.#positionVector.y,
+      w: this.#btnWidth,
+      h: this.#btnHeight
+    };
   }
-
-  /*#isHovered() {
-    
-  }*/
-
-    
-
-  
-  /*#drawPowerText() {
-
-  }*/
 }
