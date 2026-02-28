@@ -25,8 +25,11 @@ class Projectile {
         }
         this.#position.add(this.#velocity.copy().mult(dt));
         //new:using real terrain height for collision detection
-        let groundY = height - terrain.getHeightAt(this.#position.x);
-        /* if (this.#position.y >= height - controlPanel.altitude) {
+        let groundY = min(
+            height - terrain.getHeightAt(this.#position.x),
+            controlPanel.getAltitudeAt(this.#position.x)
+        );
+        /* if (this.#position.y >= height - controlPanel.baseAltitude) {
              this.#isActive = false;
              this.#impactPosition = this.#position;
              this.#isExploding = true;

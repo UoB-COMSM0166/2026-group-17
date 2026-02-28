@@ -18,7 +18,7 @@ class Terrain {
     for (let x = 0; x < this.sizeVector.x; x++) {
       let terrainHeight = map(noise(x * 0.005), 0, 1,
         panelHeight + 20,   // min
-        panelHeight + 200   // max
+        panelHeight + 300   // max
       );
       //this.columns.push(new TerrainColumn(x, terrainHeight));
       this.columns.push(new TerrainColumn(x, terrainHeight, this.sizeVector.y)
