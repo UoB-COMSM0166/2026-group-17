@@ -1,0 +1,82 @@
+class ScoreBoard{
+  constructor(){
+    this.score1 = 0;
+    this.score2 = 0;
+    let fontLoaded = null;
+  }
+
+  setup() {
+  //createCanvas(windowWidth, windowHeight);
+
+  textAlign(LEFT, TOP);
+  textFont('Comic Sans MS, Chalkboard SE, Marker Felt, cursive');
+  }
+
+  draw() {
+  //background(20);
+
+  this.drawScoreBoard();
+  }
+
+  drawScoreBoard() {
+
+  textSize(18);
+  noStroke();
+
+  // Player1
+  fill(255, 80, 80);
+  text("PLAYER 1", 20, 15);
+
+  fill(255);
+  textSize(26);
+  text(this.score1, 20, 40);
+
+  // Player2
+  //let label = "PLAYER 2";
+  //let labelWidth = textWidth(label);
+
+  
+  fill(80, 180, 255);
+  textSize(18);
+  text("PLAYER2", width - 120, 15);
+
+  textSize(26);
+  fill(255);
+  //let scoreText = this.score2.toString();
+  //let scoreWidth = textWidth(scoreText);
+  text(this.score2, width - 120, 40);
+  }
+
+// A Player1 
+// L Player2 
+// R reset
+  keyPressed() {
+
+    if (key === 'a' || key === 'A') {
+      this.score1 += 1;
+    }
+
+    if (key === 'l' || key === 'L') {
+      this.score2 += 1;
+    }
+
+    if (key === 'r' || key === 'R') {
+      this.score1 = 0;
+      this.score2 = 0;
+    }
+  }
+
+  addPointToPlayer1(points){
+    this.score1 = Math.max(this.score1 + points, 0);
+  }
+
+  addPointToPlayer2(points){
+    this.score2 = Math.max(this.score2 + points, 0);
+  }
+
+
+  reset(){
+    this.score1 = 0;
+    this.score2 = 0;
+  }
+}
