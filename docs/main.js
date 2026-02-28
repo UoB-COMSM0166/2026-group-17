@@ -62,10 +62,6 @@ function draw() {
 
     let currentPlayerId = turnController.activePlayerId;
 
-    players[currentPlayerId].positionVector.y =
-        height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) -
-        players[currentPlayerId].wheelRadius;
-
     wind.draw();
     if (currentShot?.isActive || currentShot?.isExploding) {
         currentShot.updatePhysics(deltaTime / 1000);
@@ -78,6 +74,11 @@ function draw() {
         players[currentPlayerId].barrelPower =
             controlPanel.powerAdjust.power * 5;
     }
+
+    players[currentPlayerId].positionVector.y = min(
+        height - controlPanel.altitude - players[currentPlayerId].wheelRadius,
+        height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) -
+        players[currentPlayerId].wheelRadius);
 
     players[0].drawPlayer();
     players[1].drawPlayer();
@@ -106,7 +107,7 @@ function mousePressed() {
 
     const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
     let shotRadius = 4;
-    if (lastButtonClicked && controlPanel.shootButton.isHovered  && shotFree) {
+    if (lastButtonClicked && controlPanel.shootButton.isHovered && shotFree) {
         currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
     }
 
@@ -140,10 +141,6 @@ function keyReleased() {
         setTimeout(() => {
             wind.isActive = false;
         }, 5000);
-    }
-
-    if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
-        currentShot = player1.fireShot(4);
     }
 }
 
