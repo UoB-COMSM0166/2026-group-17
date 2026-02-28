@@ -8,6 +8,10 @@ let turnController = new TurnController();
 let turnCounter;
 let controlPanel;
 let lastButtonClicked;
+
+//add wind
+let wind;
+//new
 let terrain;
 let lastShooterId = 0;
 let scoreBoard;
@@ -18,22 +22,18 @@ let hasScoredThisExplosion = false;
 
 function setup() {
   createCanvas(1280, 700);
-
   gravity = createVector(0, 200);
+  wind = new WindSystem();
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
-
   scoreBoard = new ScoreBoard();
   scoreBoard.setup();
-
   controlPanel = new ControlPanel(color(20));
-
   terrain = new Terrain(width, height, color(255, 0, 0));
   const terrainSeed = floor(random(99999));
   terrain.generateInitialTerrain(terrainSeed);
-
   scoreCalculator = new ScoreCalculator(terrain);
-
+  turnCounter = new TurnCounter(createVector(width / 2, height / 20));
   const wheelRadius = 12;
   const barrelSizeVector = createVector(wheelRadius * 6, 8);
 
@@ -58,20 +58,18 @@ function setup() {
   players[1] = player2;
 
   angleMode(DEGREES);
+  randomWinner = round(random(0, 1));
   ellipseMode(RADIUS);
 }
-
 function draw() {
   drawLinearGradient(bgTop, bgBottom);
   terrain.drawTerrain();
-  players[0].position.y = height - terrain.getHeightAt(players[0].position.x) - players[0].wheelRadius;
-  players[1].position.y = height - terrain.getHeightAt(players[1].position.x) - players[1].wheelRadius;
-
-  // control the active cannon with control panel
-const pid = turnController.activePlayerId;
-
-players[pid].barrelAngle = controlPanel.angleDial.needleRotation - 90;
-players[pid].barrelPower = controlPanel.powerAdjust.power * 8;
+  const pid = turnController.activePlayerId;
+  players[0].positionVector.y = height - terrain.getHeightAt(players[0].positionVector.x) - players[0].wheelRadius;
+  players[1].positionVector.y = height - terrain.getHeightAt(players[1].positionVector.x) - players[1].wheelRadius;
+  if (wind) wind.draw();
+  players[pid].barrelAngle = controlPanel.angleDial.needleRotation - 90;
+  players[pid].barrelPower = controlPanel.powerAdjust.power * 8;
 
   // draw both cannons
   players[0].drawPlayer();
@@ -88,32 +86,30 @@ players[pid].barrelPower = controlPanel.powerAdjust.power * 8;
     currentExplosion.update();
     currentExplosion.draw();
     if (currentExplosion.finished && !hasScoredThisExplosion) {
-  const shooterId = lastShooterId;
-
-  const { enemy, self } = scoreCalculator.calculateExplosionScore(
-    currentExplosion,
-    players,
-    shooterId
-  );
-
-  if (enemy > 0) {
-    if (shooterId === 0) scoreBoard.score1 += enemy;
+      const shooterId = lastShooterId;
+      const { enemy, self } = scoreCalculator.calculateExplosionScore(
+      currentExplosion,
+      players,
+      shooterId
+    );
+    if (enemy > 0) {
+      if (shooterId === 0) {
+      scoreBoard.score1 += enemy;
+    }
     else scoreBoard.score2 += enemy;
   }
-
-  if (self > 0) {
-    if (shooterId === 0) scoreBoard.score1 -= self;
+    if (self > 0) {
+      if (shooterId === 0) {
+        scoreBoard.score1 -= self;
+     }
     else scoreBoard.score2 -= self;
-  }
-
-  hasScoredThisExplosion = true;
-}
-
-    if (currentExplosion.finished) {
+    }
+    hasScoredThisExplosion = true;
+  }    
+  if (currentExplosion.finished) {
       currentExplosion = null;
     }
   }
-
   // allow scoring again on next explosion
   if (!currentExplosion) hasScoredThisExplosion = false;
 
@@ -122,20 +118,17 @@ players[pid].barrelPower = controlPanel.powerAdjust.power * 8;
   scoreBoard.draw();
 }
 
+
 function mousePressed() {
-    lastButtonClicked = mouseButton.left;
-
-   const shotFree = (!currentShot || (!currentShot.isActive && !currentShot.isExploding));
-let shotRadius = 4;
-
- if (lastButtonClicked && controlPanel.shootButton.isHovered && shotFree) {
-
-        const pid = turnController.activePlayerId;
-
-        lastShooterId = pid;  
-        currentShot = players[pid].fireShot(shotRadius); 
-    }
+  lastButtonClicked = mouseButton.left;
+  const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
+  let shotRadius = 4;
+  if (lastButtonClicked && controlPanel.shootButton.isHovered  && shotFree) {
+    const pid = turnController.activePlayerId;
+    lastShooterId = pid;  
+    currentShot = players[pid].fireShot(shotRadius); 
   }
+}
 
 function mouseReleased() {
   if (controlPanel.angleDial.isHovered && !controlPanel.angleDial.isFollowing && lastButtonClicked)
@@ -147,6 +140,20 @@ function mouseReleased() {
   else controlPanel.powerAdjust.isFollowing = false;
 }
 
+function keyReleased() {
+
+    // press W
+    if (key === 'w' || key === 'W') {
+
+        wind.newTurn();
+        wind.isActive = true;
+
+        // 5 second close
+        setTimeout(() => {
+            wind.isActive = false;
+        }, 5000);
+      }
+}
 
 function drawLinearGradient(colorA, colorB) {
   strokeWeight(1);

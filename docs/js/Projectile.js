@@ -21,45 +21,32 @@ class Projectile {
     }
 
     updatePhysics(dt) {
-        if (this.#isExploding) return;
-        this.#velocity.add(gravity.copy().mult(dt));
-        this.#position.add(this.#velocity.copy().mult(dt));
-        if (this.#position.y >= height - controlPanel.altitude) {
-            this.#isActive = false;
-             let groundY = height - controlPanel.altitude;
+  if (this.#isExploding) return;
 
-         this.#impactPosition = createVector(this.#position.x, groundY);
-    this.#isExploding = true;
-    this.#explosionStartTime = frameCount;
-    currentExplosion = new Explosion(
-        this.#impactPosition.x,
-        this.#impactPosition.y,
-        terrain
-    );
-}
+  this.#velocity.add(gravity.copy().mult(dt));
 
-        //TestExplosion
-        else if (terrain.isColliding(this.#position.x, this.#position.y)) {
-
+  this.#position.add(this.#velocity.copy().mult(dt));
+  if (this.#position.x <= 0 || this.#position.x >= width) {
     this.#isActive = false;
-    let groundHeight = terrain.getHeightAt(this.#position.x);
-    let groundY = height - groundHeight;
+    turnController.advancePhase();
+    return;
+  }
+  const groundY = height - terrain.getHeightAt(this.#position.x);
+
+  if (this.#position.y >= groundY) {
+    this.#isActive = false;
     this.#impactPosition = createVector(this.#position.x, groundY);
     this.#isExploding = true;
     this.#explosionStartTime = frameCount;
-
     currentExplosion = new Explosion(
-        this.#impactPosition.x,
-        this.#impactPosition.y,
-        terrain
+      this.#impactPosition.x,
+      this.#impactPosition.y,
+      terrain
     );
+    return;
+  }
 }
-        else if (this.#position.x <= 0 || this.#position.x >= width) {
-            this.#isActive = false;
-            turnController.advancePhase();
-        }
-    }
-
+    
     drawShotSequence() {
         //console.log("Projectile state:", {   // debugging code
         //    isActive: this.#isActive,
@@ -91,6 +78,8 @@ class Projectile {
     }
 
     get position() { return this.#position; }
+    //because velocity is private
+    get vel() { return this.#velocity; }
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }

@@ -11,7 +11,7 @@ class Explosion {
 
   update() {
     if (this.finished) return;
-    this.radius += 4;
+    this.radius += 10;
     if (!this.hasAppliedTerrain && this.radius >= this.maxRadius) {
       if (this.terrain) {
         this.terrain.applyExplosion(createVector(this.x, this.y), this.maxRadius);

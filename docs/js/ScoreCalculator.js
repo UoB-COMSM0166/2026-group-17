@@ -1,25 +1,33 @@
-// ScoreCalculator.js
 class ScoreCalculator {
- constructor(terrain) {
+  constructor(terrain) {
     this.terrain = terrain;
   }
-  calculateHitPoints(explosion, cannon) {
-  const cannonPos = cannon.position;
-  const dx = cannonPos.x - explosion.x;
-  const dy = cannonPos.y - explosion.y; 
-  const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance > explosion.maxRadius) return 0;
-    const pts = map(
-      constrain(distance, 0, explosion.maxRadius),
-      0, explosion.maxRadius,
-      100, 0
-    );
-    return Math.floor(pts);
-  }
+
   calculateExplosionScore(explosion, players, shooterId) {
     const enemyId = 1 - shooterId;
-    const enemyPts = this.calculateHitPoints(explosion, players[enemyId]);
-    const selfPts  = this.calculateHitPoints(explosion, players[shooterId]);
+
+    const enemyPts = this.#calculateHit(explosion, players[enemyId]);
+    const selfPts  = this.#calculateHit(explosion, players[shooterId]);
+
     return { enemy: enemyPts, self: selfPts };
   }
+
+  
+#calculateHit(explosion, cannon) {
+  const dx = cannon.position.x - explosion.x;
+  const dy = cannon.position.y - explosion.y;
+
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance > explosion.maxRadius) return 0;
+
+  const base = map(distance, 0, explosion.maxRadius, 100, 0);
+
+  let bonus = 0;
+
+  if (distance < explosion.maxRadius * 0.2) bonus = 30;
+  else if (distance < explosion.maxRadius * 0.5) bonus = 10;
+
+  return Math.floor(base + bonus);
+}
 }

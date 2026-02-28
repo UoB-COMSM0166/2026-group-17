@@ -65,13 +65,14 @@ class ScoreBoard{
     }
   }
 
-  addPointToPlayer1(){
-    this.score1++;
-  }
+  addPointToPlayer1(points){
+  this.score1 = Math.max(this.score1 + points, 0);
+}
 
-  addPointToPlayer2(){
-    this.score2++;
-  }
+addPointToPlayer2(points){
+  this.score2 = Math.max(this.score2 + points, 0);
+}
+
 
   reset(){
     this.score1 = 0;

@@ -32,15 +32,13 @@ class PlayerCannon {
         this.#drawWheel();
     }
 
-
     get barrelAngle() { return this.#barrelAngle; }
-get barrelPower() { return this.#barrelPower; }
-set barrelAngle(a) { this.#barrelAngle = a; }
-set barrelPower(p) { this.#barrelPower = p; }
-
-get position() { return this.#positionVector; }
-get wheelRadius() { return this.#wheelRadius; }
-
+    get barrelPower() { return this.#barrelPower; }
+    set barrelAngle(a) { this.#barrelAngle = a; }
+    set barrelPower(p) { this.#barrelPower = p; }
+    get positionVector() { return this.#positionVector; }
+    get position() { return this.#positionVector; }
+    get wheelRadius() { return this.#wheelRadius; }
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);
