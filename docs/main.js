@@ -9,12 +9,18 @@ let turnCounter;
 let controlPanel;
 let movePad;
 let lastButtonClicked;
+
+//add wind
+let wind;
+//new
 let terrain;
 let currentShot = null;
 let randomWinner;
 
 function setup() {
     gravity = createVector(0, 400);
+    //set wind
+    wind = new WindSystem();
     bgTop = color(0);
     bgBottom = color(0, 80, 100);
     createCanvas(1280, 700);
@@ -52,7 +58,6 @@ function setup() {
     randomWinner = round(random(0, 1));
     ellipseMode(RADIUS);
 }
-
 function draw() {
     drawLinearGradient(bgTop, bgBottom);
     terrain.drawTerrain();
@@ -68,24 +73,47 @@ function draw() {
     if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
         currentShot?.updatePhysics(deltaTime / 1000);
         currentShot?.drawShotSequence();
+    }
 
-    }
-    else {
+
+    players[currentPlayerId].positionVector.y =
+        height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) -
+        players[currentPlayerId].wheelRadius;
+
+    wind.draw();
+    if (currentShot?.isActive || currentShot?.isExploding) {
+        currentShot.updatePhysics(deltaTime / 1000);
+        currentShot.drawShotSequence();
+    } else {
         if (controlPanel.angleDial.isFollowing)
-        players[currentPlayerId].barrelAngle = controlPanel.angleDial.needleRotation - 90;
-        players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 5;
+            players[currentPlayerId].barrelAngle =
+                controlPanel.angleDial.needleRotation - 90;
+
+        players[currentPlayerId].barrelPower =
+            controlPanel.powerAdjust.power * 5;
     }
+
     players[0].drawPlayer();
     players[1].drawPlayer();
+
     controlPanel.drawCtrlPanel();
-    turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns);
+    turnCounter.drawCounter(
+        turnController.turnNumber,
+        turnController.maxTurns
+    );
+
     if (turnController.isGameOver()) {
         background('black');
         textFont('MS Trebuchet', 36);
-        text(`Winner: Player ${randomWinner}\n\nPress 'R' to restart`, width / 2, height / 2);
-        if (key === "r" || key === "R") window.location.reload();
+        text(
+            `Winner: Player ${randomWinner}\n\nPress 'R' to restart`,
+            width / 2,
+            height / 2
+        );
     }
 }
+
+
 
 function mousePressed() {
     lastButtonClicked = mouseButton.left;
@@ -130,6 +158,21 @@ function mouseReleased() {
 
 function keyReleased() {
 
+    // press W
+    if (key === 'w' || key === 'W') {
+
+        wind.newTurn();
+        wind.isActive = true;
+
+        // 5 second close
+        setTimeout(() => {
+            wind.isActive = false;
+        }, 5000);
+    }
+
+    if (key === 'Enter' && !currentShot?.isActive && !currentShot?.isExploding) {
+        currentShot = player1.fireShot(4);
+    }
 }
 
 function drawLinearGradient(colorA, colorB) {
