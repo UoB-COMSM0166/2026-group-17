@@ -46,7 +46,7 @@ class WindSystem {
         if (frameCount % 3 === 0) {
             this.particles.push({
                 x: random(width),
-                y: random(0, height - controlPanel.altitude)
+                y: random(0, height - controlPanel.baseAltitude)
             });
         }
 
