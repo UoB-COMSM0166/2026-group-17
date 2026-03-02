@@ -8,11 +8,16 @@ class Projectile {
     #explosionStartTime;
     #maxExplosionRadius = 50;
 
+    //Added
+    #hasAppliedExplosion;
+
     constructor(muzzlePos, vel, rad) {
         this.#position = muzzlePos;
         this.#velocity = vel;
         this.#radius = rad;
         this.#isActive = true;
+        //Added
+        this.#hasAppliedExplosion = false;
     }
 
     updatePhysics(dt) {
@@ -25,24 +30,21 @@ class Projectile {
         }
         this.#position.add(this.#velocity.copy().mult(dt));
         //new:using real terrain height for collision detection
-        let groundY = min(
+        const groundY = min(
             height - terrain.getHeightAt(this.#position.x),
             controlPanel.getAltitudeAt(this.#position.x)
         );
-        /* if (this.#position.y >= height - controlPanel.baseAltitude) {
-             this.#isActive = false;
-             this.#impactPosition = this.#position;
-             this.#isExploding = true;
-             this.#explosionStartTime = frameCount;
-         }
-         else if (this.#position.x <= 0 || this.#position.x >= width) this.#isActive = false;
-     */
+
         if (this.#position.y >= groundY) {
             this.#isActive = false;
             this.#impactPosition = this.#position.copy();
             this.#isExploding = true;
             this.#explosionStartTime = frameCount;
-            //use applyExplosion method to modify the terrain
+            currentExplosion = new Explosion(
+                this.#impactPosition.x,
+                this.#impactPosition.y,
+                terrain
+            );
         }
         else if (this.#position.x <= 0 || this.#position.x >= width) {
             this.#isActive = false;
@@ -87,4 +89,7 @@ class Projectile {
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }
+    //Added
+    get hasAppliedExplosion() { return this.#hasAppliedExplosion; }
+    set hasAppliedExplosion(val) { this.#hasAppliedExplosion = val; }
 }

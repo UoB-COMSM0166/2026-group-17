@@ -4,6 +4,7 @@ class ControlPanel {
     #angleDial;
     #shootButton;
     #powerAdjust;
+
     #movePad;
     static #profile;
     constructor(bgColor) {
@@ -11,6 +12,8 @@ class ControlPanel {
         this.#angleDial = new AngleDialWidget(createVector(width / 6, height - this.#baseAltitude / 2));
         this.#shootButton = new ShootButton();
         this.#powerAdjust = new PowerAdjustWidget();
+
+
         this.#movePad = new MovePadWidget();
         // array of vectors for the position of each point forming the top of the control panel shape
         ControlPanel.#profile = [
@@ -64,6 +67,7 @@ class ControlPanel {
         this.#angleDial.drawAngleDial();
         this.#shootButton.drawButton();
         this.#powerAdjust.drawPowerAdjust();
+
         this.#movePad.drawMovePad();
     }
     getAltitudeAt(panelTopX) {

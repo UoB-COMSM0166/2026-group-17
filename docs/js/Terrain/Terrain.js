@@ -1,7 +1,6 @@
 // terrain/Terrain.js
 class Terrain {
   //colsizevector
-  //replace w,h
   constructor(sizeVec, baseColor) {
     this.sizeVector = createVector(sizeVec.x, sizeVec.y);
     this.baseColor = baseColor;

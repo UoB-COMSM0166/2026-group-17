@@ -3,7 +3,7 @@ class PlayerCannon {
     #wheelRadius;
     #barrelSize;
     #barrelAngle = 0;
-    #barrelPower = 0;
+    #barrelPower = 50;
     #fillColor;
     #outlineColor;
     #targetX;
@@ -38,11 +38,10 @@ class PlayerCannon {
 
     get barrelAngle() { return this.#barrelAngle; }
     get barrelPower() { return this.#barrelPower; }
-    set barrelAngle(needleAngle) { this.#barrelAngle = needleAngle; }
-    //new added for update the position
+    set barrelAngle(a) { this.#barrelAngle = a; }
+    set barrelPower(p) { this.#barrelPower = p; }
     get positionVector() { return this.#positionVector; }
     get wheelRadius() { return this.#wheelRadius; }
-    set barrelPower(power) { this.#barrelPower = power; }
     get targetX() { return this.#targetX; }
     set targetX(x) { this.#targetX = x; } 
 
