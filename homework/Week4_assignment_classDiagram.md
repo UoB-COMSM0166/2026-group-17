@@ -1,4 +1,4 @@
-## 1.Class Diagram Preview
+## 1. Class Diagram Preview
 ![Class Diagram](Week4_assignment_classDiagram.svg)
 
 
