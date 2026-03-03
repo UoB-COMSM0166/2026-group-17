@@ -1,4 +1,9 @@
-1️. Diagram Source Code
+## 1.Class Diagram Preview
+![Class Diagram](Week4_assignment_classDiagram.svg)
+
+
+## 2. Diagram Source Code
+```text
 @startuml
 class GameStateManager {
   - currentLevel : number
@@ -405,6 +410,5 @@ Event <|-- RainSystem
 Event <|-- Earthquake
 
 @enduml
+```
 
-2.Class Diagram Preview
-![Class Diagram](Week4_assignment_classDiagram.svg)
