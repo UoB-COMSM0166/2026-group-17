@@ -28,6 +28,10 @@ class MovePadWidget {
     //this.#drawStepsText();
   }
 
+  #drawStep() {
+    
+  }
+
   #drawBoard() {
     push();
     rectMode(CENTER);
