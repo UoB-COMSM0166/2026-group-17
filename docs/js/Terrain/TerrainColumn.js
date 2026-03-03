@@ -1,15 +1,17 @@
+// terrain/TerrainColumn.js
 class TerrainColumn {
-  constructor(xIndex, height, canvasHeight) {
+  constructor(xIndex, height, materialType = 'dirt') {
     this.xIndex = xIndex;
     this.height = height;
-    this.canvasHeight = canvasHeight;
+    this.materialType = materialType;
   }
 
   getTopY() {
-    return this.canvasHeight - this.height;
+    // return this col's y
+    return 700 - this.height;
   }
 
   setHeight(h) {
-    this.height = constrain(h, 0, this.canvasHeight);
+    this.height = constrain(h, 0, height);
   }
 }

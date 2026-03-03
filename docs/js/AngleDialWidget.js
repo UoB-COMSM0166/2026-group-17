@@ -5,7 +5,7 @@ class AngleDialWidget {
     #plateFillColor;
     #plateOutlineColor;
     #isFollowing = false;
-    #needleRotation = 0;
+    #needleRotation = 45;
 
     constructor(posV = createVector(width / 6, height - height / 5), rad = 60,
         plateInColor = color('paleturquoise'),
@@ -75,6 +75,7 @@ class AngleDialWidget {
     #updateAngle() {
         if (this.#isFollowing)
             this.#needleRotation = 90 + atan2(mouseY - this.#positionVector.y, mouseX - this.#positionVector.x);
+        else this.#needleRotation = players[turnController.activePlayerId].barrelAngle + 90;
     }
 
 }

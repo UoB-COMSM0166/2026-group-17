@@ -22,12 +22,12 @@ class ShootButton {
             strokeWeight(2);
         }
         
-        rect(this.#positionVector.x, this.#positionVector.y, width / 9, controlPanel.altitude / 3);
+        rect(this.#positionVector.x, this.#positionVector.y, width / 9, controlPanel.baseAltitude / 3);
         this.#drawText();
 
         /*const x = this.#positionVector.x;
         const y = this.#positionVector.y;
-        const rShoot = (controlPanel.altitude * 0.4);
+        const rShoot = (controlPanel.baseAltitude * 0.4);
         this.#drawNeonShootButton(x, y, rShoot, this.#isHovered());
         this.#drawText();*/
     }
@@ -76,7 +76,7 @@ class ShootButton {
     #isHovered() {
     let mouseVector = createVector(mouseX, mouseY);
     const w = width / 9;
-    const h = controlPanel.altitude / 3;
+    const h = controlPanel.baseAltitude / 3;
 
     return (
         mouseX >= this.#positionVector.x - w / 2 &&
