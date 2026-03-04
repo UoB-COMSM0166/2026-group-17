@@ -151,17 +151,28 @@ function draw() {
     background('black');
     fill('white');
     noStroke();
-    textAlign(CENTER, CENTER);
+    textAlign(CENTER, TOP);
     textFont('MS Trebuchet', 36);
     const result = scoreBoard.getHighestScorePlayerId();
+    
     let statusText;
     if (result.leader === "tie") statusText = "N/A - Draw!";
     else statusText = `Player ${result.leader + 1}`;
+    //Display wineer
+    textSize(60);
+    text(`Winner: ${statusText}`, width / 2, 120); 
+    //Display final scores
+    textSize(32);
     text(
-      `Winner: ${statusText}\n\nPress 'R' to restart`,
+      "Player 1 Score: " + scoreBoard.score1 + "\n" +
+      "Player 2 Score: " + scoreBoard.score2,
       width / 2,
-      height / 2
+      250
     );
+    //Restart instruction
+    textSize(24);
+    text("Press 'R' to restart", width / 2, 400);
+
     if (key === 'r' || key === 'R') window.location.reload();
   }
 }
