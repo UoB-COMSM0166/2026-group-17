@@ -11,6 +11,7 @@ class WindSystem {
 
     newTurn() {
         this.windForce = random(-3, 3);
+        this.isActive = random() > 0.5;
     }
 
     applyTo(projectile, dt) {
