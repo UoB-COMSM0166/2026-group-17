@@ -11,7 +11,6 @@ class Terrain {
   generateInitialTerrain(seed) {
     randomSeed(seed);
     noiseSeed(seed);
-    //use global var height, make a different name
     let panelHeight = this.sizeVector.y * 0.25;
 
     for (let x = 0; x < this.sizeVector.x; x++) {
@@ -38,24 +37,24 @@ class Terrain {
   applyExplosion(center, radius) {
     //loop each cols which is under the area of explosion
     let startId = floor(center.x - radius), endId = ceil(center.x + radius);
-    console.log("applyExplosion called at", center, "radius:", radius);
+    // console.log("applyExplosion called at", center, "radius:", radius);
     for (let x = startId; x < endId; x++) {
       // the distance from this col to the center of explosion
       let dx = center.x - x;
       //triangle: |_\  to avoid negative : max()
       let craterDepth = round(sqrt(max(0, radius * radius - dx * dx)));
       let col = this.columns[x];
-      console.log("center.x:", center.x);
-      console.log("x:", x);
+      // console.log("center.x:", center.x);
+      // console.log("x:", x);
       if (col) {
         //change the height
-        console.log("radius:", radius);
-        console.log("before:", col.height, "craterDepth:", craterDepth);
+        // console.log("radius:", radius);
+        // console.log("before:", col.height, "craterDepth:", craterDepth);
         const explosionBottomY = center.y + craterDepth;  // bottom of explosion circle
         if (col.getTopY() < explosionBottomY) {
           col.setHeight(this.sizeVector.y - explosionBottomY);  // snap to bottom semicircle edge
         }
-        console.log("after:", col.height);
+        // console.log("after:", col.height);
       }
     }
   }

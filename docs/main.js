@@ -1,19 +1,14 @@
 let gravity;
 let bgTop;
 let bgBottom;
-let player1;
-let player2;
-//let players = { player1: null, player2: null };
 let players = [];
-let turnController = new TurnController();
+let turnController;
 let turnCounter;
 let controlPanel;
 let movePad;
 let lastButtonClicked;
 
-//add wind
 let wind;
-//new
 let terrain;
 let lastShooterId = 0;
 let scoreBoard;
@@ -24,9 +19,12 @@ let hasScoredThisExplosion = false;
 
 function setup() {
   createCanvas(1280, 700);
+  angleMode(DEGREES);
+  ellipseMode(RADIUS);
   gravity = createVector(0, 400);
   //set wind
   wind = new WindSystem();
+  turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
   scoreBoard = new ScoreBoard();
@@ -53,7 +51,6 @@ function setup() {
     height - terrain.getHeightAt(cannon2X) - wheelRadius
   );
 
-  angleMode(DEGREES);
   movePad = new MovePadWidget();
   players[0] = new PlayerCannon(
     cannon1Position,
@@ -71,8 +68,6 @@ function setup() {
     color('moccasin'),
     color('navajowhite')
   );
-  randomWinner = round(random(0, 1));
-  ellipseMode(RADIUS);
 }
 
 function draw() {
@@ -99,10 +94,8 @@ function draw() {
 
   players[currentPlayerId].positionVector.y = min(
     controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
-    height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) -
-    players[currentPlayerId].wheelRadius);
+    height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius);
 
-  // draw both cannons
   players[0].drawPlayer();
   players[1].drawPlayer();
 
@@ -134,6 +127,8 @@ function draw() {
       scoreBoard.score2 = Math.max(0, scoreBoard.score2);
 
       hasScoredThisExplosion = true;
+      // Need to fix bug where last hit in last turn doesn't count correctly towards the score
+      console.log(shooterId, enemy, self);
     }
     if (currentExplosion.finished) {
       currentExplosion = null;
@@ -145,7 +140,6 @@ function draw() {
   // UI
   controlPanel.drawCtrlPanel();
   turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns);
-  scoreBoard.draw();
 
   if (turnController.isGameOver()) {
     background('black');
@@ -175,6 +169,7 @@ function draw() {
 
     if (key === 'r' || key === 'R') window.location.reload();
   }
+  scoreBoard.draw();
 }
 
 
@@ -215,17 +210,9 @@ function mouseReleased() {
 }
 
 function keyReleased() {
-
-  // press W
-  if (key === 'w' || key === 'W') {
-
-    wind.newTurn();
-    wind.isActive = true;
-
-    // 5 second close
-    setTimeout(() => {
-      wind.isActive = false;
-    }, 5000);
+  let shotRadius = 4;
+  if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
+    currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
   }
 }
 

@@ -11,6 +11,7 @@ class WindSystem {
 
     newTurn() {
         this.windForce = random(-3, 3);
+        this.isActive = random() > 0.5;
     }
 
     applyTo(projectile, dt) {
@@ -35,7 +36,7 @@ class WindSystem {
         push();
         fill(255);
         textSize(16);
-        text("Wind: " + this.windForce.toFixed(2), 50, 30);
+        // text("Wind: " + this.windForce.toFixed(2), 50, 30);
         pop();
 
         this.drawParticles();
