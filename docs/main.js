@@ -16,6 +16,7 @@ let scoreCalculator;
 let currentShot = null;
 let currentExplosion = null;
 let hasScoredThisExplosion = false;
+let lastTurnNumber = 1;
 
 function setup() {
   createCanvas(1280, 700);
@@ -98,7 +99,19 @@ function draw() {
 
   players[0].drawPlayer();
   players[1].drawPlayer();
+  const pid = turnController.activePlayerId;
 
+  push();
+  noFill();
+  strokeWeight(4);
+  if (pid === 0) stroke(255, 80, 80);
+  else stroke(80, 180, 255);
+  circle(players[pid].positionVector.x,players[pid].positionVector.y,players[pid].wheelRadius + 15);
+  let arrowY = players[pid].positionVector.y - 50;
+  fill(pid === 0 ? color(255, 80, 80) : color(80, 180, 255));
+  noStroke();
+  triangle(players[pid].positionVector.x - 10, arrowY,players[pid].positionVector.x + 10, arrowY,players[pid].positionVector.x, arrowY + 15);
+  pop();
   // update/draw explosion + score once per explosion 
   if (currentExplosion) {
     currentExplosion.update();
@@ -138,8 +151,12 @@ function draw() {
   if (!currentExplosion) hasScoredThisExplosion = false;
 
   // UI
-  controlPanel.drawCtrlPanel();
-  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns);
+  if (turnController.turnNumber !== lastTurnNumber) {
+    turnCounter.startRoundAnimation(turnController.turnNumber);
+    lastTurnNumber = turnController.turnNumber;
+  }
+    controlPanel.drawCtrlPanel();
+    turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
 
   if (turnController.isGameOver()) {
     background('black');
@@ -148,7 +165,6 @@ function draw() {
     textAlign(CENTER, TOP);
     textFont('MS Trebuchet', 36);
     const result = scoreBoard.getHighestScorePlayerId();
-    
     let statusText;
     if (result.leader === "tie") statusText = "N/A - Draw!";
     else statusText = `Player ${result.leader + 1}`;
