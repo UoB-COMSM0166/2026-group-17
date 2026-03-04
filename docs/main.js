@@ -216,6 +216,27 @@ function keyReleased() {
       wind.isActive = false;
     }, 5000);
   }
+
+  const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
+  const currentPlayerId = turnController.activePlayerId;
+
+  const shotRadius = 4;
+  if (keyCode === 32 && shotFree) {
+    lastShooterId = currentPlayerId;
+    currentShot = players[currentPlayerId].fireShot(shotRadius);
+  }
+
+  if (keyCode === 37) {
+    players[currentPlayerId].targetX -= 100;
+  }
+  else if (keyCode === 39) {
+    players[currentPlayerId].targetX += 100;
+  }
+  players[currentPlayerId].targetX = constrain(
+    players[currentPlayerId].targetX,
+    players[currentPlayerId].wheelRadius,
+    width - players[currentPlayerId].wheelRadius
+  );
 }
 
 function drawLinearGradient(colorA, colorB) {
