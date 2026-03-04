@@ -36,7 +36,7 @@ class WindSystem {
         push();
         fill(255);
         textSize(16);
-        text("Wind: " + this.windForce.toFixed(2), 50, 30);
+        // text("Wind: " + this.windForce.toFixed(2), 50, 30);
         pop();
 
         this.drawParticles();
