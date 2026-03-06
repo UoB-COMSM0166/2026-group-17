@@ -5,6 +5,7 @@ let player1;
 let player2;
 //let players = { player1: null, player2: null };
 let players = [];
+let lastActivePlayerId = -1;
 let turnController = new TurnController();
 let turnCounter;
 let controlPanel;
@@ -54,12 +55,12 @@ function setup() {
   );
 
   angleMode(DEGREES);
-  movePad = new MovePadWidget();
   players[0] = new PlayerCannon(
     cannon1Position,
     wheelRadius,
     barrelSizeVector,
     -45,
+    3,
     color('silver'),
     color('lightslategray')
   );
@@ -68,9 +69,11 @@ function setup() {
     wheelRadius,
     barrelSizeVector,
     220,
+    3,
     color('moccasin'),
     color('navajowhite')
   );
+  movePad = new MovePadWidget();
   randomWinner = round(random(0, 1));
   ellipseMode(RADIUS);
 }
@@ -80,12 +83,20 @@ function draw() {
   terrain.drawTerrain();
 
   if (wind) wind.draw();
-  movePad.drawMovePad();
   //update the location each time
   let currentPlayerId = turnController.activePlayerId;
 
+  
   players[currentPlayerId].updateMove(0.18);
 
+
+  if (currentPlayerId !== lastActivePlayerId) {
+    controlPanel.angleDial.needleRotation = players[currentPlayerId].barrelAngle + 90;
+    controlPanel.powerAdjust.power = players[currentPlayerId].barrelPower / 7;
+    movePad.step = players[currentPlayerId].moveSteps;
+    lastActivePlayerId = currentPlayerId;
+  }
+  
   if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     currentShot?.updatePhysics(deltaTime / 1000);
     currentShot?.drawShotSequence();
@@ -93,9 +104,11 @@ function draw() {
   else {
     if (controlPanel.angleDial.isFollowing)
       players[currentPlayerId].barrelAngle = controlPanel.angleDial.needleRotation - 90;
+    if (controlPanel.powerAdjust.isFollowing) {
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+    }
   }
 
-  players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
 
   players[currentPlayerId].positionVector.y = min(
     controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
@@ -146,6 +159,8 @@ function draw() {
   controlPanel.drawCtrlPanel();
   turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns);
   scoreBoard.draw();
+  movePad.step = players[currentPlayerId].moveSteps;
+  movePad.drawMovePad();
 
   if (turnController.isGameOver()) {
     background('black');
@@ -179,13 +194,22 @@ function mousePressed() {
     currentShot = players[currentPlayerId].fireShot(shotRadius);
   }
 
+  console.log("before:", players[currentPlayerId].moveSteps);
   const res = movePad.mousePressed();
-  if (res === 'left') {
-    players[currentPlayerId].targetX -= 100;
+  if (players[currentPlayerId].moveSteps > 0) {
+    if (res === 'left') {
+      players[currentPlayerId].targetX -= 50;
+      players[currentPlayerId].moveSteps = players[currentPlayerId].moveSteps - 1;
+    }
+    else if (res === 'right') {
+      players[currentPlayerId].targetX += 50;
+      players[currentPlayerId].moveSteps = players[currentPlayerId].moveSteps - 1;
+    }
+    movePad.step = players[currentPlayerId].moveSteps;
   }
-  else if (res === 'right') {
-    players[currentPlayerId].targetX += 100;
-  }
+  console.log("after:", players[currentPlayerId].moveSteps);
+  console.log("pad:", movePad.step);
+
   players[currentPlayerId].targetX = constrain(
     players[currentPlayerId].targetX,
     players[currentPlayerId].wheelRadius,
@@ -227,10 +251,10 @@ function keyReleased() {
   }
 
   if (keyCode === 37) {
-    players[currentPlayerId].targetX -= 100;
+    players[currentPlayerId].targetX -= 50;
   }
   else if (keyCode === 39) {
-    players[currentPlayerId].targetX += 100;
+    players[currentPlayerId].targetX += 50;
   }
   players[currentPlayerId].targetX = constrain(
     players[currentPlayerId].targetX,
