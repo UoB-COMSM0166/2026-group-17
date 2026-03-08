@@ -1,20 +1,15 @@
 let gravity;
 let bgTop;
 let bgBottom;
-let player1;
-let player2;
-//let players = { player1: null, player2: null };
 let players = [];
 let lastActivePlayerId = -1;
-let turnController = new TurnController();
+let turnController;
 let turnCounter;
 let controlPanel;
 let movePad;
 let lastButtonClicked;
 
-//add wind
 let wind;
-//new
 let terrain;
 let lastShooterId = 0;
 let scoreBoard;
@@ -22,12 +17,16 @@ let scoreCalculator;
 let currentShot = null;
 let currentExplosion = null;
 let hasScoredThisExplosion = false;
+let lastTurnNumber = 1;
 
 function setup() {
   createCanvas(1280, 700);
+  angleMode(DEGREES);
+  ellipseMode(RADIUS);
   gravity = createVector(0, 400);
   //set wind
   wind = new WindSystem();
+  turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
   scoreBoard = new ScoreBoard();
@@ -73,7 +72,7 @@ function setup() {
     color('moccasin'),
     color('navajowhite')
   );
-  movePad = new MovePadWidget();
+
   randomWinner = round(random(0, 1));
   ellipseMode(RADIUS);
 }
@@ -112,13 +111,23 @@ function draw() {
 
   players[currentPlayerId].positionVector.y = min(
     controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
-    height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) -
-    players[currentPlayerId].wheelRadius);
+    height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius);
 
-  // draw both cannons
   players[0].drawPlayer();
   players[1].drawPlayer();
+  const pid = turnController.activePlayerId;
 
+  push();
+  noFill();
+  strokeWeight(4);
+  if (pid === 0) stroke(255, 80, 80);
+  else stroke(80, 180, 255);
+  circle(players[pid].positionVector.x,players[pid].positionVector.y,players[pid].wheelRadius + 15);
+  let arrowY = players[pid].positionVector.y - 50;
+  fill(pid === 0 ? color(255, 80, 80) : color(80, 180, 255));
+  noStroke();
+  triangle(players[pid].positionVector.x - 10, arrowY,players[pid].positionVector.x + 10, arrowY,players[pid].positionVector.x, arrowY + 15);
+  pop();
   // update/draw explosion + score once per explosion 
   if (currentExplosion) {
     currentExplosion.update();
@@ -147,6 +156,8 @@ function draw() {
       scoreBoard.score2 = Math.max(0, scoreBoard.score2);
 
       hasScoredThisExplosion = true;
+      // Need to fix bug where last hit in last turn doesn't count correctly towards the score
+      console.log(shooterId, enemy, self);
     }
     if (currentExplosion.finished) {
       currentExplosion = null;
@@ -156,29 +167,41 @@ function draw() {
   if (!currentExplosion) hasScoredThisExplosion = false;
 
   // UI
-  controlPanel.drawCtrlPanel();
-  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns);
-  scoreBoard.draw();
-  movePad.step = players[currentPlayerId].moveSteps;
-  movePad.drawMovePad();
+  if (turnController.turnNumber !== lastTurnNumber) {
+    turnCounter.startRoundAnimation(turnController.turnNumber);
+    lastTurnNumber = turnController.turnNumber;
+  }
+    controlPanel.drawCtrlPanel();
+    turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
 
   if (turnController.isGameOver()) {
     background('black');
     fill('white');
     noStroke();
-    textAlign(CENTER, CENTER);
+    textAlign(CENTER, TOP);
     textFont('MS Trebuchet', 36);
     const result = scoreBoard.getHighestScorePlayerId();
     let statusText;
     if (result.leader === "tie") statusText = "N/A - Draw!";
     else statusText = `Player ${result.leader + 1}`;
+    //Display wineer
+    textSize(60);
+    text(`Winner: ${statusText}`, width / 2, 120); 
+    //Display final scores
+    textSize(32);
     text(
-      `Winner: ${statusText}\n\nPress 'R' to restart`,
+      "Player 1 Score: " + scoreBoard.score1 + "\n" +
+      "Player 2 Score: " + scoreBoard.score2,
       width / 2,
-      height / 2
+      250
     );
+    //Restart instruction
+    textSize(24);
+    text("Press 'R' to restart", width / 2, 400);
+
     if (key === 'r' || key === 'R') window.location.reload();
   }
+  scoreBoard.draw();
 }
 
 
@@ -228,23 +251,15 @@ function mouseReleased() {
 }
 
 function keyReleased() {
-
-  // press W
-  if (key === 'w' || key === 'W') {
-
-    wind.newTurn();
-    wind.isActive = true;
-
-    // 5 second close
-    setTimeout(() => {
-      wind.isActive = false;
-    }, 5000);
+  let shotRadius = 4;
+  if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
+    currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
   }
 
   const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
   const currentPlayerId = turnController.activePlayerId;
 
-  const shotRadius = 4;
+
   if (keyCode === 32 && shotFree) {
     lastShooterId = currentPlayerId;
     currentShot = players[currentPlayerId].fireShot(shotRadius);
