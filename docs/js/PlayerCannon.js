@@ -63,6 +63,7 @@ class PlayerCannon {
     get wheelRadius() { return this.#wheelRadius; }
     get targetX() { return this.#targetX; }
     set targetX(x) { this.#targetX = x; } 
+    get barrelSize() { return this.#barrelSize; }
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);

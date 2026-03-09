@@ -3,7 +3,7 @@ class ShootButton {
     #fillColor;
     #outlineColor;
 
-    constructor(posVec = createVector(width / 2, height - ( height * 0.16)),
+    constructor(posVec = createVector(width / 2, height - (height * 0.16)),
         fillColor = 'lightblue', outColor = 'cadetblue') {
         this.#positionVector = posVec;
         this.#fillColor = fillColor;
@@ -21,7 +21,7 @@ class ShootButton {
         } else {
             strokeWeight(2);
         }
-        
+
         rect(this.#positionVector.x, this.#positionVector.y, width / 9, controlPanel.baseAltitude / 3);
         this.#drawText();
 
@@ -74,15 +74,15 @@ class ShootButton {
     }
 
     #isHovered() {
-    let mouseVector = createVector(mouseX, mouseY);
-    const w = width / 9;
-    const h = controlPanel.baseAltitude / 3;
+        let mouseVector = createVector(mouseX, mouseY);
+        const w = width / 9;
+        const h = controlPanel.baseAltitude / 3;
 
-    return (
-        mouseX >= this.#positionVector.x - w / 2 &&
-        mouseX <= this.#positionVector.x + w / 2 &&
-        mouseY >= this.#positionVector.y - h / 2 &&
-        mouseY <= this.#positionVector.y + h / 2
-    );
+        return (
+            mouseX >= this.#positionVector.x - w / 2 &&
+            mouseX <= this.#positionVector.x + w / 2 &&
+            mouseY >= this.#positionVector.y - h / 2 &&
+            mouseY <= this.#positionVector.y + h / 2
+        );
     }
 }

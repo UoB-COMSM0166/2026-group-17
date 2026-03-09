@@ -19,14 +19,14 @@ class FloatingScore {
     return Math.max(a, Math.min(b, v));
   }
   update() {
-    this.t += 0.045;
+    this.t += 0.14;
     const tt = this._clamp(this.t, 0, 1);
     const eased = 1 - Math.pow(1 - tt, 3); 
     this.x = lerp(this.x0, this.x1, eased);
     this.y = lerp(this.y0, this.y1, eased);
 if (tt >= 1) {
   this._hold = (this._hold ?? 18) - 1; 
-  if (this._hold <= 0) this.life -= 0.03;
+  if (this._hold <= 0) this.life -= 0.12;
 }
   }
   draw() {
