@@ -17,6 +17,10 @@ let currentShot = null;
 let currentExplosion = null;
 let hasScoredThisExplosion = false;
 let lastTurnNumber = 1;
+let floatingScores = []; 
+let shakeFrames = 0;
+let shakeMag = 0;
+function triggerShake(frames = 10, mag = 6) { shakeFrames = frames; shakeMag = mag; }
 
 function setup() {
   createCanvas(1280, 700);
@@ -72,7 +76,12 @@ function setup() {
 }
 
 function draw() {
-  drawLinearGradient(bgTop, bgBottom);
+  push();
+  if (shakeFrames > 0) {
+    translate(random(-shakeMag, shakeMag), random(-shakeMag, shakeMag));
+    shakeFrames--;
+  }
+drawLinearGradient(bgTop, bgBottom);
   terrain.drawTerrain();
 
   if (wind) wind.draw();
@@ -115,32 +124,48 @@ function draw() {
   // update/draw explosion + score once per explosion 
   if (currentExplosion) {
     currentExplosion.update();
-    // commenting below line out until we resolve double explosion from Projectile & Explosion classes issue
-    //currentExplosion.draw();
     if (currentExplosion.finished && !hasScoredThisExplosion) {
       const shooterId = lastShooterId;
+      const targetId = 1 - shooterId; 
       const { enemy, self } = scoreCalculator.calculateExplosionScore(
         currentExplosion,
         players,
         shooterId
       );
-      if (enemy > 0) {
-        if (shooterId === 0) {
-          scoreBoard.score1 += enemy;
-        }
-        else scoreBoard.score2 += enemy;
+    if (enemy > 0) {
+      if (shooterId === 0) {
+        scoreBoard.score1 += enemy;
       }
-      if (self > 0) {
-        if (shooterId === 0) {
-          scoreBoard.score1 -= self;
-        }
-        else scoreBoard.score2 -= self;
-      }
-      scoreBoard.score1 = Math.max(0, scoreBoard.score1);
-      scoreBoard.score2 = Math.max(0, scoreBoard.score2);
+      else scoreBoard.score2 += enemy;
+    floatingScores.push(new FloatingScore(
+      players[shooterId].positionVector.x,
+      players[shooterId].positionVector.y - 60,+enemy, color(255, 220, 0)));
+   // floatingScores.push( new FloatingScore(
+    //  players[1 - shooterId].positionVector.x,
+     // players[1 - shooterId].positionVector.y - 60,"HIT", color(255)));
+       players[targetId].triggerHitFlash(12); 
+  triggerShake(10, 6);                  
+
+}
+
+if (self > 0) {
+  if (shooterId === 0) scoreBoard.score1 -= self;
+  else scoreBoard.score2 -= self;
+  floatingScores.push(
+    new FloatingScore(
+      players[shooterId].positionVector.x,
+      players[shooterId].positionVector.y - 60,
+      -self,
+      color(255, 80, 80)
+    )
+  );
+    players[shooterId].triggerHitFlash(10); 
+  triggerShake(8, 4);                    
+}
+scoreBoard.score1 = Math.max(0, scoreBoard.score1);
+scoreBoard.score2 = Math.max(0, scoreBoard.score2);
 
       hasScoredThisExplosion = true;
-      // Need to fix bug where last hit in last turn doesn't count correctly towards the score
       console.log(shooterId, enemy, self);
     }
     if (currentExplosion.finished) {
@@ -149,15 +174,21 @@ function draw() {
   }
   // allow scoring again on next explosion
   if (!currentExplosion) hasScoredThisExplosion = false;
-
+  pop();
   // UI
   if (turnController.turnNumber !== lastTurnNumber) {
     turnCounter.startRoundAnimation(turnController.turnNumber);
     lastTurnNumber = turnController.turnNumber;
   }
-    controlPanel.drawCtrlPanel();
-    turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
-
+  controlPanel.drawCtrlPanel();
+  turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
+  for (let i = floatingScores.length - 1; i >= 0; i--) {
+    floatingScores[i].update();
+    floatingScores[i].draw();
+    if (floatingScores[i].finished) {
+      floatingScores.splice(i, 1);
+    }
+  }
   if (turnController.isGameOver()) {
     background('black');
     fill('white');

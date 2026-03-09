@@ -7,6 +7,9 @@ class PlayerCannon {
     #fillColor;
     #outlineColor;
     #targetX;
+      #hitFlashFrames = 0;
+  #hitFlashMax = 10;
+
 
     constructor(posVec, wheelRad, barrelSz, barrAngle, fillColor, outColor) {
         this.#positionVector = posVec;
@@ -30,12 +33,27 @@ class PlayerCannon {
         return new Projectile(p5.Vector.add(this.#positionVector, offset), velocity, shotRadius);
     }
     drawPlayer() {
-        fill(this.#fillColor);
-        stroke(this.#outlineColor);
-        this.#drawBarrel();
-        this.#drawWheel();
-    }
+  fill(this.#fillColor);
+  if (this.#hitFlashFrames > 0) {
+    stroke(255, 255, 0);      
+    strokeWeight(6);
+  } else {
+    stroke(this.#outlineColor);
+    strokeWeight(2);
+  }
 
+  this.#drawBarrel();
+  this.#drawWheel();
+  this.tickEffects();
+}
+
+    triggerHitFlash(frames = 10) {
+    this.#hitFlashFrames = Math.max(this.#hitFlashFrames, frames);
+  }
+
+  tickEffects() {
+    if (this.#hitFlashFrames > 0) this.#hitFlashFrames--;
+  }
     get barrelAngle() { return this.#barrelAngle; }
     get barrelPower() { return this.#barrelPower; }
     set barrelAngle(a) { this.#barrelAngle = a; }
