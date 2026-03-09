@@ -9,8 +9,9 @@ class TurnController {
     get activePlayerId() { return this.#activePlayerId; }
     get turnNumber() { return this.#turnNumber; }
     get maxTurns() { return this.#maxTurns; }
-
-    playerCanAct(flying, exploding) { return !(this.isGameOver() || flying || exploding); }
+    //Removed isCameOver() from return so the final shot can finish
+    //and the score can be calculated before the end screen appears
+    playerCanAct(flying, exploding) { return !(flying || exploding); }
     advancePhase() {
         this.#updateActivePlayerId();
         if (this.#activePlayerId === 0) {
