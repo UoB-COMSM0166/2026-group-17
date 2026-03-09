@@ -10,13 +10,12 @@ class WindSystem {
     }
 
     newTurn() {
-        this.windForce = random(-3, 3);
-        this.isActive = random() > 0.5;
+        this.windForce = random(-1.2, 1.2);
     }
 
     applyTo(projectile, dt) {
         if (!this.isActive) return;
-        let windEffect = this.windForce * 50;
+        let windEffect = this.windForce * 20;
 
         projectile.vel.x += windEffect * dt;
 
@@ -30,15 +29,13 @@ class WindSystem {
         }
     }
     draw() {
-
         if (!this.isActive) return;
-
         push();
         fill(255);
-        textSize(16);
-        // text("Wind: " + this.windForce.toFixed(2), 50, 30);
+        textSize(26);
+        textStyle(BOLD);
+        text("Wind: " + this.windForce.toFixed(2), width * 0.35, 40);
         pop();
-
         this.drawParticles();
     }
 

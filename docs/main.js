@@ -24,6 +24,7 @@ let gameStarted = false;
 
 function setup() {
   createCanvas(1280, 700);
+  wind = new WindSystem();
   angleMode(DEGREES);
   ellipseMode(RADIUS);
   //Initialize StartMenu
@@ -32,8 +33,8 @@ function setup() {
 }
 
 function draw() {
-    //If the game has not started, draw the start menu
-  if (!gameStarted){
+  //If the game has not started, draw the start menu
+  if (!gameStarted) {
     startMenu.draw();
     return;
   }
@@ -72,11 +73,11 @@ function draw() {
   strokeWeight(4);
   if (pid === 0) stroke(255, 80, 80);
   else stroke(80, 180, 255);
-  circle(players[pid].positionVector.x,players[pid].positionVector.y,players[pid].wheelRadius + 15);
+  circle(players[pid].positionVector.x, players[pid].positionVector.y, players[pid].wheelRadius + 15);
   let arrowY = players[pid].positionVector.y - 50;
   fill(pid === 0 ? color(255, 80, 80) : color(80, 180, 255));
   noStroke();
-  triangle(players[pid].positionVector.x - 10, arrowY,players[pid].positionVector.x + 10, arrowY,players[pid].positionVector.x, arrowY + 15);
+  triangle(players[pid].positionVector.x - 10, arrowY, players[pid].positionVector.x + 10, arrowY, players[pid].positionVector.x, arrowY + 15);
   pop();
   // update/draw explosion + score once per explosion 
   if (currentExplosion) {
@@ -118,11 +119,14 @@ function draw() {
 
   // UI
   if (turnController.turnNumber !== lastTurnNumber) {
+    if (wind && wind.isActive) {
+      wind.newTurn();
+    }
     turnCounter.startRoundAnimation(turnController.turnNumber);
     lastTurnNumber = turnController.turnNumber;
   }
-    controlPanel.drawCtrlPanel();
-    turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
+  controlPanel.drawCtrlPanel();
+  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
 
   if (turnController.isGameOver()) {
     background('black');
@@ -136,7 +140,7 @@ function draw() {
     else statusText = `Player ${result.leader + 1}`;
     //Display wineer
     textSize(60);
-    text(`Winner: ${statusText}`, width / 2, 120); 
+    text(`Winner: ${statusText}`, width / 2, 120);
     //Display final scores
     textSize(32);
     text(
@@ -156,10 +160,10 @@ function draw() {
 
 
 function mousePressed() {
-  if(!gameStarted){
+  if (!gameStarted) {
     //Handle Start menu clicks
     const mode = startMenu.handleMousePressed();
-    if (mode){
+    if (mode) {
       //Initialize game objects selecting difficulty
       gameStarted = true;
       initGame(mode);
@@ -202,9 +206,12 @@ function mouseReleased() {
   else controlPanel.powerAdjust.isFollowing = false;
 }
 
-function initGame(mode){
-  //set wind
+function initGame(mode) {
   wind = new WindSystem();
+
+  if (mode === "easy") wind.isActive = false;
+  if (mode === "hard") wind.isActive = true;
+  wind.newTurn();
   turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
