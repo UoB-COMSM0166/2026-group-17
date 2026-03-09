@@ -116,7 +116,14 @@ function draw() {
   }
   // allow scoring again on next explosion
   if (!currentExplosion) hasScoredThisExplosion = false;
-
+  if (turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
+    //only show trajectory preview when player can act and wind is not active
+    if(wind && wind.isActive === false){
+    const windForce = wind ? wind.forceVector : createVector(0, 0);
+    const enemyId = currentPlayerId === 0 ? 1 : 0; // opponent player id
+    drawTrajectoryPreview(players[currentPlayerId], gravity, windForce, terrain, players[enemyId]);
+  }
+}
   // UI
   if (turnController.turnNumber !== lastTurnNumber) {
     if (wind && wind.isActive) {
@@ -270,4 +277,99 @@ function drawLinearGradient(colorA, colorB) {
     stroke(lerpColor(colorA, colorB, map(i, 0, height, 0, 1)));
     line(0, i, width, i);
   }
+}
+
+function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer) {
+    const angle = player.barrelAngle;
+    const speed = player.barrelPower;
+    const offsetDist = player.wheelRadius + player.barrelSize.x / 2;
+
+    let offset = createVector(offsetDist, 0);
+    offset.rotate(angle);
+
+    let px = player.positionVector.x + offset.x;
+    let py = player.positionVector.y + offset.y;
+
+    let vx = cos(angle) * speed;
+    let vy = sin(angle) * speed;
+
+    const wx = windVec?.x ?? 0;
+    const wy = windVec?.y ?? 0;
+    const dt = 0.035;
+    const maxSteps = 300;
+    const hitRadius = enemyPlayer.wheelRadius + 20; // the radius
+
+    // identify if this shot would hit the enemy by simulating the trajectory in advance
+    let willHit = false;
+    let simPx = px, simPy = py, simVx = vx, simVy = vy;
+    for (let i = 0; i < maxSteps; i++) {
+        simVx += (gravityVec.x + wx) * dt;
+        simVy += (gravityVec.y + wy) * dt;
+        simPx += simVx * dt;
+        simPy += simVy * dt;
+
+        if (simPx < 0 || simPx > width || simPy > height) break;
+        if (simPy >= height - terrain.getHeightAt(simPx)) break;
+
+        const d = dist(simPx, simPy, enemyPlayer.positionVector.x, enemyPlayer.positionVector.y);
+        if (d < hitRadius) { willHit = true; break; }
+    }
+
+    // decide colors based on hit or miss
+    const baseColor = willHit ? [80, 255, 120] : [0, 245, 212]; // color for hit and miss
+    const glowColor = willHit ? `rgba(80,255,120,` : `rgba(0,245,212,`;
+
+    push();
+    noStroke();
+    for (let i = 0; i < maxSteps; i++) {
+        vx += (gravityVec.x + wx) * dt;
+        vy += (gravityVec.y + wy) * dt;
+        px += vx * dt;
+        py += vy * dt;
+
+        if (px < 0 || px > width || py > height) break;
+        if (py >= height - terrain.getHeightAt(px)) break;
+
+        if (i % 3 === 0) {
+            const progress = i / maxSteps;
+            const alpha = lerp(255, 0, progress);
+            const sz = lerp(3, 0.8, progress);
+
+            drawingContext.shadowBlur = lerp(18, 0, progress);
+            drawingContext.shadowColor = glowColor + (alpha / 255) + ')';
+            fill(...baseColor, alpha * 0.4);
+            circle(px, py, sz * 1.5);
+
+            drawingContext.shadowBlur = lerp(8, 0, progress);
+            fill(200, 255, 250, alpha);
+            circle(px, py, sz);
+        }
+    }
+
+    // hit 
+    if (willHit) {
+        const ex = enemyPlayer.positionVector.x;
+        const ey = enemyPlayer.positionVector.y;
+
+        drawingContext.shadowBlur = 20;
+        drawingContext.shadowColor = 'rgba(80, 255, 120, 0.9)';
+        noFill();
+        stroke(80, 255, 120, 200);
+        strokeWeight(2);
+        //  frameCount fot pulsing effect
+        const pulse = sin(frameCount * 5) * 4;
+        circle(ex, ey, hitRadius + pulse);
+
+        // "HIT" txt
+        noStroke();
+        drawingContext.shadowBlur = 10;
+        fill(80, 255, 120);
+        textAlign(CENTER, BOTTOM);
+        textSize(14);
+        text('HIT', ex, ey - hitRadius - 8);
+    }
+
+    drawingContext.shadowBlur = 0;
+    drawingContext.shadowColor = 'transparent';
+    pop();
 }
