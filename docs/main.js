@@ -198,6 +198,7 @@ function draw() {
   pendingRoundAnimation = false;
 }
   controlPanel.drawCtrlPanel();
+
   turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
   for (let i = floatingScores.length - 1; i >= 0; i--) {
     floatingScores[i].update();
@@ -206,7 +207,18 @@ function draw() {
       floatingScores.splice(i, 1);
     }
   }
+  /*
   if (turnController.isGameOver()) {
+
+  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
+*/
+  scoreBoard.draw();
+
+  //Wait until the last shot and explosion are ginished
+  //before turinig to the end screen
+  if (turnController.isGameOver() && !currentExplosion 
+    && (!currentShot || !currentShot.isActive)) {
+
     background('black');
     fill('white');
     noStroke();
@@ -235,7 +247,6 @@ function draw() {
   }
   scoreBoard.draw();
 }
-
 
 function mousePressed() {
   if (!gameStarted) {
