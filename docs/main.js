@@ -135,7 +135,10 @@ function draw() {
   controlPanel.drawCtrlPanel();
   turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
 
-  if (turnController.isGameOver()) {
+  //Wait until the last shot and explosion are ginished
+  //before turinig to the end screen
+  if (turnController.isGameOver() && !currentExplosion 
+    && (!currentShot || !currentShot.isActive)) {
     background('black');
     fill('white');
     noStroke();
