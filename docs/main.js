@@ -117,9 +117,12 @@ function draw() {
   // allow scoring again on next explosion
   if (!currentExplosion) hasScoredThisExplosion = false;
   if (turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
+    //only show trajectory preview when player can act and wind is not active
+    if(wind && wind.isActive === false){
     const windForce = wind ? wind.forceVector : createVector(0, 0);
     const enemyId = currentPlayerId === 0 ? 1 : 0; // opponent player id
     drawTrajectoryPreview(players[currentPlayerId], gravity, windForce, terrain, players[enemyId]);
+  }
 }
   // UI
   if (turnController.turnNumber !== lastTurnNumber) {
