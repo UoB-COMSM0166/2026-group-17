@@ -31,7 +31,7 @@ function setup() {
   scoreBoard = new ScoreBoard();
   scoreBoard.setup();
   controlPanel = new ControlPanel(color(20));
-  terrain = new Terrain(createVector(width, height), color(255, 0, 0));
+  terrain = new Terrain(controlPanel, color(255, 0, 0));
   const terrainSeed = floor(random(99999));
   terrain.generateInitialTerrain(terrainSeed);
   scoreCalculator = new ScoreCalculator();
@@ -40,16 +40,18 @@ function setup() {
 
   // left cannon
   const cannon1X = random(wheelRadius, width / 4);
+  console.log("terrain height for cannon1: " + terrain.getHeightAt(cannon1X));
   const cannon1Position = createVector(
     cannon1X,
-    height - terrain.getHeightAt(cannon1X) - wheelRadius
+    terrain.getHeightAt(cannon1X) - wheelRadius
   );
 
   // right cannon
   const cannon2X = random(width - width / 5, width - wheelRadius);
+    console.log("terrain height for cannon2: " + terrain.getHeightAt(cannon2X));
   const cannon2Position = createVector(
     cannon2X,
-    height - terrain.getHeightAt(cannon2X) - wheelRadius
+    terrain.getHeightAt(cannon2X) - wheelRadius
   );
 
   movePad = new MovePadWidget();
@@ -95,7 +97,7 @@ function draw() {
 
   players[currentPlayerId].positionVector.y = min(
     controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
-    height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius);
+    terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius);
 
   players[0].drawPlayer();
   players[1].drawPlayer();
@@ -227,7 +229,7 @@ function mouseReleased() {
 
 function keyReleased() {
   let shotRadius = 4;
-  if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
+  if (key === ' ' && !currentShot?.isActive && !currentShot?.isExploding) {
     currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
   }
 }

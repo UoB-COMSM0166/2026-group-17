@@ -3,7 +3,7 @@ class Projectile {
     #velocity;
     #radius;
     #isActive;
-    #impactPosition;
+    #impactPosition = createVector(0, 0);
     #isExploding;
     #explosionStartTime;
     #maxExplosionRadius = 50;
@@ -30,14 +30,20 @@ class Projectile {
         }
         this.#position.add(this.#velocity.copy().mult(dt));
         //new:using real terrain height for collision detection
-        const groundY = min(
-            height - terrain.getHeightAt(this.#position.x),
+        const groundY = min(  
+            terrain.getHeightAt(this.#position.x),
             controlPanel.getAltitudeAt(this.#position.x)
         );
-
+        console.log(`position:
+            X: ${this.#position.x}
+            Y: ${this.#position.y}`);
+        console.log(`groundY: ${groundY}`);
         if (this.#position.y >= groundY) {
             this.#isActive = false;
-            this.#impactPosition = this.#position.copy();
+            this.#impactPosition.set(floor(this.#position.x), floor(this.#position.y));
+            //console.log(`impactPosition:
+            //    X: ${this.#impactPosition.x}
+            //    Y: ${this.#impactPosition.y}`)
             this.#isExploding = true;
             this.#explosionStartTime = frameCount;
             currentExplosion = new Explosion(
