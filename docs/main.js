@@ -165,6 +165,8 @@ function draw() {
       scoreBoard.score2 = Math.max(0, scoreBoard.score2);
 
       hasScoredThisExplosion = true;
+      pendingRoundAnimation = true;   
+      console.log(shooterId, enemy, self);
     }
 
     if (currentExplosion.finished) {
