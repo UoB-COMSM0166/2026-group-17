@@ -1,17 +1,14 @@
 let gravity;
 let bgTop;
 let bgBottom;
-let player1;
-let player2;
-let players = { player1, player2 };
-let turnController = new TurnController();
+let players = [];
+let turnController;
 let turnCounter;
 let controlPanel;
+let movePad;
 let lastButtonClicked;
 
-//add wind
 let wind;
-//new
 let terrain;
 let lastShooterId = 0;
 let scoreBoard;
@@ -19,115 +16,234 @@ let scoreCalculator;
 let currentShot = null;
 let currentExplosion = null;
 let hasScoredThisExplosion = false;
+let lastTurnNumber = 1;
+let floatingScores = []; 
+let shakeFrames = 0;
+let shakeMag = 0;
+function triggerShake(frames = 10, mag = 6) { shakeFrames = frames; shakeMag = mag; }
 
 function setup() {
   createCanvas(1280, 700);
-  gravity = createVector(0, 200);
+  angleMode(DEGREES);
+  ellipseMode(RADIUS);
+  gravity = createVector(0, 400);
+  //set wind
   wind = new WindSystem();
+  turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
   scoreBoard = new ScoreBoard();
   scoreBoard.setup();
   controlPanel = new ControlPanel(color(20));
-  terrain = new Terrain(width, height, color(255, 0, 0));
+  terrain = new Terrain(createVector(width, height), color(255, 0, 0));
   const terrainSeed = floor(random(99999));
   terrain.generateInitialTerrain(terrainSeed);
-  scoreCalculator = new ScoreCalculator(terrain);
+  scoreCalculator = new ScoreCalculator();
   turnCounter = new TurnCounter(createVector(width / 2, height / 20));
-  const wheelRadius = 12;
-  const barrelSizeVector = createVector(wheelRadius * 6, 8);
+  const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
 
   // left cannon
   const cannon1X = random(wheelRadius, width / 4);
-  const cannon1Pos = createVector(
+  const cannon1Position = createVector(
     cannon1X,
     height - terrain.getHeightAt(cannon1X) - wheelRadius
   );
 
   // right cannon
   const cannon2X = random(width - width / 5, width - wheelRadius);
-  const cannon2Pos = createVector(
+  const cannon2Position = createVector(
     cannon2X,
     height - terrain.getHeightAt(cannon2X) - wheelRadius
   );
 
-  player1 = new PlayerCannon(cannon1Pos, wheelRadius, barrelSizeVector, -45, color('silver'), color('lightslategray'));
-  player2 = new PlayerCannon(cannon2Pos, wheelRadius, barrelSizeVector, 220, color('moccasin'), color('navajowhite'));
-
-  players[0] = player1;
-  players[1] = player2;
-
-  angleMode(DEGREES);
-  randomWinner = round(random(0, 1));
-  ellipseMode(RADIUS);
+  movePad = new MovePadWidget();
+  players[0] = new PlayerCannon(
+    cannon1Position,
+    wheelRadius,
+    barrelSizeVector,
+    -45,
+    color('silver'),
+    color('lightslategray')
+  );
+  players[1] = new PlayerCannon(
+    cannon2Position,
+    wheelRadius,
+    barrelSizeVector,
+    220,
+    color('moccasin'),
+    color('navajowhite')
+  );
 }
+
 function draw() {
-  drawLinearGradient(bgTop, bgBottom);
+  push();
+  if (shakeFrames > 0) {
+    translate(random(-shakeMag, shakeMag), random(-shakeMag, shakeMag));
+    shakeFrames--;
+  }
+drawLinearGradient(bgTop, bgBottom);
   terrain.drawTerrain();
-  const pid = turnController.activePlayerId;
-  players[0].positionVector.y = height - terrain.getHeightAt(players[0].positionVector.x) - players[0].wheelRadius;
-  players[1].positionVector.y = height - terrain.getHeightAt(players[1].positionVector.x) - players[1].wheelRadius;
+
   if (wind) wind.draw();
-  players[pid].barrelAngle = controlPanel.angleDial.needleRotation - 90;
-  players[pid].barrelPower = controlPanel.powerAdjust.power * 8;
+  movePad.drawMovePad();
+  //update the location each time
+  let currentPlayerId = turnController.activePlayerId;
 
-  // draw both cannons
-  players[0].drawPlayer();
-  players[1].drawPlayer();
+  players[currentPlayerId].updateMove(0.18);
 
-  // update/draw projectile
-  if (currentShot?.isActive || currentShot?.isExploding) {
-    currentShot.updatePhysics(deltaTime / 1000);
-    currentShot.drawShotSequence();
+  if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
+    currentShot?.updatePhysics(deltaTime / 1000);
+    currentShot?.drawShotSequence();
+  }
+  else {
+    if (controlPanel.angleDial.isFollowing)
+      players[currentPlayerId].barrelAngle = controlPanel.angleDial.needleRotation - 90;
   }
 
+  players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+
+  players[currentPlayerId].positionVector.y = min(
+    controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
+    height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius);
+
+  players[0].drawPlayer();
+  players[1].drawPlayer();
+  const pid = turnController.activePlayerId;
+
+  push();
+  noFill();
+  strokeWeight(4);
+  if (pid === 0) stroke(255, 80, 80);
+  else stroke(80, 180, 255);
+  circle(players[pid].positionVector.x,players[pid].positionVector.y,players[pid].wheelRadius + 15);
+  let arrowY = players[pid].positionVector.y - 50;
+  fill(pid === 0 ? color(255, 80, 80) : color(80, 180, 255));
+  noStroke();
+  triangle(players[pid].positionVector.x - 10, arrowY,players[pid].positionVector.x + 10, arrowY,players[pid].positionVector.x, arrowY + 15);
+  pop();
   // update/draw explosion + score once per explosion 
   if (currentExplosion) {
     currentExplosion.update();
-    currentExplosion.draw();
     if (currentExplosion.finished && !hasScoredThisExplosion) {
       const shooterId = lastShooterId;
+      const targetId = 1 - shooterId; 
       const { enemy, self } = scoreCalculator.calculateExplosionScore(
-      currentExplosion,
-      players,
-      shooterId
-    );
+        currentExplosion,
+        players,
+        shooterId
+      );
     if (enemy > 0) {
       if (shooterId === 0) {
-      scoreBoard.score1 += enemy;
+        scoreBoard.score1 += enemy;
+      }
+      else scoreBoard.score2 += enemy;
+    floatingScores.push(new FloatingScore(
+      players[shooterId].positionVector.x,
+      players[shooterId].positionVector.y - 60,+enemy, color(255, 220, 0)));
+   // floatingScores.push( new FloatingScore(
+    //  players[1 - shooterId].positionVector.x,
+     // players[1 - shooterId].positionVector.y - 60,"HIT", color(255)));
+       players[targetId].triggerHitFlash(12); 
+  triggerShake(10, 6);                  
+
+}
+
+if (self > 0) {
+  if (shooterId === 0) scoreBoard.score1 -= self;
+  else scoreBoard.score2 -= self;
+  floatingScores.push(
+    new FloatingScore(
+      players[shooterId].positionVector.x,
+      players[shooterId].positionVector.y - 60,
+      -self,
+      color(255, 80, 80)
+    )
+  );
+    players[shooterId].triggerHitFlash(10); 
+  triggerShake(8, 4);                    
+}
+scoreBoard.score1 = Math.max(0, scoreBoard.score1);
+scoreBoard.score2 = Math.max(0, scoreBoard.score2);
+
+      hasScoredThisExplosion = true;
+      console.log(shooterId, enemy, self);
     }
-    else scoreBoard.score2 += enemy;
-  }
-    if (self > 0) {
-      if (shooterId === 0) {
-        scoreBoard.score1 -= self;
-     }
-    else scoreBoard.score2 -= self;
-    }
-    hasScoredThisExplosion = true;
-  }    
-  if (currentExplosion.finished) {
+    if (currentExplosion.finished) {
       currentExplosion = null;
     }
   }
   // allow scoring again on next explosion
   if (!currentExplosion) hasScoredThisExplosion = false;
-
+  pop();
   // UI
+  if (turnController.turnNumber !== lastTurnNumber) {
+    turnCounter.startRoundAnimation(turnController.turnNumber);
+    lastTurnNumber = turnController.turnNumber;
+  }
   controlPanel.drawCtrlPanel();
+  turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
+  for (let i = floatingScores.length - 1; i >= 0; i--) {
+    floatingScores[i].update();
+    floatingScores[i].draw();
+    if (floatingScores[i].finished) {
+      floatingScores.splice(i, 1);
+    }
+  }
+  if (turnController.isGameOver()) {
+    background('black');
+    fill('white');
+    noStroke();
+    textAlign(CENTER, TOP);
+    textFont('MS Trebuchet', 36);
+    const result = scoreBoard.getHighestScorePlayerId();
+    let statusText;
+    if (result.leader === "tie") statusText = "N/A - Draw!";
+    else statusText = `Player ${result.leader + 1}`;
+    //Display wineer
+    textSize(60);
+    text(`Winner: ${statusText}`, width / 2, 120); 
+    //Display final scores
+    textSize(32);
+    text(
+      "Player 1 Score: " + scoreBoard.score1 + "\n" +
+      "Player 2 Score: " + scoreBoard.score2,
+      width / 2,
+      250
+    );
+    //Restart instruction
+    textSize(24);
+    text("Press 'R' to restart", width / 2, 400);
+
+    if (key === 'r' || key === 'R') window.location.reload();
+  }
   scoreBoard.draw();
 }
 
 
 function mousePressed() {
   lastButtonClicked = mouseButton.left;
+
   const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
-  let shotRadius = 4;
-  if (lastButtonClicked && controlPanel.shootButton.isHovered  && shotFree) {
-    const pid = turnController.activePlayerId;
-    lastShooterId = pid;  
-    currentShot = players[pid].fireShot(shotRadius); 
+  const currentPlayerId = turnController.activePlayerId;
+
+  const shotRadius = 4;
+  if (lastButtonClicked && controlPanel.shootButton.isHovered && shotFree) {
+    lastShooterId = currentPlayerId;
+    currentShot = players[currentPlayerId].fireShot(shotRadius);
   }
+
+  const res = movePad.mousePressed();
+  if (res === 'left') {
+    players[currentPlayerId].targetX -= 100;
+  }
+  else if (res === 'right') {
+    players[currentPlayerId].targetX += 100;
+  }
+  players[currentPlayerId].targetX = constrain(
+    players[currentPlayerId].targetX,
+    players[currentPlayerId].wheelRadius,
+    width - players[currentPlayerId].wheelRadius
+  );
 }
 
 function mouseReleased() {
@@ -141,18 +257,10 @@ function mouseReleased() {
 }
 
 function keyReleased() {
-
-    // press W
-    if (key === 'w' || key === 'W') {
-
-        wind.newTurn();
-        wind.isActive = true;
-
-        // 5 second close
-        setTimeout(() => {
-            wind.isActive = false;
-        }, 5000);
-      }
+  let shotRadius = 4;
+  if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
+    currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
+  }
 }
 
 function drawLinearGradient(colorA, colorB) {

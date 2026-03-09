@@ -24,7 +24,7 @@ class PowerAdjustWidget {
   }
 
   get isFollowing() { return this.#isFollowing; }
-  get isHovered() { return this.#isHovered; } 
+  get isHovered() { return this.#isHovered(); } 
   set isFollowing(track) { this.#isFollowing = track; }
   get power() { return this.#power; }
 

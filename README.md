@@ -21,7 +21,7 @@ STRAPLINE. Add an exciting one sentence description of your game here.
 
 IMAGE. Add an image of your game here, keep this updated with a snapshot of your latest development.
 
-LINK. Add a link here to your deployed game, you can also make the image above link to your game if you wish. Your game lives in the [/docs](/docs) folder, and is published using Github pages. 
+[![Static Badge](https://img.shields.io/badge/Live%20Demo-WIP-EDF734?style=plastic&logo=p5dotjs&logoColor=crimson&logoSize=auto&labelColor=lightslategrey)](https://uob-comsm0166.github.io/2026-group-17/)
 
 VIDEO. Include a demo video of your game here (you don't have to wait until the end, you can insert a work in progress video)
 
@@ -63,13 +63,33 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 - Describe implementation of your game, in particular highlighting the TWO areas of *technical challenge* in developing your game. 
 
 ### Evaluation
+#### Qualitative: Think Aloud
 
-- 15% ~750 words
+The following section presents the outcome of the first think aloud evaluation of our game.
 
-- One qualitative evaluation (of your choice) 
+At this stage the game represented a minimum viable product. The core gameplay loop allowing 2 players to take turns adjusting the angle and power with which they shoot, fire a single weapon, score hits and determine a winner as well as 1 event - wind - had all been implemented in their initial form.
+
+**Users' observations:**
+
+1. The most frequently requested improvement mentioned by three users was some sort of indicator for whose turn it is as at the time there was no such clue
+2. Two players wanted to know how many turns each match lasts.
+3. Another player concern was the inability to precisely estimate the trajectory of shots before actually firing them.
+4. One user thought it was unintuitive for shots flying off the left and right side of the screen to disappear and for those that fly off the top side to disappear and then fall down, eventually. They suggested adding some sort of barriers/invisible walls that make the shots explode or bounce on collision as a clearer indication of the outcome of the shots.
+5. A suggested addition was to allow the Space key to fire shots, as well as allowing the arrow keys to move the current player's cannon. 
+6. A user complained about the situation in which cannons that are close to each other and both get hit by the same explosion. In this case, the shooting player both gains and loses points which the user found confusing.
+
+**Analysis outcome:**
+
+1. *add proposed solution to player phase indicator problem*
+2. Extra text should be added to the turn counter which should show the total turns in the match, for example - Turn 3/5, rather than just Turn 3.
+3. While it is part of the gameplay challenge for players to have to estimate the correct angle and power necessary to accurately hit the enemy player, an easy mode in which either the partial or full trajectory of a shot is shown before firing would be a good and useful addition, especially when taking into consideration the requirements of future evaluations.
+4. The team disagreed about this critique constituting a real issue. The suggestion to add some sort of either visible or invisible walls at the left top and right edges of the screen which would cause shots to explode or bounce could be an interesting addition (especially the bouncing variation) but not one that the team would like to prioritise, currently.
+5. Adding quality of life additions such as hotkeys for the shoot button and the move pad widget is a welcome and straightforward addition to implement.
+6. This should be resolved by reducing the number of times cannons can move in a single match to somewhere in the range of 2 to 4 times. As each player cannon start at a random position close to the opposite sides of the screen, making this change would make it much less likely for such a situation to occur. If it does occur, the original behaviour as described above is logical and should be preserved.
+<br/>
+<br/>
 
 - One quantitative evaluation (of your choice) 
-
 - Description of how code was tested. 
 
 ### Process 

@@ -1,0 +1,181 @@
+@startuml
+
+title Hot Cannon Sequential Diagram
+
+actor User
+
+participant GameStateManager
+participant TurnController
+participant TurnCounter
+participant Terrain
+participant Player
+participant PlayerCannon
+participant WeaponInventory
+participant Weapon
+participant ControlPanel
+participant AngleDialWidget
+participant PowerAdjustWidget
+participant MovePadWidget
+participant ShootButton
+participant Projectile
+participant Explosion
+participant ScoreCalculator
+participant ScoreBoard
+participant Event
+participant WindSystem
+participant RainSystem
+participant Earthquake
+participant WeaponShop
+
+== Weapon Purchase ==
+
+User -> GameStateManager : open shop
+GameStateManager -> WeaponShop : purchaseWeapon(player, weapon)
+
+WeaponShop -> PlayerCannon : getWeaponInventory()
+PlayerCannon --> WeaponShop : inventory
+
+WeaponShop -> WeaponInventory : addWeapon(weapon)
+
+WeaponShop --> GameStateManager : purchase complete
+
+== Weapon Inventory Management ==
+
+PlayerCannon -> WeaponInventory : getWeapons()
+TurnCounter->PlayerCannon:info
+PlayerCannon -> WeaponInventory : hasWeapon(weapon)
+PlayerCannon -> WeaponInventory : removeWeapon(weapon)
+
+== Game Start ==
+
+User -> GameStateManager : startNewGame()
+GameStateManager -> GameStateManager : initializeLevel()
+GameStateManager -> Terrain : generateInitialTerrain(seed)
+GameStateManager -> GameStateManager : initializePlayers()
+
+GameStateManager -> TurnController : startTurn()
+TurnController -> TurnCounter : incrementTurn()
+
+
+== Start Of Turn Events ==
+
+GameStateManager -> GameStateManager : applyStartOfTurnEvents()
+GameStateManager -> Event : applyStartOfTurn(game)
+
+alt WindSystem active
+    Event -> WindSystem : applyStartOfTurn(game)
+    WindSystem -> WindSystem : newTurn()
+    WindSystem -> WindSystem : applyEffect(game)
+end
+
+alt RainSystem active
+    Event -> RainSystem : applyStartOfTurn(game)
+end
+
+alt Earthquake active
+    Event -> Earthquake : applyStartOfTurn(game)
+end
+
+== Player Input Handling ==
+
+group Control adjustments
+  opt Adjust angle
+    User -> AngleDialWidget : drag angle dial
+    GameStateManager -> AngleDialWidget : get needleRotation
+    GameStateManager -> PlayerCannon : set barrelAngle
+  end
+
+  opt Adjust power
+    User -> PowerAdjustWidget : drag power slider
+    GameStateManager -> PowerAdjustWidget : get power
+    GameStateManager -> PlayerCannon : set barrelPower
+  end
+  
+  opt Move
+  User -> MovePadWidget : mousePressed()
+  MovePadWidget --> GameStateManager : direction
+  GameStateManager -> PlayerCannon : update targetX
+  end
+  
+  opt Weapon
+  User -> WeaponInventory: chooseWeapons()
+  PlayerCannon -> WeaponInventory : getWeapons()
+  PlayerCannon -> WeaponInventory : hasWeapon(weapon)
+  PlayerCannon -> WeaponInventory : removeWeapon(weapon)
+  end
+end
+
+  User -> ShootButton : mousePressed()
+  ShootButton --> GameStateManager : fireRequested (if hit)
+  GameStateManager -> PlayerCannon : fireShot()
+
+
+== Firing Process ==
+
+GameStateManager -> Player : getCannon()
+Player -> PlayerCannon : fireShot(radius)
+PlayerCannon -> WeaponInventory : getWeapons()
+TurnCounter->Player:info
+PlayerCannon -> Weapon : activate()
+PlayerCannon --> GameStateManager : return Projectile
+
+GameStateManager -> Projectile : update(deltaTime)
+
+== Projectile Flight ==
+
+loop While projectile is active
+    GameStateManager -> WindSystem : applyTo(projectile, deltaTime)
+    WindSystem -> Projectile : applyWind(windVector)
+
+    GameStateManager -> Projectile : update(deltaTime)
+    Projectile -> Terrain : checkCollisionWithTerrain(terrain)
+end
+
+== Impact ==
+
+Projectile -> GameStateManager : onImpact(position, game)
+GameStateManager -> Explosion : create Explosion
+Explosion -> Terrain : applyExplosion(center, radius)
+
+== Explosion Expansion ==
+
+loop While explosion is not finished
+    Explosion -> Explosion : update()
+    Explosion -> Explosion : draw()
+end
+
+== Score Calculation == 
+
+GameStateManager -> ScoreCalculator : calculateExplosionScore(explosion, players, shooterId)
+ScoreCalculator --> GameStateManager : return score
+
+GameStateManager -> Player : addScore(points)
+Player -> ScoreCounter : addScore(points)
+
+GameStateManager -> ScoreBoard : addPointToPlayer1(points)
+GameStateManager -> ScoreBoard : addPointToPlayer2(points)
+
+== Turn End ==
+
+GameStateManager -> GameStateManager : endTurn()
+GameStateManager -> Event : applyEndOfTurn(game)
+alt Event duration finished
+    Event -> Event : deactivate(game)
+end
+GameStateManager -> TurnController : endTurn()
+TurnController -> TurnController : updateActivePlayerId()
+TurnController -> TurnCounter : incrementTurn()
+
+== Game Over Check ==
+
+GameStateManager -> GameStateManager : checkGameOver()
+GameStateManager -> TurnController : isGameOver()
+
+alt Game Over
+    GameStateManager -> GameStateManager : determineWinner()
+    GameStateManager -> ScoreBoard : getHighestScorePlayerId()
+else Continue Game
+    GameStateManager -> TurnController : startTurn()
+end
+
+@enduml

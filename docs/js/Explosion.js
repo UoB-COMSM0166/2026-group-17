@@ -3,7 +3,7 @@ class Explosion {
     this.x = x;
     this.y = y;
     this.radius = 10;
-    this.maxRadius = random(40, 120);
+    this.maxRadius = 50;
     this.terrain = terrainRef;          
     this.hasAppliedTerrain = false;
     this.finished = false;              
@@ -11,10 +11,10 @@ class Explosion {
 
   update() {
     if (this.finished) return;
-    this.radius += 10;
+    this.radius += 0.5;
     if (!this.hasAppliedTerrain && this.radius >= this.maxRadius) {
       if (this.terrain) {
-        this.terrain.applyExplosion(createVector(this.x, this.y), this.maxRadius);
+        //this.terrain.applyExplosion(createVector(this.x, this.y), this.maxRadius);
       }
       this.hasAppliedTerrain = true;
       this.finished = true;

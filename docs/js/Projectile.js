@@ -21,32 +21,37 @@ class Projectile {
     }
 
     updatePhysics(dt) {
-  if (this.#isExploding) return;
+        if (this.#isExploding) return;
+        this.#velocity.add(gravity.copy().mult(dt));
+        // add wind
+        if (typeof wind !== "undefined") {
+            //add dt
+            wind.applyTo(this, dt);
+        }
+        this.#position.add(this.#velocity.copy().mult(dt));
+        //new:using real terrain height for collision detection
+        const groundY = min(
+            height - terrain.getHeightAt(this.#position.x),
+            controlPanel.getAltitudeAt(this.#position.x)
+        );
 
-  this.#velocity.add(gravity.copy().mult(dt));
+        if (this.#position.y >= groundY) {
+            this.#isActive = false;
+            this.#impactPosition = this.#position.copy();
+            this.#isExploding = true;
+            this.#explosionStartTime = frameCount;
+            currentExplosion = new Explosion(
+                this.#impactPosition.x,
+                this.#impactPosition.y,
+                terrain
+            );
+        }
+        else if (this.#position.x <= 0 || this.#position.x >= width) {
+            this.#isActive = false;
+            turnController.advancePhase();
+        }
+    }
 
-  this.#position.add(this.#velocity.copy().mult(dt));
-  if (this.#position.x <= 0 || this.#position.x >= width) {
-    this.#isActive = false;
-    turnController.advancePhase();
-    return;
-  }
-  const groundY = height - terrain.getHeightAt(this.#position.x);
-
-  if (this.#position.y >= groundY) {
-    this.#isActive = false;
-    this.#impactPosition = createVector(this.#position.x, groundY);
-    this.#isExploding = true;
-    this.#explosionStartTime = frameCount;
-    currentExplosion = new Explosion(
-      this.#impactPosition.x,
-      this.#impactPosition.y,
-      terrain
-    );
-    return;
-  }
-}
-    
     drawShotSequence() {
         //console.log("Projectile state:", {   // debugging code
         //    isActive: this.#isActive,
@@ -69,6 +74,7 @@ class Projectile {
         let explosionRadius = this.#maxExplosionRadius * progress;
         if (explosionRadius >= this.#maxExplosionRadius) {
             this.#isExploding = false;
+            terrain.applyExplosion(this.#impactPosition, this.#maxExplosionRadius);
             turnController.advancePhase();
             return;
         }
@@ -84,6 +90,6 @@ class Projectile {
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }
     //Added
-    get hasAppliedExplosion(){ return this.#hasAppliedExplosion;}
-    set hasAppliedExplosion(val){ this.#hasAppliedExplosion = val;}
+    get hasAppliedExplosion() { return this.#hasAppliedExplosion; }
+    set hasAppliedExplosion(val) { this.#hasAppliedExplosion = val; }
 }
