@@ -281,7 +281,7 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
     }
 
     // decide colors based on hit or miss
-    const baseColor = willHit ? [80, 255, 120] : [0, 245, 212]; // 绿色 or 青色
+    const baseColor = willHit ? [80, 255, 120] : [0, 245, 212]; // color for hit and miss
     const glowColor = willHit ? `rgba(80,255,120,` : `rgba(0,245,212,`;
 
     push();
