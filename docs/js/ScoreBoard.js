@@ -9,7 +9,7 @@ class ScoreBoard{
   //createCanvas(windowWidth, windowHeight);
 
   textAlign(LEFT, TOP);
-  textFont('Comic Sans MS, Chalkboard SE, Marker Felt, cursive');
+  textFont('Comic Sans MS');
   }
 
   draw() {
