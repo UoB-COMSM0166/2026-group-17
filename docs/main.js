@@ -2,10 +2,10 @@ let gravity;
 let bgTop;
 let bgBottom;
 let players = [];
+let lastActivePlayerId = -1;
 let turnController;
 let turnCounter;
 let controlPanel;
-let movePad;
 let lastButtonClicked;
 
 let wind;
@@ -35,6 +35,57 @@ function setup() {
   //Initialize StartMenu
   startMenu = new StartMenu(width, height);
   gravity = createVector(0, 400);
+  //set wind
+  wind = new WindSystem();
+  turnController = new TurnController(wind);
+  bgTop = color(0);
+  bgBottom = color(0, 80, 100);
+  scoreBoard = new ScoreBoard();
+  scoreBoard.setup();
+  controlPanel = new ControlPanel(color(20));
+  terrain = new Terrain(createVector(width, height), color(255, 0, 0));
+  const terrainSeed = floor(random(99999));
+  terrain.generateInitialTerrain(terrainSeed);
+  scoreCalculator = new ScoreCalculator();
+  turnCounter = new TurnCounter(createVector(width / 2, height / 20));
+  const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
+
+  // left cannon
+  const cannon1X = random(wheelRadius, width / 4);
+  const cannon1Position = createVector(
+    cannon1X,
+    height - terrain.getHeightAt(cannon1X) - wheelRadius
+  );
+
+  // right cannon
+  const cannon2X = random(width - width / 5, width - wheelRadius);
+  const cannon2Position = createVector(
+    cannon2X,
+    height - terrain.getHeightAt(cannon2X) - wheelRadius
+  );
+
+  angleMode(DEGREES);
+  players[0] = new PlayerCannon(
+    cannon1Position,
+    wheelRadius,
+    barrelSizeVector,
+    -45,
+    3,
+    color('silver'),
+    color('lightslategray')
+  );
+  players[1] = new PlayerCannon(
+    cannon2Position,
+    wheelRadius,
+    barrelSizeVector,
+    220,
+    3,
+    color('moccasin'),
+    color('navajowhite')
+  );
+
+  randomWinner = round(random(0, 1));
+  ellipseMode(RADIUS);
 }
 
 function draw() {
@@ -54,22 +105,39 @@ function draw() {
   terrain.drawTerrain();
 
   if (wind) wind.draw();
-  movePad.drawMovePad();
   //update the location each time
   let currentPlayerId = turnController.activePlayerId;
 
+  
   players[currentPlayerId].updateMove(0.18);
 
+
+  if (currentPlayerId !== lastActivePlayerId) {
+    controlPanel.angleDial.needleRotation = players[currentPlayerId].barrelAngle + 90;
+    controlPanel.powerAdjust.power = players[currentPlayerId].barrelPower / 7;
+    controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
+    lastActivePlayerId = currentPlayerId;
+  }
+  
   if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     currentShot?.updatePhysics(deltaTime / 1000);
     currentShot?.drawShotSequence();
+    if (currentShot?.isExploding && !currentExplosion && currentShot?.impactPosition) {
+      currentExplosion = new Explosion(
+        currentShot.impactPosition.x,
+        currentShot.impactPosition.y
+      );
+      currentExplosion.maxRadius = currentShot.maxExplosionRadius;
+    }
   }
   else {
     if (controlPanel.angleDial.isFollowing)
       players[currentPlayerId].barrelAngle = controlPanel.angleDial.needleRotation - 90;
+    if (controlPanel.powerAdjust.isFollowing) {
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+    }
   }
 
-  players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
 
   players[currentPlayerId].positionVector.y = min(
     controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
@@ -130,7 +198,7 @@ function draw() {
         players,
         shooterId
       );
-
+      console.log(enemy, self);
       if (enemy > 0) {
         if (shooterId === 0) {
           scoreBoard.score1 += enemy;
@@ -179,9 +247,9 @@ function draw() {
   if (turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     //only show trajectory preview when player can act and wind is not active
     if(wind && wind.isActive === false){
-    const windForce = wind ? wind.forceVector : createVector(0, 0);
+    const windSystem = wind ? wind.forceVector : createVector(0, 0);
     const enemyId = currentPlayerId === 0 ? 1 : 0; // opponent player id
-    drawTrajectoryPreview(players[currentPlayerId], gravity, windForce, terrain, players[enemyId]);
+    drawTrajectoryPreview(players[currentPlayerId], gravity, windSystem, terrain, players[enemyId]);
   }
 }
   // UI
@@ -271,13 +339,21 @@ function mousePressed() {
     currentShot = players[currentPlayerId].fireShot(shotRadius);
   }
 
-  const res = movePad.mousePressed();
-  if (res === 'left') {
-    players[currentPlayerId].targetX -= 100;
+
+  const res = controlPanel.handleMovePadClick();
+  if (players[currentPlayerId].moveSteps > 0) {
+    if (res === 'left') {
+      players[currentPlayerId].targetX -= 50;
+      players[currentPlayerId].moveSteps -= 1;
+    }
+    else if (res === 'right') {
+      players[currentPlayerId].targetX += 50;
+      players[currentPlayerId].moveSteps -= 1;
+    }
+    controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
   }
-  else if (res === 'right') {
-    players[currentPlayerId].targetX += 100;
-  }
+
+
   players[currentPlayerId].targetX = constrain(
     players[currentPlayerId].targetX,
     players[currentPlayerId].wheelRadius,
@@ -327,12 +403,13 @@ function initGame(mode) {
     height - terrain.getHeightAt(cannon2X) - wheelRadius
   );
 
-  movePad = new MovePadWidget();
+  //movePad = new MovePadWidget();
   players[0] = new PlayerCannon(
     cannon1Position,
     wheelRadius,
     barrelSizeVector,
     -45,
+    3,
     color('silver'),
     color('lightslategray')
   );
@@ -341,6 +418,7 @@ function initGame(mode) {
     wheelRadius,
     barrelSizeVector,
     220,
+    3,
     color('moccasin'),
     color('navajowhite')
   );
@@ -351,6 +429,40 @@ function keyReleased() {
   if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
     currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
   }
+
+  const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
+  const currentPlayerId = turnController.activePlayerId;
+
+
+  if (keyCode === 32 && shotFree) {
+    lastShooterId = currentPlayerId;
+    currentShot = players[currentPlayerId].fireShot(shotRadius);
+  }
+
+  if (players[currentPlayerId].moveSteps > 0) {
+    if (keyCode === 37) {
+      players[currentPlayerId].targetX -= 50;
+      players[currentPlayerId].moveSteps -= 1;
+    }
+    else if (keyCode === 39) {
+      players[currentPlayerId].targetX += 50;
+      players[currentPlayerId].moveSteps -= 1;
+  }
+  controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
+  }
+  /*else if (keyCode === 38) {
+    controlPanel.powerAdjust.increasePower();
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+  }
+  else if (keyCode === 40) {
+    controlPanel.powerAdjust.decreasePower();
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+  }*/
+  players[currentPlayerId].targetX = constrain(
+    players[currentPlayerId].targetX,
+    players[currentPlayerId].wheelRadius,
+    width - players[currentPlayerId].wheelRadius
+  );
 }
 
 function drawLinearGradient(colorA, colorB) {
@@ -379,7 +491,7 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
     const wy = windVec?.y ?? 0;
     const dt = 0.035;
     const maxSteps = 300;
-    const hitRadius = enemyPlayer.wheelRadius + 20; // the radius
+    const hitRadius = enemyPlayer.wheelRadius + 20;
 
     // identify if this shot would hit the enemy by simulating the trajectory in advance
     let willHit = false;
@@ -392,9 +504,9 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
 
         if (simPx < 0 || simPx > width || simPy > height) break;
         if (simPy >= height - terrain.getHeightAt(simPx)) break;
-
         const d = dist(simPx, simPy, enemyPlayer.positionVector.x, enemyPlayer.positionVector.y);
         if (d < hitRadius) { willHit = true; break; }
+
     }
 
     // decide colors based on hit or miss

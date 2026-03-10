@@ -13,6 +13,8 @@ class ShootButton {
     get isHovered() { return this.#isHovered() }
 
     drawButton() {
+
+        push();
         rectMode(CENTER);
         fill(this.#fillColor);
         if (this.#isHovered()) {
@@ -24,7 +26,7 @@ class ShootButton {
 
         rect(this.#positionVector.x, this.#positionVector.y, width / 9, controlPanel.baseAltitude / 3);
         this.#drawText();
-
+        pop();
         /*const x = this.#positionVector.x;
         const y = this.#positionVector.y;
         const rShoot = (controlPanel.baseAltitude * 0.4);
