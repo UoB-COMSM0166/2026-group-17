@@ -35,8 +35,6 @@ class MovePadWidget {
   push();
   rectMode(CENTER);
 
-   push();
-  rectMode(CENTER);
 
   const x = this.#positionVector.x;
   const y = this.#positionVector.y - this.#btnHeight; 
@@ -82,6 +80,7 @@ class MovePadWidget {
   textSize(16);
   textStyle(BOLD);
   text(this.#step, boxX, boxY + 0.5);
+  pop();
 }
 
   #drawBoard() {

@@ -82,6 +82,8 @@ class Projectile {
     get position() { return this.#position; }
     //because velocity is private
     get vel() { return this.#velocity; }
+    get impactPosition() { return this.#impactPosition; }
+    get maxExplosionRadius() { return this.#maxExplosionRadius; }
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }

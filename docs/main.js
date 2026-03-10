@@ -6,7 +6,6 @@ let lastActivePlayerId = -1;
 let turnController;
 let turnCounter;
 let controlPanel;
-let movePad;
 let lastButtonClicked;
 
 let wind;
@@ -92,13 +91,20 @@ function draw() {
   if (currentPlayerId !== lastActivePlayerId) {
     controlPanel.angleDial.needleRotation = players[currentPlayerId].barrelAngle + 90;
     controlPanel.powerAdjust.power = players[currentPlayerId].barrelPower / 7;
-    movePad.step = players[currentPlayerId].moveSteps;
+    controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
     lastActivePlayerId = currentPlayerId;
   }
   
   if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     currentShot?.updatePhysics(deltaTime / 1000);
     currentShot?.drawShotSequence();
+    if (currentShot?.isExploding && !currentExplosion && currentShot?.impactPosition) {
+      currentExplosion = new Explosion(
+        currentShot.impactPosition.x,
+        currentShot.impactPosition.y
+      );
+      currentExplosion.maxRadius = currentShot.maxExplosionRadius;
+    }
   }
   else {
     if (controlPanel.angleDial.isFollowing)
@@ -140,6 +146,7 @@ function draw() {
         players,
         shooterId
       );
+      console.log(enemy, self);
       if (enemy > 0) {
         if (shooterId === 0) {
           scoreBoard.score1 += enemy;
@@ -217,21 +224,20 @@ function mousePressed() {
     currentShot = players[currentPlayerId].fireShot(shotRadius);
   }
 
-  console.log("before:", players[currentPlayerId].moveSteps);
-  const res = movePad.mousePressed();
+
+  const res = controlPanel.handleMovePadClick();
   if (players[currentPlayerId].moveSteps > 0) {
     if (res === 'left') {
       players[currentPlayerId].targetX -= 50;
-      players[currentPlayerId].moveSteps = players[currentPlayerId].moveSteps - 1;
+      players[currentPlayerId].moveSteps -= 1;
     }
     else if (res === 'right') {
       players[currentPlayerId].targetX += 50;
-      players[currentPlayerId].moveSteps = players[currentPlayerId].moveSteps - 1;
+      players[currentPlayerId].moveSteps -= 1;
     }
-    movePad.step = players[currentPlayerId].moveSteps;
+    controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
   }
-  console.log("after:", players[currentPlayerId].moveSteps);
-  console.log("pad:", movePad.step);
+
 
   players[currentPlayerId].targetX = constrain(
     players[currentPlayerId].targetX,
@@ -265,12 +271,26 @@ function keyReleased() {
     currentShot = players[currentPlayerId].fireShot(shotRadius);
   }
 
+  if (players[currentPlayerId].moveSteps > 0) {
   if (keyCode === 37) {
     players[currentPlayerId].targetX -= 50;
+    players[currentPlayerId].moveSteps -= 1;
+    controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
   }
   else if (keyCode === 39) {
     players[currentPlayerId].targetX += 50;
+    players[currentPlayerId].moveSteps -= 1;
+    controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
   }
+  }
+  /*else if (keyCode === 38) {
+    controlPanel.powerAdjust.increasePower();
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+  }
+  else if (keyCode === 40) {
+    controlPanel.powerAdjust.decreasePower();
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+  }*/
   players[currentPlayerId].targetX = constrain(
     players[currentPlayerId].targetX,
     players[currentPlayerId].wheelRadius,
