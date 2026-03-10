@@ -37,7 +37,7 @@ class TurnCounter {
         text(
             `ROUND ${this.currentRound}`,
             width / 2,
-            height / 2 + yOffset
+            height *0.35 + yOffset
         );
         this.roundAnimationTimer--;
     }

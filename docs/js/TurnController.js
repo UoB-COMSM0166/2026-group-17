@@ -9,21 +9,35 @@ class TurnController {
     get activePlayerId() { return this.#activePlayerId; }
     get turnNumber() { return this.#turnNumber; }
     get maxTurns() { return this.#maxTurns; }
-
-    playerCanAct(flying, exploding) { return !(this.isGameOver() || flying || exploding); }
+    //Removed isCameOver() from return so the final shot can finish
+    //and the score can be calculated before the end screen appears
+    playerCanAct(flying, exploding) { return !(flying || exploding); }
     advancePhase() {
         this.#updateActivePlayerId();
-        if (!this.isGameOver()) {
-            this.#incrementTurnCounter();
+        if (this.#activePlayerId === 0) {
+            this.#turnNumber++;
+
+            if (this.#windEvent && this.#windEvent.isActive) {
+                this.#windEvent.newTurn();
+            }
         }
     }
 
-    isGameOver() { return this.#turnNumber > this.#maxTurns; }
-    #updateActivePlayerId() { this.#activePlayerId = 1 - this.#activePlayerId; }
+    isGameOver() {
+        return this.#turnNumber > this.#maxTurns;
+    }
+
+    #updateActivePlayerId() {
+        this.#activePlayerId = 1 - this.#activePlayerId;
+    }
+
     #incrementTurnCounter() {
         if (this.#activePlayerId === 0) {
-            if (this.#windEvent != undefined) this.#windEvent.newTurn();
             this.#turnNumber++;
+
+            if (this.#windEvent !== undefined) {
+                this.#windEvent.newTurn();
+            }
         }
     }
 }

@@ -1,3 +1,17 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+**/.DS_Store
+**/.idea/
+=======
+**/.DS_Store
+**/.idea/
+>>>>>>> origin/hm
+=======
+**/.DS_Store
+**/.idea/
+>>>>>>> origin/main
+=======
 **/.DS_Store
 **/.idea/
 **/.vscode/
@@ -10,3 +24,4 @@ Weapon.js
 index.html
 sketch.js
 style.css
+>>>>>>> main

@@ -9,6 +9,9 @@ class PlayerCannon {
     #outlineColor;
     #targetX;
     #moveSteps = 3;
+    #hitFlashFrames = 0;
+    #hitFlashMax = 10;
+
 
     constructor(posVec, wheelRad, barrelSz, barrAngle, moveSteps, fillColor, outColor) {
         this.#positionVector = posVec;
@@ -36,21 +39,39 @@ class PlayerCannon {
     }
     drawPlayer() {
         fill(this.#fillColor);
-        stroke(this.#outlineColor);
+        if (this.#hitFlashFrames > 0) {
+            stroke(255, 255, 0);      
+            strokeWeight(6);
+        } else {
+            stroke(this.#outlineColor);
+            strokeWeight(2);
+        }
+
         this.#drawBarrel();
         this.#drawWheel();
+        this.tickEffects();
     }
 
+    triggerHitFlash(frames = 10) {
+        this.#hitFlashFrames = Math.max(this.#hitFlashFrames, frames);
+    }
+
+    tickEffects() {
+        if (this.#hitFlashFrames > 0) this.#hitFlashFrames--;
+    }
     get barrelAngle() { return this.#barrelAngle; }
-    get barrelPower() { return this.#savedBarrelPower; }
+    get barrelPower() { return this.#barrelPower; }
+    get lastFiredPower() { return this.#savedBarrelPower; }
     set barrelAngle(a) { this.#barrelAngle = a; }
     set barrelPower(p) { this.#barrelPower = p; }
     get positionVector() { return this.#positionVector; }
+    get position() { return this.#positionVector; }
     get wheelRadius() { return this.#wheelRadius; }
     get targetX() { return this.#targetX; }
     set targetX(x) { this.#targetX = x; } 
     get moveSteps() { return this.#moveSteps; }
     set moveSteps(s) { this.#moveSteps = s; }
+    get barrelSize() { return this.#barrelSize; }
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);

@@ -24,7 +24,6 @@ class ScoreCalculator {
   //Calculate distance from explosion center to cannon position
   const dx = cannon.positionVector.x - explosion.x;
   const dy = cannon.positionVector.y - explosion.y;
-
   const distance = Math.sqrt(dx * dx + dy * dy);
   //Include the cannon's wheel radius in the hit detection.
   const hitRadius = explosion.maxRadius + cannon.wheelRadius;
@@ -32,7 +31,7 @@ class ScoreCalculator {
   //no score is given
   if (distance > hitRadius || isNaN(distance)) return 0;
   //Base score decreases as distance increases
-  const base = map(distance, 0, explosion.maxRadius, 200, 0);
+  const base = Math.max(0, map(distance, 0, explosion.maxRadius, 200, 0));
 
   let bonus = 0;
   //Bonus score depending on how close the hit is

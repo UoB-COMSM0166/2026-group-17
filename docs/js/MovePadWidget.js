@@ -19,7 +19,7 @@ class MovePadWidget {
   }
 
   get isFollowing() { return this.#isFollowing; }
-  isHovered() { return this.#isHovered() }
+  isHovered(r) { return this.#isHovered() }
   set isFollowing(track) { this.#isFollowing = track; }
   get step() { return this.#step; }
   set step(s) { this.#step = s; }

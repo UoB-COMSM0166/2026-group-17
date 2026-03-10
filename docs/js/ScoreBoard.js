@@ -14,8 +14,9 @@ class ScoreBoard{
 
   draw() {
   //background(20);
-
+  push();
   this.drawScoreBoard();
+  pop();
   }
 
   drawScoreBoard() {

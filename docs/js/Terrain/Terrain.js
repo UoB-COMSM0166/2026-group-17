@@ -12,7 +12,6 @@ class Terrain {
     randomSeed(seed);
     noiseSeed(seed);
     let panelHeight = this.sizeVector.y * 0.25;
-
     for (let x = 0; x < this.sizeVector.x; x++) {
       let terrainHeight = map(noise(x * 0.005), 0, 1,
         panelHeight + 20,   // min
