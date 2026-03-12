@@ -25,10 +25,15 @@ function triggerShake(frames = 10, mag = 6) { shakeFrames = frames; shakeMag = m
 
 let startMenu;
 //Flag to check if the game has started
+//new changes
 let gameStarted = false;
+let weaponShop;
+let pendingMode = null;
+let gamePhase = 'menu';
 
 function setup() {
   createCanvas(1280, 700);
+   //cnv.elt.setAttribute('tabindex', '0'); 
   wind = new WindSystem();
   angleMode(DEGREES);
   ellipseMode(RADIUS);
@@ -89,9 +94,16 @@ function setup() {
 }
 
 function draw() {
-  if (!gameStarted) {
+  //add new logic to handle different game phases
+  if (gamePhase === 'menu') {
     background(0);
     startMenu.draw();
+    return;
+  }
+  if (gamePhase === 'shop') {
+     console.log('now-shop', weaponShop);
+    //background(30);
+    weaponShop.draw();
     return;
   }
 
@@ -317,7 +329,32 @@ function draw() {
 }
 
 function mousePressed() {
-  if (!gameStarted) {
+  //menu 
+  if (gamePhase === 'menu') {
+    const mode = startMenu.handleMousePressed();
+    document.querySelector('canvas').focus(); 
+    if (mode) {
+      pendingMode = mode;
+      gamePhase = 'shop';
+      weaponShop = new WeaponShop(width, height);
+    }
+    return;
+  }
+
+  if (gamePhase === 'shop') {
+    if(!weaponShop) return;
+  weaponShop.handleClick(mouseX, mouseY);
+  if (weaponShop.isStartButtonClicked(mouseX, mouseY)) {
+    const loadout0 = weaponShop.getLoadout(0);
+    const loadout1 = weaponShop.getLoadout(1);
+    initGame(pendingMode, loadout0, loadout1);
+    gamePhase = 'game';
+  }
+  return;
+}
+
+
+  /*if (!gameStarted) {
     //Handle Start menu clicks
     const mode = startMenu.handleMousePressed();
     if (mode) {
@@ -326,7 +363,7 @@ function mousePressed() {
       initGame(mode);
     }
     return;
-  }
+  }*/
 
   lastButtonClicked = mouseButton.left;
 
@@ -359,9 +396,17 @@ function mousePressed() {
     players[currentPlayerId].wheelRadius,
     width - players[currentPlayerId].wheelRadius
   );
+  
+}
+//add a new function
+function mouseMoved() {                               
+  if (gamePhase === 'shop'&&weaponShop) {
+    weaponShop.handleMouseMove(mouseX, mouseY);
+  }
 }
 
 function mouseReleased() {
+  if (gamePhase !== 'game') return;
   if (controlPanel.angleDial.isHovered && !controlPanel.angleDial.isFollowing && lastButtonClicked)
     controlPanel.angleDial.isFollowing = true;
   else controlPanel.angleDial.isFollowing = false;
@@ -371,12 +416,11 @@ function mouseReleased() {
   else controlPanel.powerAdjust.isFollowing = false;
 }
 
-function initGame(mode) {
+function initGame(mode,loadout0 = [], loadout1 = []) {
   wind = new WindSystem();
-
-  if (mode === "easy") wind.isActive = false;
-  if (mode === "hard") wind.isActive = true;
-  wind.newTurn();
+    if (mode === "easy") wind.isActive = false;
+    if (mode === "hard") wind.isActive = true;
+    wind.newTurn();
   turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
@@ -422,10 +466,34 @@ function initGame(mode) {
     color('moccasin'),
     color('navajowhite')
   );
+    if (loadout0.length > 0) {
+    players[0].weaponLoadout = loadout0;
+    players[0].currentWeaponIndex = 0;
+    loadout0.forEach(w => w.resetAmmo());
+  }
+
+  if (loadout1.length > 0) {
+    players[1].weaponLoadout = loadout1;
+    players[1].currentWeaponIndex = 0;
+    loadout1.forEach(w => w.resetAmmo());
+  }
 }
 
 function keyReleased() {
   let shotRadius = 4;
+ 
+  if (gamePhase === 'shop') {
+  console.log('shop keyReleased, isDone:', weaponShop.isDone(), 'keyCode:', keyCode, 'ENTER:', ENTER);
+}
+if (gamePhase === 'shop' && weaponShop.isDone() && keyCode === ENTER) {
+  const loadout0 = weaponShop.getLoadout(0);
+  const loadout1 = weaponShop.getLoadout(1);
+  initGame(pendingMode, loadout0, loadout1);
+  gamePhase = 'game';
+    return
+  }
+  if (gamePhase !== 'game') return;
+
   if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
     currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
   }
