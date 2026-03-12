@@ -17,7 +17,7 @@ let currentShot = null;
 let currentExplosion = null;
 let hasScoredThisExplosion = false;
 let lastTurnNumber = 1;
-let floatingScores = []; 
+let floatingScores = [];
 let pendingRoundAnimation = false;
 let shakeFrames = 0;
 let shakeMag = 0;
@@ -33,7 +33,7 @@ let gamePhase = 'menu';
 
 function setup() {
   createCanvas(1280, 700);
-   //cnv.elt.setAttribute('tabindex', '0'); 
+  //cnv.elt.setAttribute('tabindex', '0'); 
   wind = new WindSystem();
   angleMode(DEGREES);
   ellipseMode(RADIUS);
@@ -48,7 +48,7 @@ function setup() {
   scoreBoard = new ScoreBoard();
   scoreBoard.setup();
   controlPanel = new ControlPanel(color(20));
-  terrain = new Terrain(createVector(width, height), color(255, 0, 0));
+  terrain = new Terrain(controlPanel, color(255, 0, 0));
   const terrainSeed = floor(random(99999));
   terrain.generateInitialTerrain(terrainSeed);
   scoreCalculator = new ScoreCalculator();
@@ -57,16 +57,18 @@ function setup() {
 
   // left cannon
   const cannon1X = random(wheelRadius, width / 4);
+  console.log("terrain height for cannon1: " + terrain.getHeightAt(cannon1X));
   const cannon1Position = createVector(
     cannon1X,
-    height - terrain.getHeightAt(cannon1X) - wheelRadius
+    terrain.getHeightAt(cannon1X) - wheelRadius
   );
 
   // right cannon
   const cannon2X = random(width - width / 5, width - wheelRadius);
+  console.log("terrain height for cannon2: " + terrain.getHeightAt(cannon2X));
   const cannon2Position = createVector(
     cannon2X,
-    height - terrain.getHeightAt(cannon2X) - wheelRadius
+    terrain.getHeightAt(cannon2X) - wheelRadius
   );
 
   angleMode(DEGREES);
@@ -101,7 +103,7 @@ function draw() {
     return;
   }
   if (gamePhase === 'shop') {
-     console.log('now-shop', weaponShop);
+    console.log('now-shop', weaponShop);
     //background(30);
     weaponShop.draw();
     return;
@@ -114,13 +116,13 @@ function draw() {
   }
 
   drawLinearGradient(bgTop, bgBottom);
-  terrain.drawTerrain();
+  terrain.drawTerrain(deltaTime);
 
   if (wind) wind.draw();
   //update the location each time
   let currentPlayerId = turnController.activePlayerId;
 
-  
+
   players[currentPlayerId].updateMove(0.18);
 
 
@@ -130,7 +132,7 @@ function draw() {
     controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
     lastActivePlayerId = currentPlayerId;
   }
-  
+
   if (!turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     currentShot?.updatePhysics(deltaTime / 1000);
     currentShot?.drawShotSequence();
@@ -146,14 +148,15 @@ function draw() {
     if (controlPanel.angleDial.isFollowing)
       players[currentPlayerId].barrelAngle = controlPanel.angleDial.needleRotation - 90;
     if (controlPanel.powerAdjust.isFollowing) {
-    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+      players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
     }
   }
 
 
-  players[currentPlayerId].positionVector.y = min(
-    controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
-    height - terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius);
+  for (let player of players) player.positionVector.y = min(
+    controlPanel.getAltitudeAt(player.positionVector.x) - player.wheelRadius,
+    terrain.getHeightAt(player.positionVector.x) - player.wheelRadius
+  );
 
   players[0].drawPlayer();
   players[1].drawPlayer();
@@ -171,7 +174,7 @@ function draw() {
   triangle(players[pid].positionVector.x - 10, arrowY, players[pid].positionVector.x + 10, arrowY, players[pid].positionVector.x, arrowY + 15);
   pop();
   // update/draw explosion + score once per explosion 
- if (currentExplosion) {
+  if (currentExplosion) {
     currentExplosion.update();
     if (!currentExplosion.finished) {
       const shooterId = lastShooterId;
@@ -204,7 +207,7 @@ function draw() {
 
     if (currentExplosion.finished && !hasScoredThisExplosion) {
       const shooterId = lastShooterId;
-      const targetId = 1 - shooterId; 
+      const targetId = 1 - shooterId;
       const { enemy, self } = scoreCalculator.calculateExplosionScore(
         currentExplosion,
         players,
@@ -245,41 +248,41 @@ function draw() {
       scoreBoard.score2 = Math.max(0, scoreBoard.score2);
 
       hasScoredThisExplosion = true;
-      pendingRoundAnimation = true;   
+      pendingRoundAnimation = true;
       console.log(shooterId, enemy, self);
     }
 
     if (currentExplosion.finished) {
       currentExplosion = null;
     }
-}
+  }
   // allow scoring again on next explosion
   if (!currentExplosion) hasScoredThisExplosion = false;
   pop();
   if (turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     //only show trajectory preview when player can act and wind is not active
-    if(wind && wind.isActive === false){
-    const windSystem = wind ? wind.forceVector : createVector(0, 0);
-    const enemyId = currentPlayerId === 0 ? 1 : 0; // opponent player id
-    drawTrajectoryPreview(players[currentPlayerId], gravity, windSystem, terrain, players[enemyId]);
+    if (wind && wind.isActive === false) {
+      const windSystem = wind ? wind.forceVector : createVector(0, 0);
+      const enemyId = currentPlayerId === 0 ? 1 : 0; // opponent player id
+      drawTrajectoryPreview(players[currentPlayerId], gravity, windSystem, terrain, players[enemyId]);
+    }
   }
-}
   // UI
- if (
-  turnController.turnNumber !== lastTurnNumber &&
-  pendingRoundAnimation &&
-  !currentExplosion
-) {
-  if (wind && wind.isActive) {
-    wind.newTurn();
+  if (
+    turnController.turnNumber !== lastTurnNumber &&
+    pendingRoundAnimation &&
+    !currentExplosion
+  ) {
+    if (wind && wind.isActive) {
+      wind.newTurn();
+    }
+    turnCounter.startRoundAnimation(turnController.turnNumber);
+    lastTurnNumber = turnController.turnNumber;
+    pendingRoundAnimation = false;
   }
-  turnCounter.startRoundAnimation(turnController.turnNumber);
-  lastTurnNumber = turnController.turnNumber;
-  pendingRoundAnimation = false;
-}
   controlPanel.drawCtrlPanel();
 
-  turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
+  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
   for (let i = floatingScores.length - 1; i >= 0; i--) {
     floatingScores[i].update();
     floatingScores[i].draw();
@@ -294,9 +297,9 @@ function draw() {
 */
   scoreBoard.draw();
 
-  //Wait until the last shot and explosion are ginished
-  //before turinig to the end screen
-  if (turnController.isGameOver() && !currentExplosion 
+  //Wait until the last shot and explosion are finished
+  //before switching to the end screen
+  if (turnController.isGameOver() && !currentExplosion
     && (!currentShot || !currentShot.isActive)) {
 
     background('black');
@@ -332,7 +335,7 @@ function mousePressed() {
   //menu 
   if (gamePhase === 'menu') {
     const mode = startMenu.handleMousePressed();
-    document.querySelector('canvas').focus(); 
+    document.querySelector('canvas').focus();
     if (mode) {
       pendingMode = mode;
       gamePhase = 'shop';
@@ -342,16 +345,16 @@ function mousePressed() {
   }
 
   if (gamePhase === 'shop') {
-    if(!weaponShop) return;
-  weaponShop.handleClick(mouseX, mouseY);
-  if (weaponShop.isStartButtonClicked(mouseX, mouseY)) {
-    const loadout0 = weaponShop.getLoadout(0);
-    const loadout1 = weaponShop.getLoadout(1);
-    initGame(pendingMode, loadout0, loadout1);
-    gamePhase = 'game';
+    if (!weaponShop) return;
+    weaponShop.handleClick(mouseX, mouseY);
+    if (weaponShop.isStartButtonClicked(mouseX, mouseY)) {
+      const loadout0 = weaponShop.getLoadout(0);
+      const loadout1 = weaponShop.getLoadout(1);
+      initGame(pendingMode, loadout0, loadout1);
+      gamePhase = 'game';
+    }
+    return;
   }
-  return;
-}
 
 
   /*if (!gameStarted) {
@@ -396,11 +399,11 @@ function mousePressed() {
     players[currentPlayerId].wheelRadius,
     width - players[currentPlayerId].wheelRadius
   );
-  
+
 }
 //add a new function
-function mouseMoved() {                               
-  if (gamePhase === 'shop'&&weaponShop) {
+function mouseMoved() {
+  if (gamePhase === 'shop' && weaponShop) {
     weaponShop.handleMouseMove(mouseX, mouseY);
   }
 }
@@ -416,18 +419,18 @@ function mouseReleased() {
   else controlPanel.powerAdjust.isFollowing = false;
 }
 
-function initGame(mode,loadout0 = [], loadout1 = []) {
+function initGame(mode, loadout0 = [], loadout1 = []) {
   wind = new WindSystem();
-    if (mode === "easy") wind.isActive = false;
-    if (mode === "hard") wind.isActive = true;
-    wind.newTurn();
+  if (mode === "easy") wind.isActive = false;
+  if (mode === "hard") wind.isActive = true;
+  wind.newTurn();
   turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
   scoreBoard = new ScoreBoard();
   scoreBoard.setup();
   controlPanel = new ControlPanel(color(20));
-  terrain = new Terrain(createVector(width, height), color(255, 0, 0));
+  terrain = new Terrain(controlPanel, color(255, 0, 0));
   const terrainSeed = floor(random(99999));
   terrain.generateInitialTerrain(terrainSeed);
   scoreCalculator = new ScoreCalculator();
@@ -438,16 +441,15 @@ function initGame(mode,loadout0 = [], loadout1 = []) {
   const cannon1X = random(wheelRadius, width / 4);
   const cannon1Position = createVector(
     cannon1X,
-    height - terrain.getHeightAt(cannon1X) - wheelRadius
+    terrain.getHeightAt(cannon1X) - wheelRadius
   );
   // right cannon
   const cannon2X = random(width - width / 5, width - wheelRadius);
   const cannon2Position = createVector(
     cannon2X,
-    height - terrain.getHeightAt(cannon2X) - wheelRadius
+    terrain.getHeightAt(cannon2X) - wheelRadius
   );
 
-  //movePad = new MovePadWidget();
   players[0] = new PlayerCannon(
     cannon1Position,
     wheelRadius,
@@ -466,7 +468,7 @@ function initGame(mode,loadout0 = [], loadout1 = []) {
     color('moccasin'),
     color('navajowhite')
   );
-    if (loadout0.length > 0) {
+  if (loadout0.length > 0) {
     players[0].weaponLoadout = loadout0;
     players[0].currentWeaponIndex = 0;
     loadout0.forEach(w => w.resetAmmo());
@@ -481,15 +483,15 @@ function initGame(mode,loadout0 = [], loadout1 = []) {
 
 function keyReleased() {
   let shotRadius = 4;
- 
+
   if (gamePhase === 'shop') {
-  console.log('shop keyReleased, isDone:', weaponShop.isDone(), 'keyCode:', keyCode, 'ENTER:', ENTER);
-}
-if (gamePhase === 'shop' && weaponShop.isDone() && keyCode === ENTER) {
-  const loadout0 = weaponShop.getLoadout(0);
-  const loadout1 = weaponShop.getLoadout(1);
-  initGame(pendingMode, loadout0, loadout1);
-  gamePhase = 'game';
+    console.log('shop keyReleased, isDone:', weaponShop.isDone(), 'keyCode:', keyCode, 'ENTER:', ENTER);
+  }
+  if (gamePhase === 'shop' && weaponShop.isDone() && keyCode === ENTER) {
+    const loadout0 = weaponShop.getLoadout(0);
+    const loadout1 = weaponShop.getLoadout(1);
+    initGame(pendingMode, loadout0, loadout1);
+    gamePhase = 'game';
     return
   }
   if (gamePhase !== 'game') return;
@@ -515,8 +517,8 @@ if (gamePhase === 'shop' && weaponShop.isDone() && keyCode === ENTER) {
     else if (keyCode === 39) {
       players[currentPlayerId].targetX += 50;
       players[currentPlayerId].moveSteps -= 1;
-  }
-  controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
+    }
+    controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
   }
   /*else if (keyCode === 38) {
     controlPanel.powerAdjust.increasePower();
@@ -542,96 +544,96 @@ function drawLinearGradient(colorA, colorB) {
 }
 
 function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer) {
-    const angle = player.barrelAngle;
-    const speed = player.barrelPower;
-    const offsetDist = player.wheelRadius + player.barrelSize.x / 2;
+  const angle = player.barrelAngle;
+  const speed = player.barrelPower;
+  const offsetDist = player.wheelRadius + player.barrelSize.x / 2;
 
-    let offset = createVector(offsetDist, 0);
-    offset.rotate(angle);
+  let offset = createVector(offsetDist, 0);
+  offset.rotate(angle);
 
-    let px = player.positionVector.x + offset.x;
-    let py = player.positionVector.y + offset.y;
+  let px = player.positionVector.x + offset.x;
+  let py = player.positionVector.y + offset.y;
 
-    let vx = cos(angle) * speed;
-    let vy = sin(angle) * speed;
+  let vx = cos(angle) * speed;
+  let vy = sin(angle) * speed;
 
-    const wx = windVec?.x ?? 0;
-    const wy = windVec?.y ?? 0;
-    const dt = 0.035;
-    const maxSteps = 300;
-    const hitRadius = enemyPlayer.wheelRadius + 20;
+  const wx = windVec?.x ?? 0;
+  const wy = windVec?.y ?? 0;
+  const dt = 0.035;
+  const maxSteps = 300;
+  const hitRadius = enemyPlayer.wheelRadius + 20;
 
-    // identify if this shot would hit the enemy by simulating the trajectory in advance
-    let willHit = false;
-    let simPx = px, simPy = py, simVx = vx, simVy = vy;
-    for (let i = 0; i < maxSteps; i++) {
-        simVx += (gravityVec.x + wx) * dt;
-        simVy += (gravityVec.y + wy) * dt;
-        simPx += simVx * dt;
-        simPy += simVy * dt;
+  // identify if this shot would hit the enemy by simulating the trajectory in advance
+  let willHit = false;
+  let simPx = px, simPy = py, simVx = vx, simVy = vy;
+  for (let i = 0; i < maxSteps; i++) {
+    simVx += (gravityVec.x + wx) * dt;
+    simVy += (gravityVec.y + wy) * dt;
+    simPx += simVx * dt;
+    simPy += simVy * dt;
 
-        if (simPx < 0 || simPx > width || simPy > height) break;
-        if (simPy >= height - terrain.getHeightAt(simPx)) break;
-        const d = dist(simPx, simPy, enemyPlayer.positionVector.x, enemyPlayer.positionVector.y);
-        if (d < hitRadius) { willHit = true; break; }
+    if (simPx < 0 || simPx > width || simPy > height) break;
+    if (simPy >= height - terrain.getHeightAt(simPx)) break;
+    const d = dist(simPx, simPy, enemyPlayer.positionVector.x, enemyPlayer.positionVector.y);
+    if (d < hitRadius) { willHit = true; break; }
 
+  }
+
+  // decide colors based on hit or miss
+  const baseColor = willHit ? [80, 255, 120] : [0, 245, 212]; // color for hit and miss
+  const glowColor = willHit ? `rgba(80,255,120,` : `rgba(0,245,212,`;
+
+  push();
+  noStroke();
+  for (let i = 0; i < maxSteps; i++) {
+    vx += (gravityVec.x + wx) * dt;
+    vy += (gravityVec.y + wy) * dt;
+    px += vx * dt;
+    py += vy * dt;
+
+    if (px < 0 || px > width || py > height) break;
+    if (py >= height - terrain.getHeightAt(px)) break;
+
+    if (i % 3 === 0) {
+      const progress = i / maxSteps;
+      const alpha = lerp(255, 0, progress);
+      const sz = lerp(3, 0.8, progress);
+
+      drawingContext.shadowBlur = lerp(18, 0, progress);
+      drawingContext.shadowColor = glowColor + (alpha / 255) + ')';
+      fill(...baseColor, alpha * 0.4);
+      circle(px, py, sz * 1.5);
+
+      drawingContext.shadowBlur = lerp(8, 0, progress);
+      fill(200, 255, 250, alpha);
+      circle(px, py, sz);
     }
+  }
 
-    // decide colors based on hit or miss
-    const baseColor = willHit ? [80, 255, 120] : [0, 245, 212]; // color for hit and miss
-    const glowColor = willHit ? `rgba(80,255,120,` : `rgba(0,245,212,`;
+  // hit 
+  if (willHit) {
+    const ex = enemyPlayer.positionVector.x;
+    const ey = enemyPlayer.positionVector.y;
 
-    push();
+    drawingContext.shadowBlur = 20;
+    drawingContext.shadowColor = 'rgba(80, 255, 120, 0.9)';
+    noFill();
+    stroke(80, 255, 120, 200);
+    strokeWeight(2);
+    //  frameCount fot pulsing effect
+    const pulse = sin(frameCount * 5) * 4;
+    circle(ex, ey, hitRadius + pulse);
+
+    // "HIT" txt
     noStroke();
-    for (let i = 0; i < maxSteps; i++) {
-        vx += (gravityVec.x + wx) * dt;
-        vy += (gravityVec.y + wy) * dt;
-        px += vx * dt;
-        py += vy * dt;
+    drawingContext.shadowBlur = 10;
+    fill(80, 255, 120);
+    textAlign(CENTER, BOTTOM);
+    textSize(14);
+    text('HIT', ex, ey - hitRadius - 8);
+  }
 
-        if (px < 0 || px > width || py > height) break;
-        if (py >= height - terrain.getHeightAt(px)) break;
-
-        if (i % 3 === 0) {
-            const progress = i / maxSteps;
-            const alpha = lerp(255, 0, progress);
-            const sz = lerp(3, 0.8, progress);
-
-            drawingContext.shadowBlur = lerp(18, 0, progress);
-            drawingContext.shadowColor = glowColor + (alpha / 255) + ')';
-            fill(...baseColor, alpha * 0.4);
-            circle(px, py, sz * 1.5);
-
-            drawingContext.shadowBlur = lerp(8, 0, progress);
-            fill(200, 255, 250, alpha);
-            circle(px, py, sz);
-        }
-    }
-
-    // hit 
-    if (willHit) {
-        const ex = enemyPlayer.positionVector.x;
-        const ey = enemyPlayer.positionVector.y;
-
-        drawingContext.shadowBlur = 20;
-        drawingContext.shadowColor = 'rgba(80, 255, 120, 0.9)';
-        noFill();
-        stroke(80, 255, 120, 200);
-        strokeWeight(2);
-        //  frameCount fot pulsing effect
-        const pulse = sin(frameCount * 5) * 4;
-        circle(ex, ey, hitRadius + pulse);
-
-        // "HIT" txt
-        noStroke();
-        drawingContext.shadowBlur = 10;
-        fill(80, 255, 120);
-        textAlign(CENTER, BOTTOM);
-        textSize(14);
-        text('HIT', ex, ey - hitRadius - 8);
-    }
-
-    drawingContext.shadowBlur = 0;
-    drawingContext.shadowColor = 'transparent';
-    pop();
+  drawingContext.shadowBlur = 0;
+  drawingContext.shadowColor = 'transparent';
+  pop();
 }
