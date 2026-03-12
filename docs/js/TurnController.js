@@ -1,6 +1,6 @@
 class TurnController {
     #turnNumber = 1;
-    #maxTurns = 50;
+    #maxTurns = 5;
     #activePlayerId = 0;
     #windEvent;
 

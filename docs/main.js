@@ -48,7 +48,7 @@ function setup() {
 
   // right cannon
   const cannon2X = random(width - width / 5, width - wheelRadius);
-    console.log("terrain height for cannon2: " + terrain.getHeightAt(cannon2X));
+  console.log("terrain height for cannon2: " + terrain.getHeightAt(cannon2X));
   const cannon2Position = createVector(
     cannon2X,
     terrain.getHeightAt(cannon2X) - wheelRadius
@@ -75,7 +75,7 @@ function setup() {
 
 function draw() {
   drawLinearGradient(bgTop, bgBottom);
-  terrain.drawTerrain();
+  terrain.drawTerrain(deltaTime);
 
   if (wind) wind.draw();
   movePad.drawMovePad();
@@ -95,9 +95,10 @@ function draw() {
 
   players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
 
-  players[currentPlayerId].positionVector.y = min(
-    controlPanel.getAltitudeAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius,
-    terrain.getHeightAt(players[currentPlayerId].positionVector.x) - players[currentPlayerId].wheelRadius);
+  for (let player of players) player.positionVector.y = min(
+    controlPanel.getAltitudeAt(player.positionVector.x) - player.wheelRadius,
+    terrain.getHeightAt(player.positionVector.x) - player.wheelRadius
+  );
 
   players[0].drawPlayer();
   players[1].drawPlayer();
@@ -108,11 +109,11 @@ function draw() {
   strokeWeight(4);
   if (pid === 0) stroke(255, 80, 80);
   else stroke(80, 180, 255);
-  circle(players[pid].positionVector.x,players[pid].positionVector.y,players[pid].wheelRadius + 15);
+  circle(players[pid].positionVector.x, players[pid].positionVector.y, players[pid].wheelRadius + 15);
   let arrowY = players[pid].positionVector.y - 50;
   fill(pid === 0 ? color(255, 80, 80) : color(80, 180, 255));
   noStroke();
-  triangle(players[pid].positionVector.x - 10, arrowY,players[pid].positionVector.x + 10, arrowY,players[pid].positionVector.x, arrowY + 15);
+  triangle(players[pid].positionVector.x - 10, arrowY, players[pid].positionVector.x + 10, arrowY, players[pid].positionVector.x, arrowY + 15);
   pop();
   // update/draw explosion + score once per explosion 
   if (currentExplosion) {
@@ -157,8 +158,8 @@ function draw() {
     turnCounter.startRoundAnimation(turnController.turnNumber);
     lastTurnNumber = turnController.turnNumber;
   }
-    controlPanel.drawCtrlPanel();
-    turnCounter.drawCounter(turnController.turnNumber,turnController.maxTurns,turnController.activePlayerId);
+  controlPanel.drawCtrlPanel();
+  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
 
   if (turnController.isGameOver()) {
     background('black');
@@ -172,7 +173,7 @@ function draw() {
     else statusText = `Player ${result.leader + 1}`;
     //Display wineer
     textSize(60);
-    text(`Winner: ${statusText}`, width / 2, 120); 
+    text(`Winner: ${statusText}`, width / 2, 120);
     //Display final scores
     textSize(32);
     text(

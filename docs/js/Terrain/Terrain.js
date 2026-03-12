@@ -1,6 +1,4 @@
-// terrain/Terrain.js
 class Terrain {
-   //colsizevector
    #controlPanel;
    #baseColor;
    #columns;
@@ -15,12 +13,10 @@ class Terrain {
       noiseSeed(seed);
       for (let x = 0; x < width; x++) {
          const panelHeight = this.#controlPanel.getAltitudeAt(x);
-         //console.log(`panel height for x = ${x}: ` + panelHeight);
          const terrainHeight = floor(map(noise(x * 0.005), 0, 1,
             panelHeight - 20,   // min
             panelHeight - 300   // max
          ));
-         //console.log(`terrain height for x = ${x}: ` + terrainHeight);
          this.#columns.push(new TerrainColumn(x, terrainHeight, panelHeight));
       }
    }
@@ -33,32 +29,24 @@ class Terrain {
       }
    }
 
-   setHeightAt(x, h) {
-      //floor() change to int
-      const col = this.#columns[floor(x)];
-      if (col) col.setTopHeight(h);
-   }
-
    applyExplosion(center, radius) {
-      //loop each cols which is under the area of explosion
+      //loop through all columns which are under the area of explosion
       let startId = floor(center.x - radius), endId = ceil(center.x + radius);
       for (let x = startId; x < endId; x++) {
          if (this.#columns[x])
-            this.#columns[x].removeExplodedPixels(center, radius, this.#controlPanel.getAltitudeAt(x));
+            this.#columns[x].removeExplodedPixels(center, radius);
       }
-      for (let x = startId; x < endId; x++) {
-         if (this.#columns[x]) this.#columns[x].startSettling(this.#controlPanel.getAltitudeAt(x));
-      }
+      for (let x = startId; x < endId; x++)
+         if (this.#columns[x])
+            this.#columns[x].startSettling(this.#controlPanel.getAltitudeAt(x));
    }
 
-   drawTerrain() {
+   drawTerrain(dt) {
       stroke(this.#baseColor);
       strokeWeight(1);
       for (let col of this.#columns) {
-         col.updateAnimation(deltaTime);
-         //console.log("Test outer");
+         col.updateAnimation(dt);
          for (let span of col.spans) {
-            //console.log("Test inner");
             line(col.xPosition, span.topY, col.xPosition, span.bottomY);
          }
       }

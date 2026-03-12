@@ -34,16 +34,9 @@ class Projectile {
             terrain.getHeightAt(this.#position.x),
             controlPanel.getAltitudeAt(this.#position.x)
         );
-        console.log(`position:
-            X: ${this.#position.x}
-            Y: ${this.#position.y}`);
-        console.log(`groundY: ${groundY}`);
         if (this.#position.y >= groundY) {
             this.#isActive = false;
             this.#impactPosition.set(floor(this.#position.x), floor(this.#position.y));
-            //console.log(`impactPosition:
-            //    X: ${this.#impactPosition.x}
-            //    Y: ${this.#impactPosition.y}`)
             this.#isExploding = true;
             this.#explosionStartTime = frameCount;
             currentExplosion = new Explosion(
@@ -59,10 +52,6 @@ class Projectile {
     }
 
     drawShotSequence() {
-        //console.log("Projectile state:", {   // debugging code
-        //    isActive: this.#isActive,
-        //    isExploding: this.#isExploding,
-        //});
         if (this.#isActive) this.#drawShot();
         else if (this.#isExploding) {
             this.#drawExplosion();
@@ -90,12 +79,10 @@ class Projectile {
     }
 
     get position() { return this.#position; }
-    //because velocity is private
     get vel() { return this.#velocity; }
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }
-    //Added
     get hasAppliedExplosion() { return this.#hasAppliedExplosion; }
     set hasAppliedExplosion(val) { this.#hasAppliedExplosion = val; }
 }
