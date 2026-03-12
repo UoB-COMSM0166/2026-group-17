@@ -6,7 +6,9 @@ class Explosion {
     this.maxRadius = 50;
     this.terrain = terrainRef;          
     this.hasAppliedTerrain = false;
-    this.finished = false;              
+    this.finished = false;  
+    this.enemyFeedbackTriggered = false;
+    this.selfFeedbackTriggered = false;            
   }
 
   update() {

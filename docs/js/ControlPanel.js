@@ -4,17 +4,16 @@ class ControlPanel {
     #angleDial;
     #shootButton;
     #powerAdjust;
-
     #movePad;
+
     static #profile;
     constructor(bgColor) {
         this.#backgroundColor = bgColor;
         this.#angleDial = new AngleDialWidget(createVector(width / 6, height - this.#baseAltitude / 2));
         this.#shootButton = new ShootButton();
         this.#powerAdjust = new PowerAdjustWidget();
-
-
         this.#movePad = new MovePadWidget();
+
         // array of vectors for the position of each point forming the top of the control panel shape
         ControlPanel.#profile = [
             createVector(0, height - this.#baseAltitude),
@@ -85,6 +84,8 @@ class ControlPanel {
     get angleDial() { return this.#angleDial; }
     get powerAdjust() { return this.#powerAdjust; }
     get shootButton() { return this.#shootButton; }
+    handleMovePadClick() { return this.#movePad.mousePressed(); }
+    setMoveSteps(steps) { this.#movePad.step = steps; }
 
     #drawBackground() {
         fill(this.#backgroundColor);

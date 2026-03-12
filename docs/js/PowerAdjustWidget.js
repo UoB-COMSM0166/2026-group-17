@@ -27,6 +27,12 @@ class PowerAdjustWidget {
   get isHovered() { return this.#isHovered(); } 
   set isFollowing(track) { this.#isFollowing = track; }
   get power() { return this.#power; }
+    set power(p) {
+    const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
+    const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
+    this.#sliderX = map(p, 0, 100, xMin, xMax);
+    this.#power = p;
+  }
 
   drawPowerAdjust() {
     this.#drawBoard();

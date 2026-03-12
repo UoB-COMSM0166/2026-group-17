@@ -8,16 +8,11 @@ class Projectile {
     #explosionStartTime;
     #maxExplosionRadius = 50;
 
-    //Added
-    #hasAppliedExplosion;
-
     constructor(muzzlePos, vel, rad) {
         this.#position = muzzlePos;
         this.#velocity = vel;
         this.#radius = rad;
         this.#isActive = true;
-        //Added
-        this.#hasAppliedExplosion = false;
     }
 
     updatePhysics(dt) {
@@ -29,8 +24,7 @@ class Projectile {
             wind.applyTo(this, dt);
         }
         this.#position.add(this.#velocity.copy().mult(dt));
-        //new:using real terrain height for collision detection
-        const groundY = min(  
+        const groundY = min(
             terrain.getHeightAt(this.#position.x),
             controlPanel.getAltitudeAt(this.#position.x)
         );
@@ -39,11 +33,6 @@ class Projectile {
             this.#impactPosition.set(floor(this.#position.x), floor(this.#position.y));
             this.#isExploding = true;
             this.#explosionStartTime = frameCount;
-            currentExplosion = new Explosion(
-                this.#impactPosition.x,
-                this.#impactPosition.y,
-                terrain
-            );
         }
         else if (this.#position.x <= 0 || this.#position.x >= width) {
             this.#isActive = false;
@@ -57,12 +46,14 @@ class Projectile {
             this.#drawExplosion();
         }
     }
+
     #drawShot() {
         strokeWeight(2);
         stroke('whitesmoke');
         fill('snow');
         circle(this.#position.x, this.#position.y, this.#radius);
     }
+
     #drawExplosion() {
         let age = frameCount - this.#explosionStartTime;
         let progress = constrain(map(age, 0, this.#maxExplosionRadius, 0, 1), 0, 1);
@@ -79,10 +70,11 @@ class Projectile {
     }
 
     get position() { return this.#position; }
+    //because velocity is private
     get vel() { return this.#velocity; }
+    get impactPosition() { return this.#impactPosition; }
+    get maxExplosionRadius() { return this.#maxExplosionRadius; }
     get isActive() { return this.#isActive; }
     get isExploding() { return this.#isExploding; }
     set isActive(truthVal) { this.#isActive = truthVal; }
-    get hasAppliedExplosion() { return this.#hasAppliedExplosion; }
-    set hasAppliedExplosion(val) { this.#hasAppliedExplosion = val; }
 }

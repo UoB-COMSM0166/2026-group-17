@@ -3,19 +3,26 @@ class PlayerCannon {
     #wheelRadius;
     #barrelSize;
     #barrelAngle = 0;
-    #barrelPower = 50;
+    #barrelPower = 350;
+    #savedBarrelPower = 350; 
     #fillColor;
     #outlineColor;
     #targetX;
+    #moveSteps = 3;
+    #hitFlashFrames = 0;
+    #hitFlashMax = 10;
 
-    constructor(posVec, wheelRad, barrelSz, barrAngle, fillColor, outColor) {
+
+    constructor(posVec, wheelRad, barrelSz, barrAngle, moveSteps, fillColor, outColor) {
         this.#positionVector = posVec;
         this.#wheelRadius = wheelRad;
         this.#barrelSize = barrelSz;
         this.#barrelAngle = barrAngle;
+        this.#savedBarrelPower = 350;
         this.#fillColor = fillColor;
         this.#outlineColor = outColor;
         this.#targetX = posVec.x; // for smooth movement
+        this.#moveSteps = moveSteps;
     }
 
     updateMove(follow = 0.30) {
@@ -24,6 +31,7 @@ class PlayerCannon {
 
     fireShot(shotRadius) {
         // offset of muzzle tip from positionVector
+        this.#savedBarrelPower = this.#barrelPower;
         let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
         let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(this.#barrelPower);
         offset.rotate(this.#barrelAngle);
@@ -31,19 +39,39 @@ class PlayerCannon {
     }
     drawPlayer() {
         fill(this.#fillColor);
-        stroke(this.#outlineColor);
+        if (this.#hitFlashFrames > 0) {
+            stroke(255, 255, 0);      
+            strokeWeight(6);
+        } else {
+            stroke(this.#outlineColor);
+            strokeWeight(2);
+        }
+
         this.#drawBarrel();
         this.#drawWheel();
+        this.tickEffects();
     }
 
+    triggerHitFlash(frames = 10) {
+        this.#hitFlashFrames = Math.max(this.#hitFlashFrames, frames);
+    }
+
+    tickEffects() {
+        if (this.#hitFlashFrames > 0) this.#hitFlashFrames--;
+    }
     get barrelAngle() { return this.#barrelAngle; }
     get barrelPower() { return this.#barrelPower; }
+    get lastFiredPower() { return this.#savedBarrelPower; }
     set barrelAngle(a) { this.#barrelAngle = a; }
     set barrelPower(p) { this.#barrelPower = p; }
     get positionVector() { return this.#positionVector; }
+    get position() { return this.#positionVector; }
     get wheelRadius() { return this.#wheelRadius; }
     get targetX() { return this.#targetX; }
     set targetX(x) { this.#targetX = x; } 
+    get moveSteps() { return this.#moveSteps; }
+    set moveSteps(s) { this.#moveSteps = s; }
+    get barrelSize() { return this.#barrelSize; }
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);
