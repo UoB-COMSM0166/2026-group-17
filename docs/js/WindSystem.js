@@ -34,7 +34,7 @@ class WindSystem {
         fill(255);
         textSize(26);
         textStyle(BOLD);
-        text("Wind: " + this.windForce.toFixed(2), width * 0.35, 40);
+        text("Wind: " + this.windForce.toFixed(2), width * 0.25, 40);
         pop();
         this.drawParticles();
     }
