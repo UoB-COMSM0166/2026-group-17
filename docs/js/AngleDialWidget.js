@@ -20,6 +20,7 @@ class AngleDialWidget {
     drawAngleDial() {
         this.#drawPlate();
         this.#drawNeedle();
+        this.#drawAngleText();
     }
 
     get isFollowing() { return this.#isFollowing; }
@@ -73,9 +74,26 @@ class AngleDialWidget {
         return this.#positionVector.dist(mouseVector) <= this.#radius;
     }
     #updateAngle() {
-        if (this.#isFollowing)
-            this.#needleRotation = 90 + atan2(mouseY - this.#positionVector.y, mouseX - this.#positionVector.x);
-        else this.#needleRotation = players[turnController.activePlayerId].barrelAngle + 90;
+        if (this.#isFollowing) {
+            if (this.#isHovered()) {
+                this.#needleRotation =
+                    90 + atan2(mouseY - this.#positionVector.y, mouseX - this.#positionVector.x);
+            } else {
+                this.#isFollowing = false;
+            }
+        } else {
+            this.#needleRotation = players[turnController.activePlayerId].barrelAngle + 90;
+        }
     }
 
+    #drawAngleText() {
+        push();
+        fill(255);
+        textSize(16);
+        textAlign(CENTER, CENTER);
+        const angle = ((360 - (this.#needleRotation - 90)) % 360).toFixed(0);
+        text(`Angle:${angle}°`, this.#positionVector.x, this.#positionVector.y - this.#radius * 1.5);
+        pop();
+
+    }
 }

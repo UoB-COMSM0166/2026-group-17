@@ -275,6 +275,9 @@ function draw() {
       floatingScores.splice(i, 1);
     }
   }
+  console.log("thisturn: "+turnController.isGameOver());
+  console.log("max turn：　" +turnController.maxTurns)
+  console.log("playerid:　" + turnController.activePlayerId);
   /*
   if (turnController.isGameOver()) {
 
@@ -284,8 +287,7 @@ function draw() {
 
   //Wait until the last shot and explosion are ginished
   //before turinig to the end screen
-  if (turnController.isGameOver() && !currentExplosion 
-    && (!currentShot || !currentShot.isActive)) {
+  if (isEndScreenActive()) {
 
     background('black');
     fill('white');
@@ -328,6 +330,7 @@ function mousePressed() {
     return;
   }
 
+  if (isEndScreenActive()) return;
   lastButtonClicked = mouseButton.left;
 
   const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
@@ -425,10 +428,11 @@ function initGame(mode) {
 }
 
 function keyReleased() {
+  if (isEndScreenActive()) return;
   let shotRadius = 4;
-  if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
+  /*if (key === 'Space' && !currentShot?.isActive && !currentShot?.isExploding) {
     currentShot = players[turnController.activePlayerId].fireShot(shotRadius);
-  }
+  }*/
 
   const shotFree = turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding));
   const currentPlayerId = turnController.activePlayerId;
@@ -437,6 +441,14 @@ function keyReleased() {
   if (keyCode === 32 && shotFree) {
     lastShooterId = currentPlayerId;
     currentShot = players[currentPlayerId].fireShot(shotRadius);
+  }
+  
+  if (key === 'w' || key === 'W') {
+    controlPanel.powerAdjust.increasePower();
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
+  } else if (key === 's' || key === 'S') {
+    controlPanel.powerAdjust.decreasePower();
+    players[currentPlayerId].barrelPower = controlPanel.powerAdjust.power * 7;
   }
 
   if (players[currentPlayerId].moveSteps > 0) {
@@ -463,6 +475,12 @@ function keyReleased() {
     players[currentPlayerId].wheelRadius,
     width - players[currentPlayerId].wheelRadius
   );
+}
+
+function isEndScreenActive() {
+  return turnController.isGameOver() &&
+         !currentExplosion &&
+         (!currentShot || !currentShot.isActive);
 }
 
 function drawLinearGradient(colorA, colorB) {

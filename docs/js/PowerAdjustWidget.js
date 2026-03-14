@@ -101,7 +101,11 @@ class PowerAdjustWidget {
     const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
 
     if (this.#isFollowing) {
-      this.#sliderX = constrain(mouseX, xMin, xMax);
+      if (this.#isHovered()) {
+        this.#sliderX = constrain(mouseX, xMin, xMax);
+      } else {
+        this.#isFollowing = false;
+      }
     }
 
     this.#power = map(this.#sliderX, xMin, xMax, 0, 100);
@@ -150,12 +154,20 @@ class PowerAdjustWidget {
   noStroke();
   fill(255);
   textSize(16);
-  textAlign(LEFT, CENTER);
+  textAlign(CENTER, CENTER);
 
   const label = `Power: ${Math.round(this.#power)}`;
 
-  text(label, this.#p1.x, this.#p1.y - 20);
+  text(label, (this.#p1.x + this.#p2.x) / 2, height - (this.#p3.y - this.#p2.y) * 1.75);
 
   pop();
+  }
+
+  increasePower(step = 1) {
+    this.power = constrain(this.#power + step, 0, 100);
+  }
+
+  decreasePower(step = 1) {
+    this.power = constrain(this.#power - step, 0, 100);
   }
 }
