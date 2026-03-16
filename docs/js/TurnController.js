@@ -14,11 +14,11 @@ class TurnController {
     playerCanAct(flying, exploding) { return !(flying || exploding); }
     advancePhase() {
         this.#updateActivePlayerId();
+
         if (this.#activePlayerId === 0) {
             this.#turnNumber++;
-
-            if (this.#windEvent && this.#windEvent.isActive) {
-                this.#windEvent.newTurn();
+            if (typeof generateRandomWeather === "function") {
+                generateRandomWeather();
             }
         }
     }

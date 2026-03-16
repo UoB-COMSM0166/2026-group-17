@@ -7,8 +7,12 @@ let turnController;
 let turnCounter;
 let controlPanel;
 let lastButtonClicked;
+let currentWeather = "none";
 
 let wind;
+let rain;
+let weatherQueue = [];
+let weatherIndex = 0;
 let terrain;
 let lastShooterId = 0;
 let scoreBoard;
@@ -35,13 +39,12 @@ function setup() {
   createCanvas(1280, 700);
   //cnv.elt.setAttribute('tabindex', '0'); 
   wind = new WindSystem();
+  rain = new RainSystem();
   angleMode(DEGREES);
   ellipseMode(RADIUS);
   //Initialize StartMenu
   startMenu = new StartMenu(width, height);
   gravity = createVector(0, 400);
-  //set wind
-  wind = new WindSystem();
   turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
@@ -119,6 +122,9 @@ function draw() {
   terrain.drawTerrain(deltaTime);
 
   if (wind) wind.draw();
+  if (rain) rain.draw();
+
+
   //update the location each time
   let currentPlayerId = turnController.activePlayerId;
 
@@ -268,21 +274,21 @@ function draw() {
     }
   }
   // UI
-  if (
-    turnController.turnNumber !== lastTurnNumber &&
-    pendingRoundAnimation &&
-    !currentExplosion
-  ) {
-    if (wind && wind.isActive) {
-      wind.newTurn();
+  if (turnController.turnNumber !== lastTurnNumber) {
+    lastTurnNumber = turnController.turnNumber;
+    if (pendingMode === "hard") {
+      generateRandomWeather();
     }
     turnCounter.startRoundAnimation(turnController.turnNumber);
-    lastTurnNumber = turnController.turnNumber;
-    pendingRoundAnimation = false;
   }
   controlPanel.drawCtrlPanel();
 
-  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
+  turnCounter.drawCounter(
+    turnController.turnNumber,
+    turnController.maxTurns,
+    turnController.activePlayerId
+  );
+
   for (let i = floatingScores.length - 1; i >= 0; i--) {
     floatingScores[i].update();
     floatingScores[i].draw();
@@ -421,9 +427,15 @@ function mouseReleased() {
 
 function initGame(mode, loadout0 = [], loadout1 = []) {
   wind = new WindSystem();
-  if (mode === "easy") wind.isActive = false;
-  if (mode === "hard") wind.isActive = true;
-  wind.newTurn();
+  rain = new RainSystem();
+  if (mode === "easy") {
+    wind.isActive = false;
+    rain.isActive = false;
+  }
+  if (mode === "hard") {
+    generateWeatherQueue();
+    generateRandomWeather();
+  }
   turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
@@ -535,6 +547,44 @@ function keyReleased() {
   );
 }
 
+function generateWeatherQueue() {
+
+  weatherQueue = [
+    "wind",
+    "rain",
+    "none"
+  ];
+
+  weatherQueue.push(random(["wind", "rain", "none"]));
+
+  shuffle(weatherQueue, true);
+
+  weatherIndex = 0;
+}
+
+function generateRandomWeather() {
+
+  if (weatherIndex >= weatherQueue.length) {
+    generateWeatherQueue();
+  }
+
+  currentWeather = weatherQueue[weatherIndex];
+  weatherIndex++;
+
+  wind.isActive = false;
+  rain.isActive = false;
+
+  if (currentWeather === "wind") {
+    wind.isActive = true;
+    wind.newTurn();
+  }
+  else if (currentWeather === "rain") {
+    rain.isActive = true;
+    rain.newTurn();
+  }
+
+  console.log("Weather this turn:", currentWeather);
+}
 function drawLinearGradient(colorA, colorB) {
   strokeWeight(1);
   for (let i = 0; i < height; ++i) {
