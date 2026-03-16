@@ -116,7 +116,7 @@ function draw() {
   }
 
   drawLinearGradient(bgTop, bgBottom);
-  terrain.drawTerrain(deltaTime);
+  terrain.drawTerrain();
 
   if (wind) wind.draw();
   //update the location each time
@@ -573,7 +573,7 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
     simPy += simVy * dt;
 
     if (simPx < 0 || simPx > width || simPy > height) break;
-    if (simPy >= height - terrain.getHeightAt(simPx)) break;
+    if (simPy >= terrain.getHeightAt(simPx)) break;
     const d = dist(simPx, simPy, enemyPlayer.positionVector.x, enemyPlayer.positionVector.y);
     if (d < hitRadius) { willHit = true; break; }
 
@@ -592,7 +592,7 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
     py += vy * dt;
 
     if (px < 0 || px > width || py > height) break;
-    if (py >= height - terrain.getHeightAt(px)) break;
+    if (py >= terrain.getHeightAt(px)) break;
 
     if (i % 3 === 0) {
       const progress = i / maxSteps;
