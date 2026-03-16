@@ -1,10 +1,10 @@
 class TerrainColumn {
+   static #fallSpeed = 0.03;
    #xPosition;
    #pixels = [];
-   #startSpans = [];
    #spans = [];
    #targetSpans = [];
-   #settleProgress = -1;
+   #isFalling = false;
 
    constructor(xPos, top, bottom) {
       this.#xPosition = xPos;
@@ -14,13 +14,14 @@ class TerrainColumn {
 
    get xPosition() { return this.#xPosition; }
    get spans() { return this.#spans }
+   get isFalling() { return this.#isFalling; }
    getTopHeight(ctrlPanelTopY) { return this.#spans.length > 0 ? this.#spans[0].topY : ctrlPanelTopY }
-   getBottomHeight() { return this.#pixels[this.#pixels.length - 1] }
+   getBottomHeight() { return this.#pixels.at(-1) }
    setTopHeight(topY) { this.#pixels[0] = topY }
 
    removeExplodedPixels(center, radius) {
       this.#pixels = this.#pixels.filter(
-         (pxHeight) => center.dist(createVector(this.#xPosition, pxHeight)) > radius
+         pxHeight => center.dist(createVector(this.#xPosition, pxHeight)) > radius
       );
       if (this.#pixels.length === 0) {
          this.#spans.length = 0;
@@ -33,34 +34,34 @@ class TerrainColumn {
    }
 
    startSettling(ctrlPanelTopY) {
-      if (this.#settleProgress > 0) return;
-      let anchorY = ctrlPanelTopY;
+      if (this.#isFalling) return;
+      let anchorY = ctrlPanelTopY + 1;
       for (let i = this.#targetSpans.length - 1; i >= 0; i--) {
-         if (this.#targetSpans[i].bottomY + 1 != anchorY) {
+         if (this.#targetSpans[i].bottomY + 1 !== anchorY) {
             let gap = anchorY - this.#targetSpans[i].bottomY - 1;
             this.#targetSpans[i].bottomY += gap;
             this.#targetSpans[i].topY += gap;
+            this.#isFalling = true;
          }
          anchorY = this.#targetSpans[i].topY;
       }
-      this.#startSpans = this.#spans.map(this.#cloneSpan);
-      this.#settleProgress = 0;
    }
 
-   updateAnimation(dt) {
-      if (this.#settleProgress < 0) return;
-      this.#settleProgress += dt * 0.001;
-      if (this.#settleProgress >= 1) {
-         // shallow copy 2 levels deep (array, then objects with primitive fields inside)
-         this.#spans = this.#targetSpans.map(this.#cloneSpan);
-         this.#rebuildPixelsFromSpans();
-         this.#settleProgress = -1;
-         return;
-      }
-      for (let i = 0; i < this.#spans.length; i++) {
-         this.#spans[i].topY = lerp(this.#startSpans[i].topY, this.#targetSpans[i].topY, this.#settleProgress);
-         this.#spans[i].bottomY = lerp(this.#startSpans[i].bottomY, this.#targetSpans[i].bottomY, this.#settleProgress);
-      }
+   updateAnimation() {
+      if (!this.#isFalling) return;
+      const displacement = TerrainColumn.#fallSpeed * deltaTime;
+      let anyMoved = false;
+      for (let i = 0; i < this.#spans.length; ++i)
+         if (this.#spans[i].bottomY < this.#targetSpans[i].bottomY) {
+            this.#spans[i].topY += displacement;
+            this.#spans[i].bottomY += displacement;
+            anyMoved = true;
+         }
+      if (anyMoved) return;
+      this.#rebuildPixelsFromSpans();
+      this.#spans.length = 1;
+      this.#spans[0] = { topY: this.#pixels[0], bottomY: this.#pixels.at(-1) };
+      this.#isFalling = false;
    }
 
    #computeSpans() {
@@ -72,7 +73,7 @@ class TerrainColumn {
             spanStart = pxId;
          }
       }
-      spans.push({ topY: this.#pixels[spanStart], bottomY: this.#pixels[this.#pixels.length - 1] });
+      spans.push({ topY: this.#pixels[spanStart], bottomY: this.#pixels.at(-1) });
       return spans;
    }
 

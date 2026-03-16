@@ -60,7 +60,26 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 
 - 15% ~750 words
 
-- Describe implementation of your game, in particular highlighting the TWO areas of *technical challenge* in developing your game. 
+During the development process the team encountered a number of challenges of varying complexity. Two major techical hurdles among those are highlighted below.
+
+#### Destructible terrain
+
+Terrain implementation began with the use of two classes - Terrain and TerrainColumn. Inside the terrain class an array of TerrainColumn object references was stored, each of which had a field storing the x and y positions of the column's top. The Terrain class would then use p5.js's noise() function to generate a y-position within a constrained range above the top of the control panel UI element which is positioned directly below the terrain. After that, the initial drawTerrain() method would use a custom shape drawn with vertices between p5.js's beginShape() and endShape() function calls. As the control panel element's top was initially flat there were only two vertices at the bottom and then as many as the width of the screen for the top of the terrain. When a circular explosion (the first type of explosion implemented in the game) affected terrain it would use the Pythagorean theorem to calculate the amount that each column's y-position should sink down and then that amount was added to the center.y coordinate of the circle to derive a new y-position for the top of each respective terrain column. 
+
+The issue with the above approach was that floating terrain and overhangs were not possible as there could only ever be 1 non-bottom vertex in any column, when the goal was to have terrain without any support below it drift down until it settles on solid ground below. This prompted a comprehensive rework of the TerrainColumn class and to a lesser extent of the Terrain class. A pixels array was added to the TerrainColumn class to hold the y-position of each terrain pixel in the current column and the logic for calculating what part of the terrain to remove was moved to a removeExplodedPixels() method inside TerrainColumn which would use the dist() p5.js function in a comparison with the explosion circle's range to find out any pixels outside of the range of explosion in the current column and keep only them in the pixels array with the help of the Array.prototype.filter() method.
+
+After an explosion, if a column was not completely destroyed then it would end up with one or more disconnected sequences of pixels which we decided to call spans. With this in mind the approach to drawing in the Terrain class was changed from using a custom shape to using the p5.js line() function - 1 line() call per span. To store the spans a new spans array was created in the TerrainColumn class. With this, static overhangs became possible.
+
+The next step was to implement the settling down animation for any chunks of terrain which have no immediate support below them immediately after an explosion. To facilitate that, a targetSpans array field and a startSettling() method were added so the final position after settling of each span at the end of the animation could be calculated and stored. An updateAnimation() method would then gradually increase the progress of the animation stored in a settleProgress number field from 0.0 to 1.0 by adding to it the value of the p5.js deltaTime global variable modulated by a constant scalar and update each span's top and bottom y-positions using the p5.js lerp() to interpolate between the spans and targetSpans positions. This was an oversight which required the addition of a startSpans array field, so the starting position in the lerp calls could be fixed and work correctly. After the settleProgress field's value would grow above 1 the columns were snapped into the correct position by assigning to the values of the spans array the same values as those from the targetSpans array. Finally, a rebuildPixelsFromSpans() method would be called to update the pixels array based on the settled spans' y-coordinates.
+
+Thus, the initial terrain settling animation was complete. However, the way floating terrain chunks settled appeared uneven and it was decided that all columns should settle down with the same constant speed, so chunks would appear to maintain their shape while falling down and then the shape would gradually break down as each column reaches its respective solid ground below. Settling spans did not move with constant speed at the time because the lerp function calls were moving spans in different columns with different speed depending on the distance each span needed to travel to the bottom. For example, when settleProgress was 0.5 a span that was initially floating 100 pixels above its target position had moved 50 pixels, while a span which was initially 50 pixels above solid ground would have only moved down 25 pixels when settleProgress was 0.5.
+
+To achive the final desired behaviour one last update to the TerrainColumn class was required which changed the way the spans' positions were updated from using lerp() calls to simply adding the same original result of the multiplication between deltaTime and a constant speed directly to each span's top and bottom y-positions.
+
+With the above change the desired settling animation was achieved, however, one bug also appeared. It involved settled spans settling what appeared to be 1 pixel or so above their respective target position. This was fixed by replacing the two spans in the spans array which were supposed to be stacked on top of each other with a single span based on the first and last element of the pixels array immediately after the rebuildPixelsFromSpans() call had completed.
+
+#### AI-controlled player
+
 
 ### Evaluation
 #### Qualitative: Think Aloud
@@ -80,8 +99,8 @@ At this stage the game represented a minimum viable product. The core gameplay l
 
 **Analysis outcome:**
 
-1. *add proposed solution to player phase indicator problem*
-2. Extra text should be added to the turn counter which should show the total turns in the match, for example - Turn 3/5, rather than just Turn 3.
+1. To keep the player updated on whose turn it currently is, it was decided to have colored text added below the round counter in addition to adding a colored halo-like indicator around the wheel of the current active player and a triangle symbol above the halo.
+2. Extra text should be added to the round counter which should show the total number of rounds in the match, for example - Turn 3/5, rather than just Turn 3.
 3. While it is part of the gameplay challenge for players to have to estimate the correct angle and power necessary to accurately hit the enemy player, an easy mode in which either the partial or full trajectory of a shot is shown before firing would be a good and useful addition, especially when taking into consideration the requirements of future evaluations.
 4. The team disagreed about this critique constituting a real issue. The suggestion to add some sort of either visible or invisible walls at the left top and right edges of the screen which would cause shots to explode or bounce could be an interesting addition (especially the bouncing variation) but not one that the team would like to prioritise, currently.
 5. Adding quality of life additions such as hotkeys for the shoot button and the move pad widget is a welcome and straightforward addition to implement.

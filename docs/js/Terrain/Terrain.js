@@ -32,20 +32,17 @@ class Terrain {
    applyExplosion(center, radius) {
       //loop through all columns which are under the area of explosion
       let startId = floor(center.x - radius), endId = ceil(center.x + radius);
-      for (let x = startId; x < endId; x++) {
-         if (this.#columns[x])
+      for (let x = startId; x < endId; x++) if (this.#columns[x]) {
             this.#columns[x].removeExplodedPixels(center, radius);
-      }
-      for (let x = startId; x < endId; x++)
-         if (this.#columns[x])
             this.#columns[x].startSettling(this.#controlPanel.getAltitudeAt(x));
+      }
    }
 
-   drawTerrain(dt) {
+   drawTerrain() {
       stroke(this.#baseColor);
       strokeWeight(1);
       for (let col of this.#columns) {
-         col.updateAnimation(dt);
+         col.updateAnimation();
          for (let span of col.spans) {
             line(col.xPosition, span.topY, col.xPosition, span.bottomY);
          }
