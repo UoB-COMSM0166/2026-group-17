@@ -137,13 +137,10 @@ The number of valid samples for both the NASA-TLX and SUS questionnaires was 10.
 
 <p align="center">
 
-$$
-
-\begin{cases}
+$$\begin{cases}
   H_0 &: \text{There's no significant difference between the easy and hard levels.}\\
   H_1 &: \text{There's significant difference between the easy and hard levels.}\\
-\end{cases}
-$$
+\end{cases}$$
 
 </p>
 
