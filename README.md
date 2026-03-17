@@ -93,7 +93,7 @@ At this stage the game represented a minimum viable product. The core gameplay l
 
 The number of valid samples for both the NASA-TLX and SUS questionnaires was 10. This analysis aims to investigate whether there is a significant difference between the easy and hard levels in perceived workload and usability. The tables below present the total scores for the easy and the hard level in both NASA-TLX and SUS.
 
-<center> Table x. Score of NASA-TLX and SUS</center>
+<p align="center"><strong>Table x.<strong> Score of NASA-TLX and SUS</p>
 
 <div align="center">
 
@@ -135,7 +135,7 @@ The number of valid samples for both the NASA-TLX and SUS questionnaires was 10.
 
 >At the 95% confidence level, the Wilcoxon signed-rank test results suggested that level significantly affected Performance, Effort and the overall NASA-TLX score. However, the differences in Mental Demand, Physical Demand, Temporal Demand, and Frustration between the easy and hard levels were not statistically significant difference.
 
-<div align="center">
+<p align="center">
 
 $
 \left\{
@@ -146,9 +146,9 @@ $
 \right.
 $
 
-</div>
+</p>
 
-<center> Table x. Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</center>
+<p align="center"><strong>Table x.<strong> Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</p>
 
 <div align="center">
 
