@@ -5,6 +5,7 @@ class ControlPanel {
     #shootButton;
     #powerAdjust;
     #movePad;
+    #weaponInventory;
 
     static #profile;
     constructor(bgColor) {
@@ -13,6 +14,7 @@ class ControlPanel {
         this.#shootButton = new ShootButton();
         this.#powerAdjust = new PowerAdjustWidget();
         this.#movePad = new MovePadWidget();
+        this.#weaponInventory = new WeaponInventory();
 
         // array of vectors for the position of each point forming the top of the control panel shape
         ControlPanel.#profile = [
@@ -68,6 +70,7 @@ class ControlPanel {
         this.#powerAdjust.drawPowerAdjust();
 
         this.#movePad.drawMovePad();
+        this.#weaponInventory.drawInventory();
     }
     getAltitudeAt(panelTopX) {
         for (let vecId = 0; vecId < ControlPanel.#profile.length - 1; vecId++) {
@@ -91,5 +94,10 @@ class ControlPanel {
         fill(this.#backgroundColor);
         rectMode(CORNER);
         rect(0, height - this.#baseAltitude, width, this.#baseAltitude);
+    }
+
+    
+    handleWeaponInventoryClick() {
+        this.#weaponInventory.handleMousePressed();
     }
 }

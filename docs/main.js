@@ -388,12 +388,11 @@ function mousePressed() {
   if (players[currentPlayerId].moveSteps > 0) {
     if (res === 'left') {
       players[currentPlayerId].targetX -= 50;
-      players[currentPlayerId].moveSteps -= 1;
     }
     else if (res === 'right') {
       players[currentPlayerId].targetX += 50;
-      players[currentPlayerId].moveSteps -= 1;
     }
+    players[currentPlayerId].moveSteps -= 1;
     controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
   }
 
@@ -403,6 +402,9 @@ function mousePressed() {
     players[currentPlayerId].wheelRadius,
     width - players[currentPlayerId].wheelRadius
   );
+
+  
+  controlPanel.handleWeaponInventoryClick();
 
 }
 //add a new function
