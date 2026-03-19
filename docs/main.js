@@ -275,10 +275,16 @@ function draw() {
   }
   // UI
   if (turnController.turnNumber !== lastTurnNumber) {
+
     lastTurnNumber = turnController.turnNumber;
+
     if (pendingMode === "hard") {
       generateRandomWeather();
+    } else {
+      wind.isActive = false;
+      rain.isActive = false;
     }
+
     turnCounter.startRoundAnimation(turnController.turnNumber);
   }
   controlPanel.drawCtrlPanel();
