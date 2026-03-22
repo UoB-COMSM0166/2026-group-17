@@ -267,9 +267,15 @@ function draw() {
   pop();
   if (turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     //only show trajectory preview when player can act and wind is not active
+    /*
     if (wind && wind.isActive === false) {
       const windSystem = wind ? wind.forceVector : createVector(0, 0);
       const enemyId = currentPlayerId === 0 ? 1 : 0; // opponent player id
+      drawTrajectoryPreview(players[currentPlayerId], gravity, windSystem, terrain, players[enemyId]);
+    }*/
+    if (pendingMode === "easy") {
+      const windSystem = createVector(0, 0);
+      const enemyId = currentPlayerId === 0 ? 1 : 0;
       drawTrajectoryPreview(players[currentPlayerId], gravity, windSystem, terrain, players[enemyId]);
     }
   }
@@ -615,8 +621,8 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
 
   const wx = windVec?.x ?? 0;
   const wy = windVec?.y ?? 0;
-  const dt = 0.035;
-  const maxSteps = 300;
+  const dt = 0.016;
+  const maxSteps = 600;
   const hitRadius = enemyPlayer.wheelRadius + 20;
 
   // identify if this shot would hit the enemy by simulating the trajectory in advance
@@ -650,7 +656,7 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
     if (px < 0 || px > width || py > height) break;
     if (py >= terrain.getHeightAt(px)) break;
 
-    if (i % 3 === 0) {
+    if (i % 2 === 0) {
       const progress = i / maxSteps;
       const alpha = lerp(255, 0, progress);
       const sz = lerp(3, 0.8, progress);
