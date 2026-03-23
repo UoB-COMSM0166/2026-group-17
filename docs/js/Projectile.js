@@ -23,6 +23,10 @@ class Projectile {
             //add dt
             wind.applyTo(this, dt);
         }
+        // Rain effect
+        if (rain && rain.isActive) {
+            rain.applyTo(this, dt);
+        }
         this.#position.add(this.#velocity.copy().mult(dt));
         const groundY = min(
             terrain.getHeightAt(this.#position.x),

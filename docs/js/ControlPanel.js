@@ -78,7 +78,7 @@ class ControlPanel {
             const segEndVec = ControlPanel.#profile[vecId + 1];
             if (panelTopX >= segStartVec.x && panelTopX <= segEndVec.x) {
                 const amount = map(panelTopX, segStartVec.x, segEndVec.x, 0, 1);
-                return lerp(segStartVec.y, segEndVec.y, amount);
+                return ceil(lerp(segStartVec.y, segEndVec.y, amount));
             }
         }
     }

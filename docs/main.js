@@ -7,8 +7,12 @@ let turnController;
 let turnCounter;
 let controlPanel;
 let lastButtonClicked;
+let currentWeather = "none";
 
 let wind;
+let rain;
+let weatherQueue = [];
+let weatherIndex = 0;
 let terrain;
 let lastShooterId = 0;
 let scoreBoard;
@@ -35,13 +39,12 @@ function setup() {
   createCanvas(1280, 700);
   //cnv.elt.setAttribute('tabindex', '0'); 
   wind = new WindSystem();
+  rain = new RainSystem();
   angleMode(DEGREES);
   ellipseMode(RADIUS);
   //Initialize StartMenu
   startMenu = new StartMenu(width, height);
   gravity = createVector(0, 400);
-  //set wind
-  wind = new WindSystem();
   turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
@@ -116,9 +119,12 @@ function draw() {
   }
 
   drawLinearGradient(bgTop, bgBottom);
-  terrain.drawTerrain(deltaTime);
+  terrain.drawTerrain();
 
   if (wind) wind.draw();
+  if (rain) rain.draw();
+
+
   //update the location each time
   let currentPlayerId = turnController.activePlayerId;
 
@@ -261,28 +267,40 @@ function draw() {
   pop();
   if (turnController.playerCanAct(Boolean(currentShot?.isActive), Boolean(currentShot?.isExploding))) {
     //only show trajectory preview when player can act and wind is not active
+    /*
     if (wind && wind.isActive === false) {
       const windSystem = wind ? wind.forceVector : createVector(0, 0);
       const enemyId = currentPlayerId === 0 ? 1 : 0; // opponent player id
       drawTrajectoryPreview(players[currentPlayerId], gravity, windSystem, terrain, players[enemyId]);
+    }*/
+    if (pendingMode === "easy") {
+      const windSystem = createVector(0, 0);
+      const enemyId = currentPlayerId === 0 ? 1 : 0;
+      drawTrajectoryPreview(players[currentPlayerId], gravity, windSystem, terrain, players[enemyId]);
     }
   }
   // UI
-  if (
-    turnController.turnNumber !== lastTurnNumber &&
-    pendingRoundAnimation &&
-    !currentExplosion
-  ) {
-    if (wind && wind.isActive) {
-      wind.newTurn();
-    }
-    turnCounter.startRoundAnimation(turnController.turnNumber);
+  if (turnController.turnNumber !== lastTurnNumber) {
+
     lastTurnNumber = turnController.turnNumber;
-    pendingRoundAnimation = false;
+
+    if (pendingMode === "hard") {
+      generateRandomWeather();
+    } else {
+      wind.isActive = false;
+      rain.isActive = false;
+    }
+
+    turnCounter.startRoundAnimation(turnController.turnNumber);
   }
   controlPanel.drawCtrlPanel();
 
-  turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
+  turnCounter.drawCounter(
+    turnController.turnNumber,
+    turnController.maxTurns,
+    turnController.activePlayerId
+  );
+
   for (let i = floatingScores.length - 1; i >= 0; i--) {
     floatingScores[i].update();
     floatingScores[i].draw();
@@ -427,9 +445,15 @@ function mouseReleased() {
 
 function initGame(mode, loadout0 = [], loadout1 = []) {
   wind = new WindSystem();
-  if (mode === "easy") wind.isActive = false;
-  if (mode === "hard") wind.isActive = true;
-  wind.newTurn();
+  rain = new RainSystem();
+  if (mode === "easy") {
+    wind.isActive = false;
+    rain.isActive = false;
+  }
+  if (mode === "hard") {
+    generateWeatherQueue();
+    generateRandomWeather();
+  }
   turnController = new TurnController(wind);
   bgTop = color(0);
   bgBottom = color(0, 80, 100);
@@ -550,12 +574,53 @@ function keyReleased() {
   );
 }
 
+<<<<<<< hm
 function isEndScreenActive() {
   return turnController.isGameOver() &&
          !currentExplosion &&
          (!currentShot || !currentShot.isActive);
 }
 
+=======
+function generateWeatherQueue() {
+
+  weatherQueue = [
+    "wind",
+    "rain",
+    "none"
+  ];
+
+  weatherQueue.push(random(["wind", "rain", "none"]));
+
+  shuffle(weatherQueue, true);
+
+  weatherIndex = 0;
+}
+
+function generateRandomWeather() {
+
+  if (weatherIndex >= weatherQueue.length) {
+    generateWeatherQueue();
+  }
+
+  currentWeather = weatherQueue[weatherIndex];
+  weatherIndex++;
+
+  wind.isActive = false;
+  rain.isActive = false;
+
+  if (currentWeather === "wind") {
+    wind.isActive = true;
+    wind.newTurn();
+  }
+  else if (currentWeather === "rain") {
+    rain.isActive = true;
+    rain.newTurn();
+  }
+
+  console.log("Weather this turn:", currentWeather);
+}
+>>>>>>> main
 function drawLinearGradient(colorA, colorB) {
   strokeWeight(1);
   for (let i = 0; i < height; ++i) {
@@ -580,8 +645,8 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
 
   const wx = windVec?.x ?? 0;
   const wy = windVec?.y ?? 0;
-  const dt = 0.035;
-  const maxSteps = 300;
+  const dt = 0.016;
+  const maxSteps = 600;
   const hitRadius = enemyPlayer.wheelRadius + 20;
 
   // identify if this shot would hit the enemy by simulating the trajectory in advance
@@ -594,7 +659,7 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
     simPy += simVy * dt;
 
     if (simPx < 0 || simPx > width || simPy > height) break;
-    if (simPy >= height - terrain.getHeightAt(simPx)) break;
+    if (simPy >= terrain.getHeightAt(simPx)) break;
     const d = dist(simPx, simPy, enemyPlayer.positionVector.x, enemyPlayer.positionVector.y);
     if (d < hitRadius) { willHit = true; break; }
 
@@ -613,9 +678,9 @@ function drawTrajectoryPreview(player, gravityVec, windVec, terrain, enemyPlayer
     py += vy * dt;
 
     if (px < 0 || px > width || py > height) break;
-    if (py >= height - terrain.getHeightAt(px)) break;
+    if (py >= terrain.getHeightAt(px)) break;
 
-    if (i % 3 === 0) {
+    if (i % 2 === 0) {
       const progress = i / maxSteps;
       const alpha = lerp(255, 0, progress);
       const sz = lerp(3, 0.8, progress);
