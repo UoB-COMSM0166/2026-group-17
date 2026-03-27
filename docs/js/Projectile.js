@@ -15,7 +15,7 @@ class Projectile {
         this.#isActive = true;
     }
 
-    updatePhysics(dt) {
+    updatePhysics(dt, gravity, wind, rain, terrain, controlPanel, turnController) {
         if (this.#isExploding) return;
         this.#velocity.add(gravity.copy().mult(dt));
         // add wind
@@ -44,10 +44,10 @@ class Projectile {
         }
     }
 
-    drawShotSequence() {
+    drawShotSequence(terrain) {
         if (this.#isActive) this.#drawShot();
         else if (this.#isExploding) {
-            this.#drawExplosion();
+            this.#drawExplosion(terrain);
         }
     }
 
@@ -58,7 +58,7 @@ class Projectile {
         circle(this.#position.x, this.#position.y, this.#radius);
     }
 
-    #drawExplosion() {
+    #drawExplosion(terrain) {
         let age = frameCount - this.#explosionStartTime;
         let progress = constrain(map(age, 0, this.#maxExplosionRadius, 0, 1), 0, 1);
         let explosionRadius = this.#maxExplosionRadius * progress;

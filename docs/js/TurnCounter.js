@@ -9,6 +9,7 @@ class TurnCounter {
         this.roundAnimationTimer = 60;
         this.currentRound = roundNumber;
     }
+
     drawCounter(turnNumber, maxTurns, activePlayerId) {
     push();
     textFont('Comic Sans MS, Chalkboard SE, Marker Felt, cursive');
@@ -28,7 +29,7 @@ class TurnCounter {
         width / 2,
         this.#position.y + 40
     );
-    if (this.roundAnimationTimer > 0) {
+    if (this.roundAnimationTimer > 0 && turnNumber <= maxTurns) {
         let progress = this.roundAnimationTimer / 60;
         let alpha = map(progress, 1, 0, 255, 0);
         let yOffset = map(progress, 1, 0, 0, -40);

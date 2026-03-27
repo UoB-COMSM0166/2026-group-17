@@ -12,19 +12,19 @@ class ShootButton {
 
     get isHovered() { return this.#isHovered() }
 
-    drawButton() {
+    drawButton(ctrlPanelBaseAltitude) {
 
         push();
         rectMode(CENTER);
         fill(this.#fillColor);
-        if (this.#isHovered()) {
+        if (this.#isHovered(ctrlPanelBaseAltitude)) {
             stroke(this.#outlineColor);
             strokeWeight(4);
         } else {
             strokeWeight(2);
         }
 
-        rect(this.#positionVector.x, this.#positionVector.y, width / 9, controlPanel.baseAltitude / 3);
+        rect(this.#positionVector.x, this.#positionVector.y, width / 9, ctrlPanelBaseAltitude / 3);
         this.#drawText();
         pop();
         /*const x = this.#positionVector.x;
@@ -75,11 +75,10 @@ class ShootButton {
         pop();
     }
 
-    #isHovered() {
+    #isHovered(ctrlPanelBaseAltitude) {
         let mouseVector = createVector(mouseX, mouseY);
         const w = width / 9;
-        const h = controlPanel.baseAltitude / 3;
-
+        const h = ctrlPanelBaseAltitude / 3;
         return (
             mouseX >= this.#positionVector.x - w / 2 &&
             mouseX <= this.#positionVector.x + w / 2 &&

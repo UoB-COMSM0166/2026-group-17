@@ -156,7 +156,7 @@ class MovePadWidget {
   }
 
   mousePressed() {
-    lastButtonClicked = mouseButton.left;
+    // lastButtonClicked = mouseButton.left;  GLOBAL lastButtonClicked NO LONGER EXISTS
 
     if (this.#isHovered(this.#getRect(-1))) {
       this.#isFollowing = true;

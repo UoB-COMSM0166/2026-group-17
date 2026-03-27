@@ -29,7 +29,7 @@ class ControlPanel {
         ];
     }
 
-    drawCtrlPanel() {
+    drawCtrlPanel(player) {
         this.#drawBackground();
 
         push();
@@ -63,8 +63,8 @@ class ControlPanel {
         line(width * 0.80, height - this.#baseAltitude * 1.2, width * 0.84, height - this.#baseAltitude * 1.2);
         pop();
 
-        this.#angleDial.drawAngleDial();
-        this.#shootButton.drawButton();
+        this.#angleDial.drawAngleDial(player);
+        this.#shootButton.drawButton(this.#baseAltitude);
         this.#powerAdjust.drawPowerAdjust();
 
         this.#movePad.drawMovePad();

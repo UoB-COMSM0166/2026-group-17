@@ -4,7 +4,7 @@ class PlayerCannon {
     #barrelSize;
     #barrelAngle = 0;
     #barrelPower = 350;
-    #savedBarrelPower = 350; 
+    #savedBarrelPower = 350;
     #fillColor;
     #outlineColor;
     #targetX;
@@ -26,7 +26,7 @@ class PlayerCannon {
     }
 
     updateMove(follow = 0.30) {
-      this.#positionVector.x = lerp(this.#positionVector.x, this.#targetX, follow);
+        this.#positionVector.x = lerp(this.#positionVector.x, this.#targetX, follow);
     }
 
     fireShot(shotRadius) {
@@ -40,7 +40,7 @@ class PlayerCannon {
     drawPlayer() {
         fill(this.#fillColor);
         if (this.#hitFlashFrames > 0) {
-            stroke(255, 255, 0);      
+            stroke(255, 255, 0);
             strokeWeight(6);
         } else {
             stroke(this.#outlineColor);
@@ -50,6 +50,25 @@ class PlayerCannon {
         this.#drawBarrel();
         this.#drawWheel();
         this.tickEffects();
+    }
+
+    drawIndicator(playerId) {
+        push();
+        noFill();
+        strokeWeight(4);
+        // Red for player 1, blue for player 2
+        const indicatorColor = (playerId === 0) ? color(255, 80, 80) : color(80, 180, 255);
+        stroke(indicatorColor);
+        circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius + 15);
+        const arrowY = this.#positionVector.y - 50;
+        fill(indicatorColor);
+        noStroke();
+        triangle(
+            this.#positionVector.x - 10, arrowY,
+            this.#positionVector.x + 10, arrowY,
+            this.#positionVector.x, arrowY + 15
+        );
+        pop();
     }
 
     triggerHitFlash(frames = 10) {
@@ -68,10 +87,13 @@ class PlayerCannon {
     get position() { return this.#positionVector; }
     get wheelRadius() { return this.#wheelRadius; }
     get targetX() { return this.#targetX; }
-    set targetX(x) { this.#targetX = x; } 
     get moveSteps() { return this.#moveSteps; }
     set moveSteps(s) { this.#moveSteps = s; }
     get barrelSize() { return this.#barrelSize; }
+
+    setTargetX(x, canvasWidth) {
+        this.#targetX = constrain(x, this.#wheelRadius, canvasWidth - this.wheelRadius);
+    }
 
     #drawWheel() {
         circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);

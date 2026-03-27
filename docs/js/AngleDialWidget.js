@@ -17,14 +17,15 @@ class AngleDialWidget {
         AngleDialWidget.#needleColor = color('crimson');
     }
 
-    drawAngleDial() {
+    drawAngleDial(player) {
         this.#drawPlate();
-        this.#drawNeedle();
+        this.#drawNeedle(player);
     }
 
     get isFollowing() { return this.#isFollowing; }
     get isHovered() { return this.#isHovered() }
     get needleRotation() { return this.#needleRotation }
+    set needleRotation(angle) { this.#needleRotation = angle; }
     set isFollowing(track) { this.#isFollowing = track; }
 
     #drawPlate() {
@@ -39,7 +40,7 @@ class AngleDialWidget {
         circle(this.#positionVector.x, this.#positionVector.y, this.#radius);
         pop();
     }
-    #drawNeedle() {
+    #drawNeedle(player) {
         push();
         translate(this.#positionVector.x, this.#positionVector.y);
         rotate(180);
@@ -66,16 +67,16 @@ class AngleDialWidget {
         bezierVertex(-2, 52);
         endShape();
         pop();
-        this.#updateAngle();
+        this.#updateAngle(player);
     }
     #isHovered() {
         let mouseVector = createVector(mouseX, mouseY);
         return this.#positionVector.dist(mouseVector) <= this.#radius;
     }
-    #updateAngle() {
+    #updateAngle(player) {
         if (this.#isFollowing)
             this.#needleRotation = 90 + atan2(mouseY - this.#positionVector.y, mouseX - this.#positionVector.x);
-        else this.#needleRotation = players[turnController.activePlayerId].barrelAngle + 90;
+        else this.#needleRotation = player.barrelAngle + 90;
     }
 
 }
