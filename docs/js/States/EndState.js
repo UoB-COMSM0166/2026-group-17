@@ -13,8 +13,8 @@ class EndState extends State {
       textAlign(CENTER, TOP);
       textFont('MS Trebuchet');
       let statusText;
-      if (this.#results.winnerData === "tie") statusText = "N/A - Draw!";
-      else statusText = `Player ${this.#results.winnerData + 1}`;
+      if (this.#results.winnerData.leader === "tie") statusText = "N/A - Draw!";
+      else statusText = `Player ${this.#results.winnerData.leader + 1}`;
       //Display winner
       textSize(60);
       text(`Winner: ${statusText}`, this.resolution.x / 2, 120);

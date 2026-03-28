@@ -98,7 +98,7 @@ class TrajectoryPreview {
       // frameCount for pulsing effect
       const pulse = sin(frameCount * 5) * 4;
       circle(targetPos.x, targetPos.y, hitRadius + pulse);
-      // "HIT" txt
+      // "HIT" text
       noStroke();
       drawingContext.shadowBlur = 10;
       fill(80, 255, 120);

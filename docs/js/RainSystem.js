@@ -25,7 +25,7 @@ class RainSystem {
         projectile.vel.mult(0.995);
     }
 
-    draw() {
+    draw(terrain) {
         if (!this.isActive) return;
         push();
         let level = this.getRainLevel();
@@ -41,11 +41,11 @@ class RainSystem {
             40
         );
         pop();
-        this.drawDrops();
+        this.drawDrops(terrain);
         this.drawSplashes();
     }
 
-    drawDrops() {
+    drawDrops(terrain) {
 
         if (frameCount % 2 === 0) {
             this.drops.push({

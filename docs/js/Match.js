@@ -26,8 +26,9 @@ class Match {
    #trajectoryPreviewer;
    #isEasyDifficulty;
    #lastMouseButton;
+   #shakeCallback;
 
-   constructor(resolution, gameMode, loadout0, loadout1) {
+   constructor(resolution, gameMode, loadout0, loadout1, shakeCallback) {
       // Per match systems / constants
       Match.#GRAVITY = createVector(0, 400);
       Match.#ZERO_VECTOR = createVector(0, 0);
@@ -58,6 +59,7 @@ class Match {
       this.#isEasyDifficulty = (gameMode === "easy");
       this.#trajectoryPreviewer = new TrajectoryPreview(resolution);
       this.#setModeBasedWeather();
+      this.#shakeCallback = shakeCallback;
    }
 
    updateMatch(dt) {
@@ -71,23 +73,22 @@ class Match {
 
    drawMatch() {
       this.#drawEnvironment();
-      this.#drawShot();
       this.#drawPlayers();
-      this.#drawTrajectory();
+      if (!this.#turnController.isGameOver) this.#drawTrajectory();
+      this.#drawShot();
       this.#drawHUD();
    }
 
    onMousePressed(button) {
-      this.#lastMouseButton = button;
+      this.#lastMouseButton = button.left;
    }
 
-   onMouseReleased(cursorX, cursorY, button) {
-      //if (this.#lastMouseButton !== LEFT) return;  // DOESN'T WORK (and without all mouse buttons work)
-      console.log("Mouse Released in Match")
-      this.#handleWidgetToggles();
+   onMouseReleased() {
+      if (!this.#physicsDone() || this.#lastMouseButton !== true) return;
+      this.#handleAngleDialToggle();
+      this.#handlePowerAdjustToggle();
       this.#triggerMouseCannonShot();
       this.#triggerMouseCannonMovement();
-      this.#lastMouseButton = null;       // new; potential issue?
    }
 
    onKeyReleased(inputKey, keyId) {
@@ -166,21 +167,24 @@ class Match {
    }
 
    #updateShot(dt) {
-      // Destructuring assignment: after this local constant isActive = currentShot.isActive, etc.
-      const { isActive, isExploding, impactPosition, maxExplosionRadius } = this.#currentShot;
-      if (!this.#turnController.playerCanAct(isActive, isExploding)) {
-         this.#currentShot.updatePhysics(
-            dt / 1000, Match.#GRAVITY, this.#wind, this.#rain,
-            this.#terrain, this.#controlPanel, this.#turnController
-         );
-         this.#spawnExplosion(isExploding, impactPosition);
-         this.#currentExplosion.maxRadius = maxExplosionRadius;
+      if (this.#currentShot.isDead) {
+         this.#currentShot = null;
+         return;
       }
+      // Destructuring assignment: after this local constant isExplosion = currentShot.isExplosion, etc.
+      const { isExploding, impactPosition, maxExplosionRadius } = this.#currentShot;
+      this.#currentShot.updatePhysics(
+         dt / 1000, Match.#GRAVITY, this.#wind, this.#rain,
+         this.#terrain, this.#controlPanel, this.#turnController
+      );
+      this.#spawnExplosion(isExploding, impactPosition, maxExplosionRadius);
    }
 
-   #spawnExplosion(isExploding, impactPosition) {
-      if (isExploding && !this.#currentExplosion && impactPosition)
-         this.#currentExplosion = new Explosion(impactPosition.x, impactPosition.y);
+   #spawnExplosion(isExploding, impactPosition, maxExplosionRadius) {
+      if (isExploding && !this.#currentExplosion && impactPosition) {
+         this.#currentExplosion = new Explosion(impactPosition, this.#terrain);
+         this.#currentExplosion.maxRadius = maxExplosionRadius;
+      }
    }
 
    #updatePlayers() {
@@ -209,7 +213,6 @@ class Match {
       else {
          this.#handleExplosionScoring();
          this.#currentExplosion = null;
-         this.#currentShot = null;     // kill shot object. Test if this doesn't break anything!
          this.#hasScoredThisExplosion = false;
       }
    }
@@ -223,13 +226,13 @@ class Match {
    }
 
    #calculateExplosionDistance(playerId) {
-      return this.#players[playerId].dist(this.#currentExplosion);
+      return this.#players[playerId].position.dist(this.#currentExplosion.position);
    }
 
-   #applyExplosionFeedback(key, distance, playerId, flashFrames, shakeFrames, shakeMag) {
-      if (!this.#currentExplosion[key] && distance <= this.#currentExplosion.radius) {
+   #applyExplosionFeedback(id, distance, playerId, flashFrames, shakeFrames, shakeMag) {
+      if (!this.#currentExplosion[id] && distance <= this.#currentExplosion.radius) {
          this.#players[playerId].triggerHitFlash(flashFrames);
-         this.game.effects.triggerShake(shakeFrames, shakeMag);
+         this.#shakeCallback(shakeFrames, shakeMag);
          this.#currentExplosion[key] = true;
       }
    }
@@ -262,60 +265,53 @@ class Match {
    #drawEnvironment() {
       DrawUtils.drawLinearGradient(this.#bgTopColour, this.#bgBottomColour);
       this.#terrain.drawTerrain();
-      this.#wind?.draw();
-      this.#rain?.draw();
-   }
-
-   #drawShot() {
-      if (this.#currentShot?.isActive) this.#currentShot.drawShotSequence(this.#terrain);
+      this.#wind?.draw(this.#controlPanel.baseAltitude);
+      this.#rain?.draw(this.#terrain);
    }
 
    #drawPlayers() {
       const playerId = this.#turnController.activePlayerId;
       for (const player of this.#players) player.drawPlayer();
-      this.#players[playerId].drawIndicator(playerId);
+      if (!this.#turnController.isGameOver) this.#players[playerId].drawIndicator(playerId);
    }
 
    #drawTrajectory() {
-      const { isActive, isExploding } = this.#currentShot ?? { isActive: false, isExploding: false };
-      if (!this.#isEasyDifficulty || !this.#turnController.playerCanAct(isActive, isExploding)) return;
+      if (!this.#isEasyDifficulty || !this.#physicsDone()) return;
       const shooter = this.#players[this.#turnController.activePlayerId]
       const target = this.#players[1 - this.#turnController.activePlayerId];
       const noWind = Match.#ZERO_VECTOR;
       this.#trajectoryPreviewer.drawPreview(shooter, target, this.#terrain, Match.#GRAVITY, noWind);
    }
 
+   #drawShot() {
+      this.#currentShot?.drawShotSequence(this.#terrain, this.#turnController);
+   }
+
    #drawHUD() {
       const { turnNumber, maxTurns, activePlayerId } = this.#turnController;
-      this.#controlPanel.drawCtrlPanel(this.#players[activePlayerId]);
+      this.#controlPanel.drawCtrlPanel(this.#players[activePlayerId], this.#physicsDone());
       this.#turnCounter.drawCounter(turnNumber, maxTurns, activePlayerId);
       for (const floatingScore of this.#floatingScores) floatingScore.draw();
       this.#scoreBoard.draw();
    }
 
-   #handleWidgetToggles() {
-      this.#handleAngleDialToggle();
-      this.#handlePowerAdjustToggle();
-   }
-
    #handleAngleDialToggle() {
       const dial = this.#controlPanel.angleDial;
-      dial.isFollowing = (dial.isHovered && !dial.isFollowing);
+      dial.isFollowing = (!this.#controlPanel.powerAdjust.isFollowing && dial.isHovered && !dial.isFollowing);
    }
 
    #handlePowerAdjustToggle() {
       const powerWidget = this.#controlPanel.powerAdjust;
-      powerWidget.isFollowing = (powerWidget.isHovered && !powerWidget.isFollowing);
+      powerWidget.isFollowing = (!this.#controlPanel.angleDial.isFollowing && powerWidget.isHovered && !powerWidget.isFollowing);
    }
 
    #triggerMouseCannonShot() {
-      console.log("test:-", this.#controlPanel.shootButton.isHovered);
-      if (this.#controlPanel.shootButton.isHovered) this.#executeCannonShot();
+      if (this.#controlPanel.shootButton.isHovered(this.#controlPanel.baseAltitude))
+         this.#executeCannonShot();
    }
 
    #executeCannonShot() {
-      console.log("Attempting shot. Current shot status:", this.#currentShot);
-      if (!this.#currentShot) {
+      if (this.#physicsDone()) {
          this.#lastShooterId = this.#turnController.activePlayerId;
          const shotRadius = 4;
          this.#currentShot = this.#players[this.#lastShooterId].fireShot(shotRadius);
@@ -338,12 +334,19 @@ class Match {
       }
    }
 
-   get isMatchOver() { return this.#turnController.isGameOver() && !this.#currentShot; }
+   #physicsDone() {
+      return !this.#currentShot && !this.#currentExplosion && this.#terrain.isSettled;
+   }
+
+   get isMatchOver() {
+      return this.#turnController.isGameOver && this.#physicsDone() && this.#floatingScores.length === 0;
+   }
+
    get matchResults() {
       return {
          score1: this.#scoreBoard.score1,
          score2: this.#scoreBoard.score2,
-         winnerData: this.#scoreBoard.getHighestScorePlayerId
+         winnerData: this.#scoreBoard.getHighestScorePlayerId()
       }
    }
 }

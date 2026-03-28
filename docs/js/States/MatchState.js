@@ -3,12 +3,13 @@ class MatchState extends State {
 
    constructor(game, resolution, loadout0, loadout1) {
       super(game, resolution);
-      this.#match = new Match(resolution, this.game.pendingMode, loadout0, loadout1);
+      const shakeLambda = (frames, mag) => this.game.effects.triggerShake(frames, mag);
+      this.#match = new Match(resolution, this.game.pendingMode, loadout0, loadout1, shakeLambda);
    };
 
    updateState(dt) {
       this.game.effects.updateShake();
-      this.#match.updateMatch();
+      this.#match.updateMatch(dt, this.game.effects);
       if (this.#match.isMatchOver)
          this.game.switchState(new EndState(this.game, this.resolution, this.#match.matchResults));
    }
@@ -25,10 +26,10 @@ class MatchState extends State {
    }
 
    onMouseReleased(cursorX, cursorY, button) {
-      this.#match.onMouseReleased(cursorX, cursorY, button);
+      this.#match.onMouseReleased();
    }
 
    onKeyReleased(inputKey, keyId) {
-      this.#match.onMouseReleased(inputKey, keyId);
+      this.#match.onKeyReleased(inputKey, keyId);
    }
 }

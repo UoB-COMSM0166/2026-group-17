@@ -39,7 +39,7 @@ class StartMenu {
       else {
          fill(200);
       }
-      //Set the outline color of the rectancle
+      //Set the outline color of the rectangle
       stroke(0);
       //Set the thickness of the rectangle's outline
       strokeWeight(3);

@@ -26,8 +26,8 @@ class ShopState extends State {
 
    onKeyReleased(inputKey, keyId) {
       if (inputKey === ENTER && this.#weaponShop.isDone()) {
-         const loadout0 = weaponShop.getLoadout(0);
-         const loadout1 = weaponShop.getLoadout(1);
+         const loadout0 = this.#weaponShop.getLoadout(0);
+         const loadout1 = this.#weaponShop.getLoadout(1);
          this.game.switchState(new MatchState(this.game, this.resolution, loadout0, loadout1));
       }
    }
