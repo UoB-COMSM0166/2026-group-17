@@ -48,4 +48,6 @@ class Terrain {
          }
       }
    }
+
+   get isSettled() { return this.#columns.every((col) => !col.isFalling); }
 }
