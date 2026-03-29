@@ -162,7 +162,7 @@ $
 |Physical Demand|5.500|0.6875|No statistically significant difference|
 |Temporal Demand|4.500|0.5625|No statistically significant difference|
 |Performance|0.000|0.0078|Statistically significant difference|
-|Effort|0.0000|0.0078|Statistically significant difference|
+|Effort|0.0000|0.0078|Stat istically significant difference|
 |Frustration|1.000|0.0625|No statistically significant difference|
 |Total|3.000|0.0098|Statistically significant difference|
 

@@ -89,6 +89,7 @@ class ControlPanel {
     get shootButton() { return this.#shootButton; }
     handleMovePadClick() { return this.#movePad.mousePressed(); }
     setMoveSteps(steps) { this.#movePad.step = steps; }
+    setWeaponLoadouts(loadouts) { this.#weaponInventory.setWeaponLoadouts(loadouts); }
 
     #drawBackground() {
         fill(this.#backgroundColor);

@@ -280,6 +280,7 @@ function draw() {
     lastTurnNumber = turnController.turnNumber;
     pendingRoundAnimation = false;
   }
+  controlPanel.setWeaponLoadouts(players[currentPlayerId].weaponLoadout || []);
   controlPanel.drawCtrlPanel();
 
   turnCounter.drawCounter(turnController.turnNumber, turnController.maxTurns, turnController.activePlayerId);
@@ -388,11 +389,12 @@ function mousePressed() {
   if (players[currentPlayerId].moveSteps > 0) {
     if (res === 'left') {
       players[currentPlayerId].targetX -= 50;
+      players[currentPlayerId].moveSteps -= 1;
     }
     else if (res === 'right') {
       players[currentPlayerId].targetX += 50;
+      players[currentPlayerId].moveSteps -= 1;
     }
-    players[currentPlayerId].moveSteps -= 1;
     controlPanel.setMoveSteps(players[currentPlayerId].moveSteps);
   }
 
