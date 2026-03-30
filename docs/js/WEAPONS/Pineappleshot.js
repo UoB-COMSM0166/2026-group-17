@@ -12,6 +12,7 @@ class Pineappleshot extends AbstractWeapon {
       shotRadius: 4, 
       explosionRadius: 20,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();

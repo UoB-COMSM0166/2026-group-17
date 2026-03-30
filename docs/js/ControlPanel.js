@@ -14,7 +14,10 @@ class ControlPanel {
         this.#shootButton = new ShootButton();
         this.#powerAdjust = new PowerAdjustWidget();
         this.#movePad = new MovePadWidget();
-        this.#weaponInventory = new WeaponInventory();
+        this.#weaponInventory = new WeaponInventory(
+            createVector(width / 3, height * 0.85),
+            color('teal')
+        );
 
       // array of vectors for the position of each point forming the top of the control panel shape
       ControlPanel.#profile = [
@@ -65,12 +68,11 @@ class ControlPanel {
       line(width * 0.80, height - this.#baseAltitude * 1.2, width * 0.84, height - this.#baseAltitude * 1.2);
       pop();
 
-        this.#angleDial.drawAngleDial();
-        this.#shootButton.drawButton();
-        this.#powerAdjust.drawPowerAdjust();
-
-        this.#movePad.drawMovePad();
-        this.#weaponInventory.drawInventory();
+        this.#angleDial.drawAngleDial(player, isEnabled);
+        this.#shootButton.drawButton(isEnabled, this.#baseAltitude);
+        this.#powerAdjust.drawPowerAdjust(isEnabled);
+        this.#movePad.drawMovePad(isEnabled);
+        this.#weaponInventory.drawInventory(this.#baseAltitude);
     }
     getAltitudeAt(panelTopX) {
         for (let vecId = 0; vecId < ControlPanel.#profile.length - 1; vecId++) {
@@ -89,7 +91,11 @@ class ControlPanel {
     get shootButton() { return this.#shootButton; }
     handleMovePadClick() { return this.#movePad.mousePressed(); }
     setMoveSteps(steps) { this.#movePad.step = steps; }
-    setWeaponLoadouts(loadouts) { this.#weaponInventory.setWeaponLoadouts(loadouts); }
+    setWeaponLoadouts(loadouts, currentWeaponIndex = 0) {
+        this.#weaponInventory.setWeaponLoadouts(loadouts);
+        this.#weaponInventory.setCurrentWeaponIndex(currentWeaponIndex);
+    }
+    get currentWeaponIndex() { return this.#weaponInventory.currentWeaponIndex; }
 
     #drawBackground() {
         fill(this.#backgroundColor);
@@ -99,6 +105,6 @@ class ControlPanel {
 
     
     handleWeaponInventoryClick() {
-        this.#weaponInventory.handleMousePressed();
+        return this.#weaponInventory.handleMousePressed(this.#baseAltitude);
     }
 }

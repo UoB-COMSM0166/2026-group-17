@@ -11,6 +11,7 @@ class ImpactGun extends AbstractWeapon {
       shotRadius: 3,
       explosionRadius: 30,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();

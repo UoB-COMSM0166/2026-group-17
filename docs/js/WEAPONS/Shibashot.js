@@ -12,6 +12,7 @@ class Shibashot extends AbstractWeapon {
       shotRadius: 6, 
       explosionRadius: 75,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();

@@ -12,6 +12,7 @@ class Lazershot extends AbstractWeapon {
       shotRadius: 7, 
       explosionRadius: 160,
     });
+    this.used = false;
   }
  drawProjectile(cx, cy, r) {
   push();

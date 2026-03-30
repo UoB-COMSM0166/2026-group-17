@@ -165,6 +165,15 @@ class PowerAdjustWidget {
   pop();
   }
 
+  keyPressed(key, isEnabled) {
+      if(key === 'w' || key === 'W') {
+         if(isEnabled) this.increasePower(5);
+      }
+      else if(key === 's' || key === 'S') {
+         if(isEnabled) this.decreasePower(5);
+      }
+  }
+
   increasePower(step = 1) {
     this.power = constrain(this.#power + step, 0, 100);
   }

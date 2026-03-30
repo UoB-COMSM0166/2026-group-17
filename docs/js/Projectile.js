@@ -2,16 +2,18 @@ class Projectile {
    #position;
    #velocity;
    #radius;
+   #weapon;
    #isActive;
    #impactPosition = createVector(0, 0);
    #isExploding;
    #explosionStartTime;
    #maxExplosionRadius = 50;
 
-   constructor(muzzlePos, vel, rad) {
+   constructor(muzzlePos, vel, rad, weapon = null) {
       this.#position = muzzlePos;
       this.#velocity = vel;
       this.#radius = rad;
+      this.#weapon = weapon;
       this.#isActive = true;
    }
 
@@ -52,6 +54,14 @@ class Projectile {
    }
 
    #drawShot() {
+      if (this.#weapon?.drawProjectile) {
+         push();
+         translate(this.#position.x, this.#position.y);
+         rotate(this.#velocity.heading());
+         this.#weapon.drawProjectile(0, 0, this.#radius);
+         pop();
+         return;
+      }
       strokeWeight(2);
       stroke('whitesmoke');
       fill('snow');
@@ -82,4 +92,5 @@ class Projectile {
    get isExploding() { return this.#isExploding; }
    get isDead() { return !this.#isActive && !this.#isExploding; }
    set isActive(truthVal) { this.#isActive = truthVal; }
+   set maxExplosionRadius(radius) { this.#maxExplosionRadius = radius; }
 }

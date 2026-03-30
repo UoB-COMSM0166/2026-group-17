@@ -29,13 +29,20 @@ class PlayerCannon {
       this.#positionVector.x = lerp(this.#positionVector.x, this.#targetX, follow);
    }
 
-   fireShot(shotRadius) {
+   fireShot(weapon = null, shotRadius = 4) {
       // offset of muzzle tip from positionVector
       this.#savedBarrelPower = this.#barrelPower;
       let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
       let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(this.#barrelPower);
       offset.rotate(this.#barrelAngle);
-      return new Projectile(p5.Vector.add(this.#positionVector, offset), velocity, shotRadius);
+      const projectile = new Projectile(
+         p5.Vector.add(this.#positionVector, offset),
+         velocity,
+         weapon?.shotRadius ?? shotRadius,
+         weapon
+      );
+      projectile.maxExplosionRadius = weapon?.explosionRadius ?? 50;
+      return projectile;
    }
    drawPlayer() {
       fill(this.#fillColor);

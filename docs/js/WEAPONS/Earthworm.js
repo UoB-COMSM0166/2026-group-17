@@ -12,6 +12,7 @@ class Earthworm extends AbstractWeapon {
       shotRadius: 5, 
       explosionRadius: 90,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();

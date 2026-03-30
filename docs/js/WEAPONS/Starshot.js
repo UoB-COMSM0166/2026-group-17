@@ -12,6 +12,7 @@ class Starshot extends AbstractWeapon {
       shotRadius: 5, 
       explosionRadius: 80,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();

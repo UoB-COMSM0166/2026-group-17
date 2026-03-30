@@ -11,6 +11,7 @@ class Bubblegumshot extends AbstractWeapon {
       shotRadius: 5, 
       explosionRadius: 110,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();

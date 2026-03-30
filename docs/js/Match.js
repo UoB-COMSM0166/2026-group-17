@@ -80,11 +80,16 @@ class Match {
    }
 
    onMousePressed(button) {
-      this.#lastMouseButton = button.left;
+      this.#lastMouseButton = (button === LEFT || button?.left === true);
    }
 
    onMouseReleased() {
       if (!this.#physicsDone() || this.#lastMouseButton !== true) return;
+      const currentPlayer = this.#players[this.#turnController.activePlayerId];
+      const inventoryResult = this.#controlPanel.handleWeaponInventoryClick();
+      if (inventoryResult.selectedIndex !== null)
+         currentPlayer.currentWeaponIndex = inventoryResult.selectedIndex;
+      if (inventoryResult.handled) return;
       this.#handleAngleDialToggle();
       this.#handlePowerAdjustToggle();
       this.#triggerMouseCannonShot();
@@ -122,7 +127,7 @@ class Match {
       if (loadout && loadout.length > 0) {
          this.#players[id].weaponLoadout = loadout;
          this.#players[id].currentWeaponIndex = 0;
-         loadout.forEach(w => w.resetAmmo());
+         loadout.forEach(w => w.resetUsage());
       }
    }
 
@@ -162,6 +167,10 @@ class Match {
          this.#controlPanel.angleDial.needleRotation = this.#players[currentPID].barrelAngle + 90;
          this.#controlPanel.powerAdjust.power = this.#players[currentPID].barrelPower / 7;
          this.#controlPanel.setMoveSteps(this.#players[currentPID].moveSteps);
+         this.#controlPanel.setWeaponLoadouts(
+            this.#players[currentPID].weaponLoadout ?? [],
+            this.#players[currentPID].currentWeaponIndex ?? 0
+         );
          this.#lastActivePlayerId = currentPID;
       }
    }
@@ -233,7 +242,7 @@ class Match {
       if (!this.#currentExplosion[id] && distance <= this.#currentExplosion.radius) {
          this.#players[playerId].triggerHitFlash(flashFrames);
          this.#shakeCallback(shakeFrames, shakeMag);
-         this.#currentExplosion[key] = true;
+         this.#currentExplosion[id] = true;
       }
    }
 
@@ -313,8 +322,23 @@ class Match {
    #executeCannonShot() {
       if (this.#physicsDone()) {
          this.#lastShooterId = this.#turnController.activePlayerId;
-         const shotRadius = 4;
-         this.#currentShot = this.#players[this.#lastShooterId].fireShot(shotRadius);
+         const shooter = this.#players[this.#lastShooterId];
+         const selectedIndex = shooter.currentWeaponIndex ?? 0;
+         const selectedWeapon = shooter.weaponLoadout?.[selectedIndex] ?? null;
+         if (selectedWeapon && !selectedWeapon.consume()) return;
+         this.#currentShot = shooter.fireShot(selectedWeapon, 4);
+         if (selectedWeapon && Array.isArray(shooter.weaponLoadout)) {
+            shooter.weaponLoadout.splice(selectedIndex, 1);
+            shooter.currentWeaponIndex = constrain(
+               selectedIndex,
+               0,
+               Math.max(shooter.weaponLoadout.length - 1, 0)
+            );
+         }
+         this.#controlPanel.setWeaponLoadouts(
+            shooter.weaponLoadout ?? [],
+            shooter.currentWeaponIndex ?? 0
+         );
       }
    }
 

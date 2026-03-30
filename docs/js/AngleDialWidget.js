@@ -85,11 +85,12 @@ class AngleDialWidget {
 
    #drawAngleText() {
       push();
+      noStroke();
       fill(255);
       textSize(16);
       textAlign(CENTER, CENTER);
       const angle = ((360 - (this.#needleRotation - 90)) % 360).toFixed(0);
-      text(`Angle: ${angle} deg`, this.#positionVector.x, this.#positionVector.y - this.#radius * 1.5);
+      text(`Angle: ${angle} °`, this.#positionVector.x, this.#positionVector.y - this.#radius * 1.5);
       pop();
    }
 }

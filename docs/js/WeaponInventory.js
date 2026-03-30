@@ -1,58 +1,75 @@
 class WeaponInventory {
     #positionVector;
     #isExpanded = false;
-    #isPicked = false;
     weapons = [];
     #currentWeapon = 0;
     #weaponsCount = 5;
     #weaponBoxHeight = 64;
     #weaponBoxWidth = 64;
     #gap = 10;
+    #plateOutlineColor;
     
-    constructor(posV = createVector(width / 3, height - height / 6)) {
+    constructor(posV = createVector(width / 3, height - height / 5), plateOutColor = color('teal')) {
         this.#positionVector = posV;
+        this.#plateOutlineColor = plateOutColor;
     }
 
     setWeaponLoadouts(loadouts = []) {
         this.weapons = Array.isArray(loadouts) ? loadouts : [];
         this.#weaponsCount = Math.max(this.weapons.length, 1);
+        if (this.weapons.length === 0) this.#currentWeapon = 0;
+        else this.#currentWeapon = constrain(this.#currentWeapon, 0, this.weapons.length - 1);
     }
 
-    drawInventory() {
+    setCurrentWeaponIndex(index = 0) {
+        if (this.weapons.length === 0) {
+            this.#currentWeapon = 0;
+            return;
+        }
+        this.#currentWeapon = constrain(index, 0, this.weapons.length - 1);
+    }
+
+    get currentWeaponIndex() { return this.#currentWeapon; }
+
+    drawInventory(baseAltitude = height * 0.25) {
+        const { rectWidth, rectHeight } = this.#getInventoryRect(baseAltitude);
+        const activeWeapon = this.weapons[this.#currentWeapon];
+
         push();
         rectMode(CENTER);
-        fill('lightgray');
-        stroke('gray');
-        strokeWeight(2);
-        rect(this.#positionVector.x, this.#positionVector.y, width / 6, controlPanel.baseAltitude / 2);
+        fill(28, 42, 60, 235);
+        stroke(120, 220, 255);
+        strokeWeight(this.#isExpanded ? 3 : 2);
+        rect(this.#positionVector.x, this.#positionVector.y, rectWidth, rectHeight, 10);
         textAlign(CENTER, CENTER);
         fill('white');
         noStroke();
         textSize(16);
-        text(this.weapons[this.#currentWeapon]?.name || "No Weapon",
-             this.#positionVector.x + this.#gap * 2, this.#positionVector.y);
+        text(activeWeapon?.name || "No Weapon",
+             this.#positionVector.x + this.#gap * 3, this.#positionVector.y);
+
         push();
         rectMode(CORNER);
         ellipseMode(RADIUS);
-        this.weapons[this.#currentWeapon]?.drawIcon?.(this.#positionVector.x - this.#gap * 6, this.#positionVector.y, 12);
+        activeWeapon?.drawIcon?.(this.#positionVector.x - this.#gap * 6, this.#positionVector.y, 12);
         pop();
         pop();
 
         if(this.#isExpanded) {
-            this.#drawWeaponPicker();
+            this.#drawWeaponPicker(baseAltitude);
         }
     }
 
-    #drawWeaponPicker() {
+    #drawWeaponPicker(baseAltitude) {
         const pickerWidth =
             this.#weaponBoxWidth * this.#weaponsCount + this.#gap * (this.#weaponsCount - 1) + 20;
         const pickerHeight = this.#weaponBoxHeight + this.#gap * 2 + 18;
-        const pickerY = this.#positionVector.y - controlPanel.baseAltitude / 2;
+        const pickerY = this.#positionVector.y - baseAltitude / 2;
 
         push();
         rectMode(CENTER);
         fill(25, 40, 60, 235);
-        stroke(120, 220, 255);
+        stroke(this.#plateOutlineColor);
         strokeWeight(2);
         rect(this.#positionVector.x, pickerY, pickerWidth, pickerHeight, 10);
 
@@ -73,9 +90,16 @@ class WeaponInventory {
         for (let i = 0; i < this.weapons.length; i++) {
             const weapon = this.weapons[i];
             const boxX = startX + i * (this.#weaponBoxWidth + this.#gap);
+            const isSelected = i === this.#currentWeapon;
+            const isHovered = this.#contains(mouseX, mouseY, boxX, boxY, this.#weaponBoxWidth, this.#weaponBoxHeight);
 
-            fill(240, 248, 255);
-            stroke(40, 80, 110);
+            fill(isHovered ? color(255, 243, 204) : (isSelected ? color(220, 245, 255) : color(240, 248, 255)));
+            stroke(isHovered ? color(255, 170, 50) : (isSelected ? color(0, 220, 255) : color(40, 80, 110)));
+            strokeWeight(isHovered ? 3 : (isSelected ? 3 : 1));
+            if (isHovered) {
+                drawingContext.shadowBlur = 12;
+                drawingContext.shadowColor = 'rgba(255, 170, 50, 0.55)';
+            }
             rect(boxX, boxY, this.#weaponBoxWidth, this.#weaponBoxHeight, 8);
 
             push();
@@ -90,7 +114,7 @@ class WeaponInventory {
             );
             drawingContext.clip();
 
-            fill(225, 235, 245);
+            fill(isHovered ? color(255, 236, 186) : color(225, 235, 245));
             noStroke();
             rect(boxX, boxY, this.#weaponBoxWidth - 10, this.#weaponBoxHeight - 10, 6);
 
@@ -101,28 +125,63 @@ class WeaponInventory {
             pop();
 
             drawingContext.restore();
+            drawingContext.shadowBlur = 0;
             pop();
         }
 
         pop();
     }
 
-    handleMousePressed() {
-        const rectWidth = width / 6;
-        const rectHeight = controlPanel.baseAltitude / 2;
-        if (mouseX > this.#positionVector.x - rectWidth / 2 && 
-            mouseX < this.#positionVector.x + rectWidth / 2 &&
-            mouseY > this.#positionVector.y - rectHeight / 2 && 
-            mouseY < this.#positionVector.y + rectHeight / 2) {
-                this.#isExpanded = !this.#isExpanded;
+    handleMousePressed(baseAltitude = height * 0.25) {
+        const { rectWidth, rectHeight } = this.#getInventoryRect(baseAltitude);
+        if (this.#contains(mouseX, mouseY, this.#positionVector.x, this.#positionVector.y, rectWidth, rectHeight)) {
+            this.#isExpanded = !this.#isExpanded;
+            return { handled: true, selectedIndex: null };
         }
 
-        if(this.#isExpanded == true) {
+        if (this.#isExpanded) {
             for (let i = 0; i < this.weapons.length; i++) {
-                
+                const box = this.#getWeaponBoxRect(i, baseAltitude);
+                if (this.#contains(mouseX, mouseY, box.x, box.y, box.w, box.h)) {
+                    this.#currentWeapon = i;
+                    this.#isExpanded = false;
+                    return { handled: true, selectedIndex: i };
+                }
             }
+            this.#isExpanded = false;
+            return { handled: true, selectedIndex: null };
         }
-        
+
+        return { handled: false, selectedIndex: null };
     }
-    
+
+    #getInventoryRect(baseAltitude) {
+        return { rectWidth: width / 6, rectHeight: MovePadWidget.BOARD_HEIGHT };
+    }
+
+    #getWeaponBoxRect(index, baseAltitude) {
+        const pickerWidth =
+            this.#weaponBoxWidth * this.#weaponsCount + this.#gap * (this.#weaponsCount - 1) + 20;
+        const pickerY = this.#positionVector.y - baseAltitude / 2;
+        const startX =
+            this.#positionVector.x -
+            (this.weapons.length * this.#weaponBoxWidth + (this.weapons.length - 1) * this.#gap) / 2 +
+            this.#weaponBoxWidth / 2;
+        return {
+            x: startX + index * (this.#weaponBoxWidth + this.#gap),
+            y: pickerY + 8,
+            w: this.#weaponBoxWidth,
+            h: this.#weaponBoxHeight,
+            pickerWidth
+        };
+    }
+
+    #contains(mx, my, cx, cy, w, h) {
+        return (
+            mx > cx - w / 2 &&
+            mx < cx + w / 2 &&
+            my > cy - h / 2 &&
+            my < cy + h / 2
+        );
+    }
 }

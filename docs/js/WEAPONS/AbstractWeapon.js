@@ -24,17 +24,14 @@ class AbstractWeapon {
     this.shotRadius = cfg.shotRadius ?? 4;
     // radius of the explosion when it hits
     this.explosionRadius = cfg.explosionRadius ?? 60;
-    //initialize ammoLeft to ammo
-    this.ammoLeft = this.ammo;
+    this.used = false;
   }
-  //manage ammo used in battle, reset ammo when new battle starts
-  resetAmmo() {
-    this.ammoLeft = this.ammo;
+  resetUsage() {
+    this.used = false;
   }
-//returns true if ammo is used successfully, false if no ammo left
-  useAmmo() {
-    if (this.ammoLeft <= 0) return false;
-    this.ammoLeft--;
+  consume() {
+    if (this.used) return false;
+    this.used = true;
     return true;
   }
 //subclasses must implement this method to draw the projectile when shot
