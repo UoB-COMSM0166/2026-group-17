@@ -126,7 +126,7 @@ As the game grew, we refined these relationships without necessarily deleting th
 
 **Figure x:** Stage 3 - Final Implementation
 
-> For interactive SVG diagrams with **zoom & drag** functionality, please open the [interactive diagrams page](./diagrams.html).
+> For interactive SVG diagrams with **zoom & drag** functionality, please open the [interactive diagrams page](https://uob-comsm0166.github.io/2026-group-17/diagrams.html).
 
 
 ### Implementation
