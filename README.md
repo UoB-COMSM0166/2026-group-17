@@ -110,9 +110,9 @@ At this stage the game represented a minimum viable product. The core gameplay l
 
 #### Quantitative: NASA Task Load Index (NASA-TLX) and System Usability Survey (SUS)
 
-The number of valid samples for both the NASA-TLX and SUS questionnaires was 10. This analysis aims to investigate whether there is a significant difference between the easy and hard levels in preceived workload and usability. The tables below present the total scores for the easy and the hard level in both NASA-TLX and SUS.
+The number of valid samples for both the NASA-TLX and SUS questionnaires was 10. This analysis aims to investigate whether there is a significant difference between the easy and hard levels in perceived workload and usability. The tables below present the total scores for the easy and the hard level in both NASA-TLX and SUS.
 
-<center> Table x. Score of NASA-TLX and SUS</center>
+<p align="center"><strong>Table x.<strong> Score of NASA-TLX and SUS</p>
 
 <div align="center">
 
@@ -136,42 +136,34 @@ The number of valid samples for both the NASA-TLX and SUS questionnaires was 10.
 
 1. Descriptive statistics and visualisation
 
->>>The distributions of the six dimensions differed between the easy and hard levels. Overall, the easy level appeared to have lower scores, and the average scores showed the same pattern.
+>The distributions of the six dimensions differed between the easy and hard levels. Overall, the easy level appeared to have lower scores, and the average scores showed the same pattern.
 
-<div align="center">
+<p align="center">
+  <img src="images/NASA-TLX Metric.png" alt="NASA TLX Metric" width="600">
+</p>
 
-![NASA TLX Metric](images/NASA-TLX Metric.png)
+<p align="center"><strong>Figure x.</strong> Boxplot of NASA-TLX.</p>
 
-</div>
+<p align="center">
+  <img src="images/NASA-TLX Radar.png" alt="NASA TLX Radar" width="600">
+</p>
 
-<center> Figure x. Boxplot of NASA-TLK</center>
-
-<div align="center">
-
-![NASA TLX Radar](images/NASA-TLX Radar.png)
-
-</div>
-
-<center> Figure x. Radar chart of the average NASA-TLX scores across dimensions </center>
+<p align="center"><strong>Figure x.</strong>Radar chart of the average NASA-TLX scores across dimensions.</p>
 
 2. Wilcoxon signed-rank test
 
->>>At the 95% confifence level, the Wilconxon signed-rank test results suggested that level significanlly affected Performance, Effort and the overall NASA-TLK score. However, the differences in Mental Demand, Phsical Demand, Temporal Demand, and Frustration between the easy and hard levels were not statistically sigificant difference.
+>At the 95% confidence level, the Wilcoxon signed-rank test results suggested that level significantly affected Performance, Effort and the overall NASA-TLX score. However, the differences in Mental Demand, Physical Demand, Temporal Demand, and Frustration between the easy and hard levels were not statistically significant difference.
 
-<div align="center">
+<p align="center">
 
-$
-\left\{
-  \begin{aligned}
+$$\begin{cases}
   H_0 &: \text{There's no significant difference between the easy and hard levels.}\\
   H_1 &: \text{There's significant difference between the easy and hard levels.}\\
-  \end{aligned}
-\right.
-$
+\end{cases}$$
 
-</div>
+</p>
 
-<center> Table x. Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</center>
+<p align="center"><strong>Table x.<strong> Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</p>
 
 <div align="center">
 
