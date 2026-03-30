@@ -16,54 +16,54 @@ class ControlPanel {
         this.#movePad = new MovePadWidget();
         this.#weaponInventory = new WeaponInventory();
 
-        // array of vectors for the position of each point forming the top of the control panel shape
-        ControlPanel.#profile = [
-            createVector(0, height - this.#baseAltitude),
-            createVector(width * 0.08, height - this.#baseAltitude),
-            createVector(width * 0.11, height - this.#baseAltitude * 1.2),
-            createVector(width * 0.25, height - this.#baseAltitude * 1.2),
-            createVector(width * 0.25 + 10, height - this.#baseAltitude * 1.2 + 10),
-            createVector(width * 0.75 - 10, height - this.#baseAltitude * 1.2 + 10),
-            createVector(width * 0.75, height - this.#baseAltitude * 1.2),
-            createVector(width * 0.89, height - this.#baseAltitude * 1.2),
-            createVector(width * 0.92, height - this.#baseAltitude),
-            createVector(width, height - this.#baseAltitude)
-        ];
-    }
+      // array of vectors for the position of each point forming the top of the control panel shape
+      ControlPanel.#profile = [
+         createVector(0, height - this.#baseAltitude),
+         createVector(width * 0.08, height - this.#baseAltitude),
+         createVector(width * 0.11, height - this.#baseAltitude * 1.2),
+         createVector(width * 0.25, height - this.#baseAltitude * 1.2),
+         createVector(width * 0.25 + 10, height - this.#baseAltitude * 1.2 + 10),
+         createVector(width * 0.75 - 10, height - this.#baseAltitude * 1.2 + 10),
+         createVector(width * 0.75, height - this.#baseAltitude * 1.2),
+         createVector(width * 0.89, height - this.#baseAltitude * 1.2),
+         createVector(width * 0.92, height - this.#baseAltitude),
+         createVector(width, height - this.#baseAltitude)
+      ];
+   }
 
-    drawCtrlPanel() {
-        this.#drawBackground();
+   drawCtrlPanel(player, isEnabled) {
+      this.#drawBackground();
 
-        push();
-        beginShape();
+      push();
+      beginShape();
 
-        stroke(250, 180);
-        strokeWeight(2);
-        drawingContext.shadowBlur = 15;
-        drawingContext.shadowColor = 'rgb(232, 237, 238)';
-        fill(25, 240);
-        vertex(0, height - 2);
-        for (let vertId = 1; vertId < ControlPanel.#profile.length - 1; vertId++)
-            vertex(ControlPanel.#profile[vertId].x, ControlPanel.#profile[vertId].y);
-        vertex(width, height - 2);
-        vertex(width * 0.67, height - 2);
-        vertex(width * 0.67 - 30, height - 30);
-        vertex(width * 0.33 + 30, height - 30);
-        vertex(width * 0.33, height - 2);
+      stroke(250, 180);
+      strokeWeight(2);
+      drawingContext.shadowBlur = 15;
+      drawingContext.shadowColor = 'rgb(232, 237, 238)';
+      fill(25, 240);
+      vertex(0, height - 2);
+      for (let vertId = 1; vertId < ControlPanel.#profile.length - 1; vertId++)
+         vertex(ControlPanel.#profile[vertId].x, ControlPanel.#profile[vertId].y);
+      vertex(width, height - 2);
+      vertex(width * 0.67, height - 2);
+      vertex(width * 0.67 - 30, height - 30);
+      vertex(width * 0.33 + 30, height - 30);
+      vertex(width * 0.33, height - 2);
 
-        endShape(CLOSE);
-        pop();
+      endShape(CLOSE);
+      pop();
 
-        push();
-        strokeWeight(6);
-        stroke(0, 245, 212);
-        drawingContext.shadowBlur = 30;
-        drawingContext.shadowColor = 'rgb(0, 204, 255)';
-        line(width * 0.42, height - 15, width * 0.58, height - 15);
-        line(width * 0.37, height - this.#baseAltitude * 1.2 + 10, width * 0.63, height - this.#baseAltitude * 1.2 + 10);
-        line(width * 0.16, height - this.#baseAltitude * 1.2, width * 0.20, height - this.#baseAltitude * 1.2);
-        line(width * 0.80, height - this.#baseAltitude * 1.2, width * 0.84, height - this.#baseAltitude * 1.2);
-        pop();
+      push();
+      strokeWeight(6);
+      stroke(0, 245, 212);
+      drawingContext.shadowBlur = 30;
+      drawingContext.shadowColor = 'rgb(0, 204, 255)';
+      line(width * 0.42, height - 15, width * 0.58, height - 15);
+      line(width * 0.37, height - this.#baseAltitude * 1.2 + 10, width * 0.63, height - this.#baseAltitude * 1.2 + 10);
+      line(width * 0.16, height - this.#baseAltitude * 1.2, width * 0.20, height - this.#baseAltitude * 1.2);
+      line(width * 0.80, height - this.#baseAltitude * 1.2, width * 0.84, height - this.#baseAltitude * 1.2);
+      pop();
 
         this.#angleDial.drawAngleDial();
         this.#shootButton.drawButton();

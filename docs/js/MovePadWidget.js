@@ -24,10 +24,10 @@ class MovePadWidget {
   get step() { return this.#step; }
   set step(s) { this.#step = s; }
 
-  drawMovePad() {
+  drawMovePad(isEnabled) {
     this.#drawBoard();
-    this.#drawButtons(-1);
-    this.#drawButtons(1);
+    this.#drawButtons(-1, isEnabled);
+    this.#drawButtons(1, isEnabled);
     this.#drawSteps();
   }
 
@@ -96,13 +96,13 @@ class MovePadWidget {
     pop();
   }
 
-  #drawButtons(dir) {
+  #drawButtons(dir, isEnabled) {
     const buttonRect = this.#getRect(dir);
 
     push();
     rectMode(CENTER);
     stroke(this.#plateOutlineColor);
-    if (this.#isHovered(buttonRect)) {
+    if (isEnabled && this.#isHovered(buttonRect)) {
       strokeWeight(4);
     } else {
       strokeWeight(2);
@@ -156,7 +156,7 @@ class MovePadWidget {
   }
 
   mousePressed() {
-    lastButtonClicked = mouseButton.left;
+    // lastButtonClicked = mouseButton.left;  GLOBAL lastButtonClicked NO LONGER EXISTS
 
     if (this.#isHovered(this.#getRect(-1))) {
       this.#isFollowing = true;

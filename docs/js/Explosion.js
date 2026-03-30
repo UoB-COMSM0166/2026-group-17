@@ -1,7 +1,6 @@
 class Explosion {
-  constructor(x, y, terrainRef = null) {
-    this.x = x;
-    this.y = y;
+  constructor(impactPosition, terrainRef = null) {
+    this.position = impactPosition;
     this.radius = 10;
     this.maxRadius = 50;
     this.terrain = terrainRef;          
@@ -16,7 +15,7 @@ class Explosion {
     this.radius += 0.5;
     if (!this.hasAppliedTerrain && this.radius >= this.maxRadius) {
       if (this.terrain) {
-        //this.terrain.applyExplosion(createVector(this.x, this.y), this.maxRadius);
+        //this.terrain.applyExplosion(createVector(this.position.x, this.position.y), this.maxRadius);
       }
       this.hasAppliedTerrain = true;
       this.finished = true;
@@ -28,6 +27,6 @@ class Explosion {
     noFill();
     stroke(255, 150, 0);
     strokeWeight(3);
-    circle(this.x, this.y, this.radius);
+    circle(this.position.x, this.position.y, this.radius);
   }
 }
