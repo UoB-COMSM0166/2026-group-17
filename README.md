@@ -62,32 +62,39 @@ In the early stages of development, our primary goal was to establish a function
        style="width:900px; height:auto;">
 
   <figcaption>
-    <b>Figure x:</b> behavioural diagram
+    <b>Figure x:</b> bInitial Design diagram
   </figcaption>
 </figure>
 
 In the early development stage, a central **GameStateManager** class was responsible for coordinating most aspects of the gameplay loop, including terrain generation, turn handling, player management, event processing, and UI control. While this structure was effective for initial prototyping, the addition of projectile behaviour, scoring logic, explosion handling, and environmental systems gradually increased the responsibilities of this controller. Any modification in one module, such as the UI logic, could inadvertently affect other systems like the physics engine. This "ripple effect" made the codebase difficult to manage, hard to read, and prone to errors, ultimately motivating a refactor toward a more modular architecture.
 
+---
 ### Final Design
 
 To solve those problems, we transitioned to a State Pattern to decouple the various domains of the game. The final high-level architecture is illustrated in Figure x. Based on that, we created the overview behavioural diagram (see figure x).
 
-<figure style="text-align:center">
-  <img src="images/stage3.png" alt="Final design class diagram" width="900px" height="300px">
-  <figcaption>Figure x: Final design class diagram</figcaption>
+
+<figure style="text-align:center;">
+  <img src="images/stage3.png"
+       alt="Final design class diagram"
+       style="width:900px; height:auto;">
+
+  <figcaption>
+    <b>Figure x:</b> Figure x: Final design class diagram
+  </figcaption>
 </figure>
 
 <div style="width:100%; overflow-x:scroll; text-align:center;">
   <img src="images/behaviouraldiagram.svg"
        alt="behavioural diagram"
-       style="min-width:900px; max-width:75%;height:420px; display:inline-block;">
+       style="width:900px;height:420px; display:inline-block;">
 </div>
 
 <p style="text-align:center;">
   <b>Figure x:</b> behavioural diagram
 </p>
 
-
+---
 **Key Differences and Improvements:**
 * **State-Driven Lifecycle**: Unlike Stage 1, where all game logic was resident in memory simultaneously, the final design introduced an abstract `State` class. The `Game` class now only manages state transitions (e.g., switching from `MenuState` to `MatchState`). This ensures that heavy simulation logic, such as the terrain engine, is only instantiated during an active match and is disposed of when returning to the menu, significantly optimizing memory performance.
 * **Logic Decoupling**: By isolating the "Shop" and "Match" logic into separate state classes, we ensured that UI interactions in the shop cannot interfere with the complex physics updates during combat.
