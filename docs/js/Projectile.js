@@ -18,23 +18,15 @@ class Projectile {
    updatePhysics(dt, gravity, wind, rain, terrain, controlPanel, turnController) {
       if (this.#isExploding) return;
       this.#velocity.add(gravity.copy().mult(dt));
-      // add wind
-      if (typeof wind !== "undefined") {
-         //add dt
-         wind.applyTo(this, dt);
-      }
-      // Rain effect
-      if (rain && rain.isActive) {
-         rain.applyTo(this, dt);
-      }
+      this.#applyWeatherEffects(wind, rain, dt);
       this.#position.add(this.#velocity.copy().mult(dt));
       const groundY = min(
          terrain.getHeightAt(this.#position.x),
          controlPanel.getAltitudeAt(this.#position.x)
       );
       if (this.#position.y >= groundY) {
+         this.#refineImpactPosition(terrain, dt);
          this.#isActive = false;
-         this.#impactPosition.set(floor(this.#position.x), floor(this.#position.y));
          this.#isExploding = true;
          this.#explosionStartTime = frameCount;
       }
@@ -49,6 +41,25 @@ class Projectile {
       else if (this.#isExploding) {
          this.#drawExplosion(terrain, turnController);
       }
+   }
+
+   #applyWeatherEffects(wind, rain, dt) {
+      if (wind) wind.applyTo(this, dt);
+      if (rain) rain.applyTo(this, dt);
+   }
+
+   #refineImpactPosition(terrain, dt) {
+      this.#impactPosition = this.#position;
+      const oldPosition = p5.Vector.sub(this.#position, this.#velocity.copy().mult(dt));
+      let low = 0, high = 1;
+      // binary search to close in on precise position on terrain surface
+      for (let i = 0; i < 4; i++) {
+         const mid = (low + high) / 2;
+         this.#impactPosition = p5.Vector.lerp(oldPosition, this.#position, mid);
+         if (this.#impactPosition.y >= terrain.getHeightAt(this.#impactPosition.x)) high = mid;
+         else low = mid;
+      }
+      this.#position = this.#impactPosition;
    }
 
    #drawShot() {
