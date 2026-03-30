@@ -53,8 +53,61 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 
 ### Design
 
-- 15% ~750 words 
-- System architecture. Class diagrams, behavioural diagrams. 
+### Initial Design
+In the early stages of development, our primary goal was to establish a functional prototype centered on core mechanics: turn-based artillery combat and a destructible environment. We initially conceived a centralized architecture where a single manager coordinated the game's high-level flow. This initial design is illustrated in the class diagram below (Figure xx).
+
+<figure style="text-align:center">
+  <img src="images/stage1.png" alt="Initial design class diagram" width="900px" height="300px">
+  <figcaption>Figure x: Initial design class diagram</figcaption>
+</figure>
+
+In the early development stage, a central **GameStateManager** class was responsible for coordinating most aspects of the gameplay loop, including terrain generation, turn handling, player management, event processing, and UI control. While this structure was effective for initial prototyping, the addition of projectile behaviour, scoring logic, explosion handling, and environmental systems gradually increased the responsibilities of this controller. Any modification in one module, such as the UI logic, could inadvertently affect other systems like the physics engine. This "ripple effect" made the codebase difficult to manage, hard to read, and prone to errors, ultimately motivating a refactor toward a more modular architecture.
+
+### Final Design
+
+To solve those problems, we transitioned to a State Pattern to decouple the various domains of the game. The final high-level architecture is illustrated in Figure x.
+
+<figure style="text-align:center">
+  <img src="images/stage3.png" alt="Final design class diagram" width="900px" height="300px">
+  <figcaption>Figure x: Final design class diagram</figcaption>
+</figure>
+
+**Key Differences and Improvements:**
+* **State-Driven Lifecycle**: Unlike Stage 1, where all game logic was resident in memory simultaneously, the final design introduced an abstract `State` class. The `Game` class now only manages state transitions (e.g., switching from `MenuState` to `MatchState`). This ensures that heavy simulation logic, such as the terrain engine, is only instantiated during an active match and is disposed of when returning to the menu, significantly optimizing memory performance.
+* **Logic Decoupling**: By isolating the "Shop" and "Match" logic into separate state classes, we ensured that UI interactions in the shop cannot interfere with the complex physics updates during combat.
+* **Polymorphic Weaponry**: The final version utilizes **Polymorphism** to manage the weapon inventory. The player's loadout is stored in a unified `Weapon` array, allowing the system to handle diverse projectiles (like `ShibaShot` or `LazerShot`) through a single interface without modifying the core firing logic.
+
+### Class Diagrams
+To illustrate the structural growth and refactoring of the system, we have documented the class diagrams across three key development stages. These diagrams reflect the transition from a monolithic prototype to a modular, state-driven architecture.
+## Stage 1 - Initial Prototype
+
+<p style="text-align:center;">
+  <img src="images/stage1.svg" alt="Stage 1" width="600px" height="300px">
+</p>
+**Figure 1:** Stage 1 - Initial Prototype
+
+---
+
+### Stage 2 - Refactored Prototype
+
+<p style="text-align:center;">
+  <img src="images/stage2.svg" alt="Stage 1" width="600px" height="300px" >
+</p>
+
+**Figure 2:** Stage 2 - Refactored Prototype
+
+---
+
+### Stage 3 - Final Implementation
+
+<p style="text-align:center;">
+  <img src="images/stage3.svg" alt="Stage 1" width="600px" height="300px" >
+</p>
+
+**Figure 3:** Stage 3 - Final Implementation
+
+> For interactive SVG diagrams with **zoom & drag** functionality, please open the [interactive diagrams page](diagrams.html).
+
 
 ### Implementation
 
