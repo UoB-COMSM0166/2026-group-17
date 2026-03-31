@@ -9,6 +9,7 @@ class Match {
    #lastActivePlayerId = -1;
    #wind;
    #rain;
+   #earthquake;
    #weatherQueue = [];
    #weatherIndex = 0;
    #terrain;
@@ -36,6 +37,7 @@ class Match {
       this.#height = resolution.y;
       this.#wind = new WindSystem();
       this.#rain = new RainSystem();
+      this.#earthquake = new EarthquakeSystem(shakeCallback);
       // Background colors
       this.#bgTopColour = color(0);
       this.#bgBottomColour = color(0, 80, 100);
@@ -98,9 +100,15 @@ class Match {
    }
 
    #setModeBasedWeather() {
-      if (!this.#isEasyDifficulty) this.#generateRandomWeather();
-      else this.#wind.isActive = this.#rain.isActive = false;
+      if (!this.#isEasyDifficulty) {
+         this.#generateRandomWeather();
+      } else {
+         this.#wind.isActive = false;
+         this.#rain.isActive = false;
+         this.#earthquake.isActive = false;
+      }
    }
+
 
    #spawnPlayers() {
       const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
@@ -139,6 +147,7 @@ class Match {
       this.#weatherIndex++;
       this.#wind.isActive = false;
       this.#rain.isActive = false;
+      this.#earthquake.isActive = false;
       if (currentWeather === "wind") {
          this.#wind.isActive = true;
          this.#wind.newTurn();
@@ -147,11 +156,15 @@ class Match {
          this.#rain.isActive = true;
          this.#rain.newTurn();
       }
+      else if (currentWeather === "earthquake") {
+         this.#earthquake.isActive = true;
+         this.#earthquake.newTurn();
+      }
    }
 
    #generateWeatherQueue() {
-      this.#weatherQueue = ["wind", "rain", "none"];
-      this.#weatherQueue.push(random(["wind", "rain", "none"]));
+      this.#weatherQueue = ["wind", "rain", "earthquake"];
+      this.#weatherQueue.push(random(["wind", "rain", "earthquake"]));
       shuffle(this.#weatherQueue, true);
       this.#weatherIndex = 0;
    }
@@ -174,8 +187,14 @@ class Match {
       // Destructuring assignment: after this local constant isExplosion = currentShot.isExplosion, etc.
       const { isExploding, impactPosition, maxExplosionRadius } = this.#currentShot;
       this.#currentShot.updatePhysics(
-         dt / 1000, Match.#GRAVITY, this.#wind, this.#rain,
-         this.#terrain, this.#controlPanel, this.#turnController
+         dt / 1000,
+         Match.#GRAVITY,
+         this.#wind,
+         this.#rain,
+         this.#earthquake,
+         this.#terrain,
+         this.#controlPanel,
+         this.#turnController
       );
       this.#spawnExplosion(isExploding, impactPosition, maxExplosionRadius);
    }
@@ -267,6 +286,7 @@ class Match {
       this.#terrain.drawTerrain();
       this.#wind?.draw(this.#controlPanel.baseAltitude);
       this.#rain?.draw(this.#terrain);
+      this.#earthquake?.draw();
    }
 
    #drawPlayers() {

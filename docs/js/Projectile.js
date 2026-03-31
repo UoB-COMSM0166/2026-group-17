@@ -15,7 +15,7 @@ class Projectile {
       this.#isActive = true;
    }
 
-   updatePhysics(dt, gravity, wind, rain, terrain, controlPanel, turnController) {
+   updatePhysics(dt, gravity, wind, rain, earthquake, terrain, controlPanel, turnController) {
       if (this.#isExploding) return;
       this.#velocity.add(gravity.copy().mult(dt));
       // add wind
@@ -26,6 +26,10 @@ class Projectile {
       // Rain effect
       if (rain && rain.isActive) {
          rain.applyTo(this, dt);
+      }
+      // Earthquake effect
+      if (earthquake && earthquake.isActive) {
+         earthquake.applyTo(this, dt);
       }
       this.#position.add(this.#velocity.copy().mult(dt));
       const groundY = min(
