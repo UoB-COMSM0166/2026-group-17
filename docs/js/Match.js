@@ -65,7 +65,7 @@ class Match {
    updateMatch(dt) {
       this.#handleRoundTransition();
       this.#syncControlPanel();
-      if (this.#currentShot) this.#updateShot(dt);
+      this.#updateShot(dt);
       this.#updatePlayers();
       if (this.#currentExplosion) this.#updateExplosion();
       this.#updateFloatingScores();
@@ -75,7 +75,7 @@ class Match {
       this.#drawEnvironment();
       this.#drawPlayers();
       if (!this.#turnController.isGameOver) this.#drawTrajectory();
-      this.#drawShot();
+      this.#drawShotSequence();
       this.#drawHUD();
    }
 
@@ -167,24 +167,25 @@ class Match {
    }
 
    #updateShot(dt) {
-      if (this.#currentShot.isDead) {
-         this.#currentShot = null;
-         return;
-      }
-      // Destructuring assignment: after this local constant isExplosion = currentShot.isExplosion, etc.
-      const { isExploding, impactPosition, maxExplosionRadius } = this.#currentShot;
-      this.#currentShot.updatePhysics(
-         dt / 1000, Match.#GRAVITY, this.#wind, this.#rain,
-         this.#terrain, this.#controlPanel, this.#turnController
+      if (!this.#currentShot?.isActive) return;
+      const impactEvent = this.#currentShot.updatePhysics(
+         dt / 1000,
+         Match.#GRAVITY,
+         this.#wind,
+         this.#rain,
+         this.#terrain,
+         this.#controlPanel,
+         this.#width
       );
-      this.#spawnExplosion(isExploding, impactPosition, maxExplosionRadius);
+      if (impactEvent) this.#spawnExplosion(impactEvent);
    }
 
-   #spawnExplosion(isExploding, impactPosition, maxExplosionRadius) {
-      if (isExploding && !this.#currentExplosion && impactPosition) {
-         this.#currentExplosion = new Explosion(impactPosition, this.#terrain);
-         this.#currentExplosion.maxRadius = maxExplosionRadius;
+   #spawnExplosion(impactEvent) {
+      this.#currentShot = null;
+      if (impactEvent.type === 'TERRAIN_IMPACT') {
+         this.#currentExplosion = new Explosion(impactEvent.pos, this.#terrain);
       }
+      else if (impactEvent.type === 'OUT_OF_BOUNDS') this.#turnController.advancePhase();
    }
 
    #updatePlayers() {
@@ -208,7 +209,8 @@ class Match {
    }
 
    #updateExplosion() {
-      this.#currentExplosion.update();
+      if (!this.#currentExplosion) return;
+      this.#currentExplosion.update(this.#turnController);
       if (!this.#currentExplosion.finished) this.#handleExplosionFeedback();
       else {
          this.#handleExplosionScoring();
@@ -220,6 +222,7 @@ class Match {
    #handleExplosionFeedback() {
       // lastShooterId for self, 1 - lastShooterId for enemy
       let distance = this.#calculateExplosionDistance(1 - this.#lastShooterId);
+      // last 3 arguments to applyExplosionFeedback() relate to visual effects
       this.#applyExplosionFeedback('enemyFeedbackTriggered', distance, 1 - this.#lastShooterId, 12, 6, 8);
       distance = this.#calculateExplosionDistance(this.#lastShooterId);
       this.#applyExplosionFeedback('selfFeedbackTriggered', distance, this.#lastShooterId, 10, 5, 6);
@@ -283,11 +286,13 @@ class Match {
       this.#trajectoryPreviewer.drawPreview(shooter, target, this.#terrain, Match.#GRAVITY, noWind);
    }
 
-   #drawShot() {
-      this.#currentShot?.drawShotSequence(this.#terrain, this.#turnController);
+   #drawShotSequence() {
+      this.#currentShot?.drawShot();
+      this.#currentExplosion?.draw();
    }
 
    #drawHUD() {
+      // Destructuring assignment: after this local constant turnNumber = turnController.turnNumber, etc.
       const { turnNumber, maxTurns, activePlayerId } = this.#turnController;
       this.#controlPanel.drawCtrlPanel(this.#players[activePlayerId], this.#physicsDone());
       this.#turnCounter.drawCounter(turnNumber, maxTurns, activePlayerId);
