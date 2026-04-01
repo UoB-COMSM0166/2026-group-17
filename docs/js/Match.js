@@ -9,6 +9,7 @@ class Match {
    #lastActivePlayerId = -1;
    #wind;
    #rain;
+   #earthquake;
    #weatherQueue = [];
    #weatherIndex = 0;
    #terrain;
@@ -36,6 +37,7 @@ class Match {
       this.#height = resolution.y;
       this.#wind = new WindSystem();
       this.#rain = new RainSystem();
+      this.#earthquake = new EarthquakeSystem(shakeCallback);
       // Background colors
       this.#bgTopColour = color(0);
       this.#bgBottomColour = color(0, 80, 100);
@@ -65,9 +67,9 @@ class Match {
    updateMatch(dt) {
       this.#handleRoundTransition();
       this.#syncControlPanel();
-      if (this.#currentShot) this.#updateShot(dt);
+      this.#updateShot(dt);
       this.#updatePlayers();
-      if (this.#currentExplosion) this.#updateExplosion();
+      if (this.#currentExplosion) this.#updateExplosion(dt);
       this.#updateFloatingScores();
    }
 
@@ -75,7 +77,7 @@ class Match {
       this.#drawEnvironment();
       this.#drawPlayers();
       if (!this.#turnController.isGameOver) this.#drawTrajectory();
-      this.#drawShot();
+      this.#drawShotSequence();
       this.#drawHUD();
    }
 
@@ -103,9 +105,15 @@ class Match {
    }
 
    #setModeBasedWeather() {
-      if (!this.#isEasyDifficulty) this.#generateRandomWeather();
-      else this.#wind.isActive = this.#rain.isActive = false;
+      if (!this.#isEasyDifficulty) {
+         this.#generateRandomWeather();
+      } else {
+         this.#wind.isActive = false;
+         this.#rain.isActive = false;
+         this.#earthquake.isActive = false;
+      }
    }
+
 
    #spawnPlayers() {
       const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
@@ -144,6 +152,7 @@ class Match {
       this.#weatherIndex++;
       this.#wind.isActive = false;
       this.#rain.isActive = false;
+      this.#earthquake.isActive = false;
       if (currentWeather === "wind") {
          this.#wind.isActive = true;
          this.#wind.newTurn();
@@ -152,11 +161,15 @@ class Match {
          this.#rain.isActive = true;
          this.#rain.newTurn();
       }
+      else if (currentWeather === "earthquake") {
+         this.#earthquake.isActive = true;
+         this.#earthquake.newTurn();
+      }
    }
 
    #generateWeatherQueue() {
-      this.#weatherQueue = ["wind", "rain", "none"];
-      this.#weatherQueue.push(random(["wind", "rain", "none"]));
+      this.#weatherQueue = ["wind", "rain", "earthquake"];
+      this.#weatherQueue.push(random(["wind", "rain", "earthquake"]));
       shuffle(this.#weatherQueue, true);
       this.#weatherIndex = 0;
    }
@@ -176,24 +189,26 @@ class Match {
    }
 
    #updateShot(dt) {
-      if (this.#currentShot.isDead) {
-         this.#currentShot = null;
-         return;
-      }
-      // Destructuring assignment: after this local constant isExplosion = currentShot.isExplosion, etc.
-      const { isExploding, impactPosition, maxExplosionRadius } = this.#currentShot;
-      this.#currentShot.updatePhysics(
-         dt / 1000, Match.#GRAVITY, this.#wind, this.#rain,
-         this.#terrain, this.#controlPanel, this.#turnController
+      if (!this.#currentShot?.isActive) return;
+      const impactEvent = this.#currentShot.updatePhysics(
+         dt / 1000,
+         Match.#GRAVITY,
+         this.#wind,
+         this.#rain,
+         this.#earthquake,
+         this.#terrain,
+         this.#controlPanel,
+         this.#width
       );
-      this.#spawnExplosion(isExploding, impactPosition, maxExplosionRadius);
+      if (impactEvent) this.#spawnExplosion(impactEvent);
    }
 
-   #spawnExplosion(isExploding, impactPosition, maxExplosionRadius) {
-      if (isExploding && !this.#currentExplosion && impactPosition) {
-         this.#currentExplosion = new Explosion(impactPosition, this.#terrain);
-         this.#currentExplosion.maxRadius = maxExplosionRadius;
+   #spawnExplosion(impactEvent) {
+      this.#currentShot = null;
+      if (impactEvent.type === 'TERRAIN_IMPACT') {
+         this.#currentExplosion = new Explosion(impactEvent.pos, this.#terrain);
       }
+      else if (impactEvent.type === 'OUT_OF_BOUNDS') this.#turnController.advancePhase();
    }
 
    #updatePlayers() {
@@ -216,8 +231,9 @@ class Match {
       }
    }
 
-   #updateExplosion() {
-      this.#currentExplosion.update();
+   #updateExplosion(dt) {
+      if (!this.#currentExplosion) return;
+      this.#currentExplosion.update(this.#turnController, dt);
       if (!this.#currentExplosion.finished) this.#handleExplosionFeedback();
       else {
          this.#handleExplosionScoring();
@@ -229,6 +245,7 @@ class Match {
    #handleExplosionFeedback() {
       // lastShooterId for self, 1 - lastShooterId for enemy
       let distance = this.#calculateExplosionDistance(1 - this.#lastShooterId);
+      // last 3 arguments to applyExplosionFeedback() relate to visual effects
       this.#applyExplosionFeedback('enemyFeedbackTriggered', distance, 1 - this.#lastShooterId, 12, 6, 8);
       distance = this.#calculateExplosionDistance(this.#lastShooterId);
       this.#applyExplosionFeedback('selfFeedbackTriggered', distance, this.#lastShooterId, 10, 5, 6);
@@ -276,6 +293,7 @@ class Match {
       this.#terrain.drawTerrain();
       this.#wind?.draw(this.#controlPanel.baseAltitude);
       this.#rain?.draw(this.#terrain);
+      this.#earthquake?.draw();
    }
 
    #drawPlayers() {
@@ -292,11 +310,13 @@ class Match {
       this.#trajectoryPreviewer.drawPreview(shooter, target, this.#terrain, Match.#GRAVITY, noWind);
    }
 
-   #drawShot() {
-      this.#currentShot?.drawShotSequence(this.#terrain, this.#turnController);
+   #drawShotSequence() {
+      this.#currentShot?.drawShot();
+      this.#currentExplosion?.draw();
    }
 
    #drawHUD() {
+      // Destructuring assignment: after this local constant turnNumber = turnController.turnNumber, etc.
       const { turnNumber, maxTurns, activePlayerId } = this.#turnController;
       this.#controlPanel.drawCtrlPanel(this.#players[activePlayerId], this.#physicsDone());
       this.#turnCounter.drawCounter(turnNumber, maxTurns, activePlayerId);

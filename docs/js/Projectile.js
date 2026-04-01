@@ -2,12 +2,7 @@ class Projectile {
    #position;
    #velocity;
    #radius;
-   #weapon;
    #isActive;
-   #impactPosition = createVector(0, 0);
-   #isExploding;
-   #explosionStartTime;
-   #maxExplosionRadius = 50;
 
    constructor(muzzlePos, vel, rad, weapon = null) {
       this.#position = muzzlePos;
@@ -17,80 +12,71 @@ class Projectile {
       this.#isActive = true;
    }
 
-   updatePhysics(dt, gravity, wind, rain, terrain, controlPanel, turnController) {
-      if (this.#isExploding) return;
+   // returns outcome object which is either null or signals OOB or impact position
+   updatePhysics(dt, gravity, wind, rain, quake, terrain, controlPanel, canvasWidth) {
+      if (!this.#isActive) return null;
       this.#velocity.add(gravity.copy().mult(dt));
-      // add wind
-      if (typeof wind !== "undefined") {
-         //add dt
-         wind.applyTo(this, dt);
-      }
-      // Rain effect
-      if (rain && rain.isActive) {
-         rain.applyTo(this, dt);
-      }
+      this.#applyEventEffects(wind, rain, quake, dt);
       this.#position.add(this.#velocity.copy().mult(dt));
+      let outcome = this.#checkBoundaries(canvasWidth);
+      if (outcome) return outcome;
       const groundY = min(
          terrain.getHeightAt(this.#position.x),
          controlPanel.getAltitudeAt(this.#position.x)
       );
       if (this.#position.y >= groundY) {
+         this.#refineImpactPosition(terrain, dt);
          this.#isActive = false;
-         this.#impactPosition.set(floor(this.#position.x), floor(this.#position.y));
-         this.#isExploding = true;
-         this.#explosionStartTime = frameCount;
+         outcome = { type: 'TERRAIN_IMPACT', pos: this.#position.copy() };
       }
-      else if (this.#position.x <= 0 || this.#position.x >= width) {
-         this.#isActive = false;
-         turnController.advancePhase();
-      }
+      return outcome;
    }
 
-   drawShotSequence(terrain, turnController) {
-      if (this.#isActive) this.#drawShot();
-      else if (this.#isExploding) {
-         this.#drawExplosion(terrain, turnController);
+   #applyEventEffects(wind, rain, earthquake, dt) {
+      wind?.applyTo(this, dt);
+      rain?.applyTo(this, dt);
+      earthquake?.applyTo(this, dt);
+   }
+
+   #checkBoundaries(canvasWidth) {
+      if (this.#position.x <= 0 || this.#position.x >= canvasWidth) {
+         this.#isActive = false
+         return { type: 'OUT_OF_BOUNDS' };
       }
+      return null;
+   }
+
+   #refineImpactPosition(terrain, dt) {
+      const oldPosition = p5.Vector.sub(this.#position, this.#velocity.copy().mult(dt));
+      let low = 0, high = 1, testPosition;
+      // binary search to close in on precise position on terrain surface
+      for (let i = 0; i < 4; i++) {
+         const mid = (low + high) / 2;
+         testPosition = p5.Vector.lerp(oldPosition, this.#position, mid);
+         if (testPosition.y >= terrain.getHeightAt(testPosition.x)) high = mid;
+         else low = mid;
+      }
+      this.#position.set(floor(testPosition.x), floor(testPosition.y));
    }
 
    #drawShot() {
-      if (this.#weapon?.drawProjectile) {
-         push();
+      if (!this.#isActive) return;
+      push();
+      if (weapon) {
          translate(this.#position.x, this.#position.y);
          rotate(this.#velocity.heading());
          this.#weapon.drawProjectile(0, 0, this.#radius);
-         pop();
-         return;
+      else {
+         strokeWeight(2);
+         stroke('whitesmoke');
+         fill('snow');
+         circle(this.#position.x, this.#position.y, this.#radius);
       }
-      strokeWeight(2);
-      stroke('whitesmoke');
-      fill('snow');
-      circle(this.#position.x, this.#position.y, this.#radius);
-   }
-
-   #drawExplosion(terrain, turnController) {
-      let age = frameCount - this.#explosionStartTime;
-      let progress = constrain(map(age, 0, this.#maxExplosionRadius, 0, 1), 0, 1);
-      let explosionRadius = this.#maxExplosionRadius * progress;
-      if (explosionRadius >= this.#maxExplosionRadius) {
-         this.#isExploding = false;
-         terrain.applyExplosion(this.#impactPosition, this.#maxExplosionRadius);
-         turnController.advancePhase();
-         return;
-      }
-      stroke('orange');
-      fill('yellow');
-      circle(this.#impactPosition.x, this.#impactPosition.y, explosionRadius);
+      pop();
    }
 
    get position() { return this.#position; }
-   //because velocity is private
    get vel() { return this.#velocity; }
-   get impactPosition() { return this.#impactPosition; }
-   get maxExplosionRadius() { return this.#maxExplosionRadius; }
    get isActive() { return this.#isActive; }
-   get isExploding() { return this.#isExploding; }
-   get isDead() { return !this.#isActive && !this.#isExploding; }
    set isActive(truthVal) { this.#isActive = truthVal; }
-   set maxExplosionRadius(radius) { this.#maxExplosionRadius = radius; }
 }

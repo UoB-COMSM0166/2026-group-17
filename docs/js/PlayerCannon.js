@@ -10,7 +10,6 @@ class PlayerCannon {
    #targetX;
    #moveSteps = 3;
    #hitFlashFrames = 0;
-   #hitFlashMax = 10;
 
 
    constructor(posVec, wheelRad, barrelSz, barrAngle, moveSteps, fillColor, outColor) {
