@@ -17,8 +17,7 @@ class Match {
    #scoreBoard;
    #scoreCalculator;
    #currentShot = null;
-   #currentExplosion = null;
-   #hasScoredThisExplosion = false;
+   #currentExplosions = [];
    #turnController;
    #turnCounter;
    #controlPanel;
@@ -69,24 +68,29 @@ class Match {
       this.#syncControlPanel();
       this.#updateShot(dt);
       this.#updatePlayers();
-      if (this.#currentExplosion) this.#updateExplosion(dt);
+      if (this.#currentExplosions.length > 0) this.#updateExplosions(dt);
       this.#updateFloatingScores();
    }
 
-   drawMatch() {
+   drawMatch(applyShake = null) {
+      push();
+      applyShake?.();
       this.#drawEnvironment();
       this.#drawPlayers();
       if (!this.#turnController.isGameOver) this.#drawTrajectory();
       this.#drawShotSequence();
+      pop();
       this.#drawHUD();
    }
 
    onMousePressed(button) {
-      this.#lastMouseButton = button.left;
+      this.#lastMouseButton = (button === LEFT) || (button?.left === true);
    }
 
    onMouseReleased() {
-      if (!this.#physicsDone() || this.#lastMouseButton !== true) return;
+      const wasLeftMousePress = this.#lastMouseButton === true;
+      this.#lastMouseButton = false;
+      if (!this.#physicsDone() || !wasLeftMousePress) return;
       this.#handleAngleDialToggle();
       this.#handlePowerAdjustToggle();
       this.#triggerMouseCannonShot();
@@ -97,6 +101,8 @@ class Match {
       if (inputKey === 'Space' || keyId === 32) this.#executeCannonShot();
       if (keyId === 37) this.#executeCannonMovement('left');
       if (keyId === 39) this.#executeCannonMovement('right');
+      if (inputKey === 'q' || inputKey === 'Q') this.#switchCurrentWeapon(-1);
+      if (inputKey === 'e' || inputKey === 'E') this.#switchCurrentWeapon(1);
    }
 
    #setModeBasedWeather() {
@@ -127,11 +133,11 @@ class Match {
    }
 
    #applyLoadout(loadout, id) {
-      if (loadout && loadout.length > 0) {
-         this.#players[id].weaponLoadout = loadout;
-         this.#players[id].currentWeaponIndex = 0;
-         loadout.forEach(w => w.resetAmmo());
-      }
+      const fallbackLoadout = WEAPON_REGISTRY.map((weapon) => new weapon.constructor());
+      const resolvedLoadout = (loadout && loadout.length > 0) ? loadout : fallbackLoadout;
+      this.#players[id].weaponLoadout = resolvedLoadout;
+      this.#players[id].currentWeaponIndex = 0;
+      resolvedLoadout.forEach(w => w.resetAmmo());
    }
 
    #handleRoundTransition() {
@@ -197,7 +203,17 @@ class Match {
    #spawnExplosion(impactEvent) {
       this.#currentShot = null;
       if (impactEvent.type === 'TERRAIN_IMPACT') {
-         this.#currentExplosion = new Explosion(impactEvent.pos, this.#terrain);
+         const weapon = impactEvent.weapon;
+         const specs = weapon?.createExplosionsFromImpact?.(impactEvent.pos, impactEvent.projectile)
+            ?? [{ position: impactEvent.pos.copy() }];
+         this.#currentExplosions = specs.map((spec) =>
+            new Explosion(
+               spec.position.copy(),
+               this.#terrain,
+               spec.weapon ?? weapon,
+               { maxRadius: spec.maxRadius, duration: spec.duration }
+            )
+         );
       }
       else if (impactEvent.type === 'OUT_OF_BOUNDS') this.#turnController.advancePhase();
    }
@@ -222,42 +238,47 @@ class Match {
       }
    }
 
-   #updateExplosion(dt) {
-      if (!this.#currentExplosion) return;
-      this.#currentExplosion.update(this.#turnController, dt);
-      if (!this.#currentExplosion.finished) this.#handleExplosionFeedback();
-      else {
-         this.#handleExplosionScoring();
-         this.#currentExplosion = null;
-         this.#hasScoredThisExplosion = false;
+   #updateExplosions(dt) {
+      let removedAnyExplosion = false;
+      for (let i = this.#currentExplosions.length - 1; i >= 0; i--) {
+         const explosion = this.#currentExplosions[i];
+         explosion.update(dt);
+         if (!explosion.finished) this.#handleExplosionFeedback(explosion);
+         else {
+            this.#handleExplosionScoring(explosion);
+            this.#currentExplosions.splice(i, 1);
+            removedAnyExplosion = true;
+         }
+      }
+      if (removedAnyExplosion && this.#currentExplosions.length === 0) {
+         this.#turnController.advancePhase();
       }
    }
 
-   #handleExplosionFeedback() {
+   #handleExplosionFeedback(explosion) {
       // lastShooterId for self, 1 - lastShooterId for enemy
-      let distance = this.#calculateExplosionDistance(1 - this.#lastShooterId);
+      let distance = this.#calculateExplosionDistance(explosion, 1 - this.#lastShooterId);
       // last 3 arguments to applyExplosionFeedback() relate to visual effects
-      this.#applyExplosionFeedback('enemyFeedbackTriggered', distance, 1 - this.#lastShooterId, 12, 6, 8);
-      distance = this.#calculateExplosionDistance(this.#lastShooterId);
-      this.#applyExplosionFeedback('selfFeedbackTriggered', distance, this.#lastShooterId, 10, 5, 6);
+      this.#applyExplosionFeedback(explosion, 'enemyFeedbackTriggered', distance, 1 - this.#lastShooterId, 12, 6, 8);
+      distance = this.#calculateExplosionDistance(explosion, this.#lastShooterId);
+      this.#applyExplosionFeedback(explosion, 'selfFeedbackTriggered', distance, this.#lastShooterId, 10, 5, 6);
    }
 
-   #calculateExplosionDistance(playerId) {
-      return this.#players[playerId].position.dist(this.#currentExplosion.position);
+   #calculateExplosionDistance(explosion, playerId) {
+      return this.#players[playerId].position.dist(explosion.position);
    }
 
-   #applyExplosionFeedback(id, distance, playerId, flashFrames, shakeFrames, shakeMag) {
-      if (!this.#currentExplosion[id] && distance <= this.#currentExplosion.radius) {
+   #applyExplosionFeedback(explosion, id, distance, playerId, flashFrames, shakeFrames, shakeMag) {
+      if (!explosion[id] && distance <= explosion.radius) {
          this.#players[playerId].triggerHitFlash(flashFrames);
          this.#shakeCallback(shakeFrames, shakeMag);
-         this.#currentExplosion[key] = true;
+         explosion[id] = true;
       }
    }
 
-   #handleExplosionScoring() {
-      if (this.#hasScoredThisExplosion) return;
+   #handleExplosionScoring(explosion) {
       const { enemy, self } = this.#scoreCalculator.calculateExplosionScore(
-         this.#currentExplosion,
+         explosion,
          this.#players,
          this.#lastShooterId
       );
@@ -265,7 +286,6 @@ class Match {
       if (self > 0) this.#updateScore(-self, color(255, 80, 80));
       this.#scoreBoard.score1 = Math.max(0, this.#scoreBoard.score1);
       this.#scoreBoard.score2 = Math.max(0, this.#scoreBoard.score2);
-      this.#hasScoredThisExplosion = true;
    }
 
    #updateScore(extraPoints, scoreColor) {
@@ -303,7 +323,7 @@ class Match {
 
    #drawShotSequence() {
       this.#currentShot?.drawShot();
-      this.#currentExplosion?.draw();
+      for (const explosion of this.#currentExplosions) explosion.draw();
    }
 
    #drawHUD() {
@@ -311,8 +331,32 @@ class Match {
       const { turnNumber, maxTurns, activePlayerId } = this.#turnController;
       this.#controlPanel.drawCtrlPanel(this.#players[activePlayerId], this.#physicsDone());
       this.#turnCounter.drawCounter(turnNumber, maxTurns, activePlayerId);
+      this.#drawWeaponHUD(activePlayerId);
       for (const floatingScore of this.#floatingScores) floatingScore.draw();
       this.#scoreBoard.draw();
+   }
+
+   #drawWeaponHUD(activePlayerId) {
+      const player = this.#players[activePlayerId];
+      const weapon = player.currentWeapon;
+      if (!weapon) return;
+
+      push();
+      rectMode(CORNER);
+      noStroke();
+      fill(10, 20, 30, 170);
+      rect(20, 20, 280, 68, 12);
+
+      fill(255);
+      textAlign(LEFT, TOP);
+      textSize(16);
+      text(`Weapon: ${weapon.name}`, 84, 30);
+      textSize(12);
+      text(`Ammo ${weapon.ammoLeft}/${weapon.ammo}  Radius ${weapon.explosionRadius}`, 84, 52);
+      text(`Q/E switch`, 210, 52);
+
+      weapon.drawIcon(52, 53, 16);
+      pop();
    }
 
    #handleAngleDialToggle() {
@@ -333,9 +377,17 @@ class Match {
    #executeCannonShot() {
       if (this.#physicsDone()) {
          this.#lastShooterId = this.#turnController.activePlayerId;
-         const shotRadius = 4;
-         this.#currentShot = this.#players[this.#lastShooterId].fireShot(shotRadius);
+         const player = this.#players[this.#lastShooterId];
+         const weapon = player.currentWeapon;
+         const target = this.#players[1 - this.#lastShooterId];
+         if (weapon && !weapon.useAmmo()) return;
+         this.#currentShot = player.fireShot(weapon, target);
       }
+   }
+
+   #switchCurrentWeapon(step) {
+      if (!this.#physicsDone()) return;
+      this.#players[this.#turnController.activePlayerId].cycleWeapon(step);
    }
 
    #triggerMouseCannonMovement() {
@@ -355,7 +407,7 @@ class Match {
    }
 
    #physicsDone() {
-      return !this.#currentShot && !this.#currentExplosion && this.#terrain.isSettled;
+      return !this.#currentShot && this.#currentExplosions.length === 0 && this.#terrain.isSettled;
    }
 
    get isMatchOver() {

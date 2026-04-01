@@ -3,19 +3,32 @@ class Projectile {
    #velocity;
    #radius;
    #isActive;
+   #weapon;
+   #target;
+   #age = 0;
+   #state = {};
+   #previousPosition;
 
-   constructor(muzzlePos, vel, rad) {
+   constructor(muzzlePos, vel, rad, weapon = null, target = null) {
       this.#position = muzzlePos;
       this.#velocity = vel;
       this.#radius = rad;
       this.#isActive = true;
+      this.#weapon = weapon;
+      this.#target = target;
+      this.#previousPosition = muzzlePos.copy();
    }
 
    // returns outcome object which is either null or signals OOB or impact position
    updatePhysics(dt, gravity, wind, rain, quake, terrain, controlPanel, canvasWidth) {
       if (!this.#isActive) return null;
+      this.#age += dt;
+      this.#previousPosition = this.#position.copy();
       this.#velocity.add(gravity.copy().mult(dt));
       this.#applyEventEffects(wind, rain, quake, dt);
+      this.#weapon?.beforeProjectileStep?.(this, {
+         dt, gravity, wind, rain, quake, terrain, controlPanel, canvasWidth
+      });
       this.#position.add(this.#velocity.copy().mult(dt));
       let outcome = this.#checkBoundaries(canvasWidth);
       if (outcome) return outcome;
@@ -26,7 +39,12 @@ class Projectile {
       if (this.#position.y >= groundY) {
          this.#refineImpactPosition(terrain, dt);
          this.#isActive = false;
-         outcome = { type: 'TERRAIN_IMPACT', pos: this.#position.copy() };
+         outcome = {
+            type: 'TERRAIN_IMPACT',
+            pos: this.#position.copy(),
+            weapon: this.#weapon,
+            projectile: this
+         };
       }
       return outcome;
    }
@@ -60,6 +78,14 @@ class Projectile {
 
    drawShot() {
       if (!this.#isActive) return;
+      if (this.#weapon?.drawProjectileInstance) {
+         this.#weapon.drawProjectileInstance(this);
+         return;
+      }
+      if (this.#weapon?.drawProjectile) {
+         this.#weapon.drawProjectile(this.#position.x, this.#position.y, this.#radius);
+         return;
+      }
       strokeWeight(2);
       stroke('whitesmoke');
       fill('snow');
@@ -69,5 +95,11 @@ class Projectile {
    get position() { return this.#position; }
    get vel() { return this.#velocity; }
    get isActive() { return this.#isActive; }
+   get weapon() { return this.#weapon; }
+   get target() { return this.#target; }
+   get age() { return this.#age; }
+   get state() { return this.#state; }
+   get radius() { return this.#radius; }
+   get previousPosition() { return this.#previousPosition; }
    set isActive(truthVal) { this.#isActive = truthVal; }
 }

@@ -25,4 +25,19 @@ class ImpactGun extends AbstractWeapon {
     ellipse(cx, cy, r*0.5, r*0.5);
     pop();
   }
+
+  drawExplosion(explosion) {
+    this.drawStyledExplosion(explosion, {
+      coreColor: color(255, 255, 255, 240),
+      ringColor: color(120, 220, 255, 220),
+      ringWeight: 3,
+      coreScale: 0.18,
+      ringScale: 0.7,
+      glowInner: 'rgba(240,255,255,0.9)',
+      glowMid: 'rgba(120,210,255,0.35)',
+      glowOuter: 'rgba(0,100,255,0)',
+      accent: 'diamond',
+      accentColor: color(210, 245, 255, 180)
+    });
+  }
 }

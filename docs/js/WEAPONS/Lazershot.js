@@ -9,10 +9,36 @@ class Lazershot extends AbstractWeapon {
       blastRadius: 10, 
       ammo: 1, 
       rarity: 'legendary',
-      shotRadius: 7, 
+      shotRadius: 10, 
       explosionRadius: 160,
     });
   }
+
+ drawProjectileInstance(projectile) {
+  push();
+  const dir = projectile.vel.copy();
+  if (dir.mag() > 0) dir.normalize();
+  const tail = dir.mult(34);
+  stroke(120, 255, 255, 180);
+  strokeWeight(6);
+  line(
+    projectile.position.x,
+    projectile.position.y,
+    projectile.position.x - tail.x,
+    projectile.position.y - tail.y
+  );
+  stroke(255, 255, 255, 220);
+  strokeWeight(2);
+  line(
+    projectile.position.x,
+    projectile.position.y,
+    projectile.position.x - tail.x * 0.8,
+    projectile.position.y - tail.y * 0.8
+  );
+  pop();
+
+  this.drawProjectile(projectile.position.x, projectile.position.y, projectile.radius);
+ }
  drawProjectile(cx, cy, r) {
   push();
   noStroke();
@@ -68,6 +94,21 @@ class Lazershot extends AbstractWeapon {
   // right fin
   triangle(cx + bodyW/2, cy + r*0.4, cx + bodyW, cy + r*1.1, cx + bodyW/2, cy + r*0.8);
 
-  pop();
+ pop();
 }
+
+ drawExplosion(explosion) {
+  this.drawStyledExplosion(explosion, {
+    coreColor: color(255, 255, 255, 230),
+    ringColor: color(60, 255, 255, 220),
+    ringWeight: 5,
+    coreScale: 0.28,
+    ringScale: 0.92,
+    glowInner: 'rgba(180,255,255,0.95)',
+    glowMid: 'rgba(0,170,255,0.45)',
+    glowOuter: 'rgba(80,0,255,0)',
+    accent: 'cross',
+    accentColor: color(170, 255, 255, 220)
+  });
+ }
 }

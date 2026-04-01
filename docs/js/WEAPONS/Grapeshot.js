@@ -9,10 +9,78 @@ class Grapeshot extends AbstractWeapon {
       blastRadius: 10,
       ammo: 4,
       rarity: 'rare',
-      shotRadius: 6, 
+      shotRadius: 9, 
       explosionRadius: 120,
     });
   }
+
+ beforeProjectileStep(projectile, context) {
+  const state = projectile.state;
+  if (state.split === undefined) {
+    state.split = false;
+    state.spread = 0;
+  }
+
+  if (!state.split && (projectile.age > 0.38 || projectile.vel.y > 40)) {
+    state.split = true;
+  }
+
+  if (state.split) {
+    state.spread = min(18, state.spread + context.dt * 42);
+  }
+ }
+
+ drawProjectileInstance(projectile) {
+  const state = projectile.state;
+  if (!state.split) {
+    this.drawProjectile(projectile.position.x, projectile.position.y, projectile.radius);
+    return;
+  }
+
+  push();
+  noStroke();
+  const spread = state.spread ?? 0;
+  const offsets = [
+    createVector(-spread, spread * 0.25),
+    createVector(spread, spread * 0.25),
+    createVector(0, -spread * 0.55),
+    createVector(-spread * 0.25, spread * 0.8)
+  ];
+
+  for (const offset of offsets) {
+    const px = projectile.position.x + offset.x;
+    const py = projectile.position.y + offset.y;
+    fill(70);
+    circle(px, py, projectile.radius * 0.55);
+    fill(255, 140, 40, 180);
+    circle(px, py - projectile.radius * 0.45, 2);
+  }
+
+  stroke(210, 160, 60, 120);
+  strokeWeight(1.2);
+  for (const offset of offsets) {
+    line(projectile.position.x, projectile.position.y, projectile.position.x + offset.x, projectile.position.y + offset.y);
+  }
+  pop();
+ }
+
+ createExplosionsFromImpact(impactPosition, projectile) {
+  const spread = max(14, projectile.state.spread ?? 12);
+  const directions = [
+    createVector(-1, 0.15),
+    createVector(1, 0.15),
+    createVector(0.2, -0.85),
+    createVector(-0.35, 0.8)
+  ];
+
+  return directions.map((dir, index) => {
+    const offset = dir.copy().setMag(spread * (0.8 + index * 0.08));
+    return {
+      position: impactPosition.copy().add(offset),
+      maxRadius: 52
+    };
+  });
+ }
 
  drawProjectile(cx, cy, r) {
   push();
@@ -55,7 +123,22 @@ class Grapeshot extends AbstractWeapon {
   drawingContext.shadowColor = 'orange';
   ellipse(cx, cy - r * 0.8, 3, 3);
   
-  pop();
+ pop();
 }
+
+ drawExplosion(explosion) {
+  this.drawStyledExplosion(explosion, {
+    coreColor: color(255, 230, 150, 235),
+    ringColor: color(255, 175, 70, 210),
+    ringWeight: 5,
+    coreScale: 0.38,
+    ringScale: 0.98,
+    glowInner: 'rgba(255,240,180,0.95)',
+    glowMid: 'rgba(255,155,60,0.44)',
+    glowOuter: 'rgba(120,50,0,0)',
+    accent: 'embers',
+    accentColor: color(255, 215, 120, 180)
+  });
+ }
   
 }

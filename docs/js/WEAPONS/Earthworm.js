@@ -33,4 +33,19 @@ class Earthworm extends AbstractWeapon {
     }
     pop();
   }
+
+  drawExplosion(explosion) {
+    this.drawStyledExplosion(explosion, {
+      coreColor: color(215, 120, 255, 230),
+      ringColor: color(175, 80, 255, 210),
+      ringWeight: 5,
+      coreScale: 0.24,
+      ringScale: 0.78,
+      glowInner: 'rgba(245,210,255,0.9)',
+      glowMid: 'rgba(170,70,255,0.38)',
+      glowOuter: 'rgba(80,0,120,0)',
+      accent: 'diamond',
+      accentColor: color(235, 185, 255, 180)
+    });
+  }
 }

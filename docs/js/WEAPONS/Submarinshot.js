@@ -9,10 +9,47 @@ class Submarinshot extends AbstractWeapon {
       blastRadius: 8, 
       ammo: 3, 
       rarity: 'legendary',
-      shotRadius: 5, 
+      shotRadius: 8, 
       explosionRadius: 95,
     });
   }
+
+beforeProjectileStep(projectile, context) {
+  const targetPos = projectile.target?.positionVector ?? projectile.target?.position;
+  if (!targetPos) return;
+
+  const desired = p5.Vector.sub(targetPos, projectile.position);
+  if (desired.mag() < 1) return;
+
+  desired.setMag(85 * context.dt);
+  projectile.vel.add(desired);
+}
+
+drawProjectileInstance(projectile) {
+  push();
+  noFill();
+  stroke(220, 150, 255, 120);
+  strokeWeight(2);
+  const dir = projectile.vel.copy();
+  if (dir.mag() > 0) dir.normalize();
+  const normal = createVector(-dir.y, dir.x).mult(6);
+  line(
+    projectile.position.x - dir.x * 16 - normal.x,
+    projectile.position.y - dir.y * 16 - normal.y,
+    projectile.position.x - normal.x * 0.2,
+    projectile.position.y - normal.y * 0.2
+  );
+  line(
+    projectile.position.x - dir.x * 16 + normal.x,
+    projectile.position.y - dir.y * 16 + normal.y,
+    projectile.position.x + normal.x * 0.2,
+    projectile.position.y + normal.y * 0.2
+  );
+  pop();
+
+  this.drawProjectile(projectile.position.x, projectile.position.y, projectile.radius);
+}
+
 drawProjectile(cx, cy, r) {
   push();
   noStroke();
@@ -47,5 +84,20 @@ drawProjectile(cx, cy, r) {
   ellipse(cx, cy + r * 1.8, r * 0.8, r * 0.8);
 
   pop();
+}
+
+drawExplosion(explosion) {
+  this.drawStyledExplosion(explosion, {
+    coreColor: color(220, 170, 255, 230),
+    ringColor: color(190, 80, 255, 210),
+    ringWeight: 4,
+    coreScale: 0.28,
+    ringScale: 0.93,
+    glowInner: 'rgba(245,220,255,0.92)',
+    glowMid: 'rgba(180,70,255,0.38)',
+    glowOuter: 'rgba(60,0,120,0)',
+    accent: 'cross',
+    accentColor: color(235, 195, 255, 180)
+  });
 }
 }
