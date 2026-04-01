@@ -1,32 +1,42 @@
 class Explosion {
-  constructor(impactPosition, terrainRef = null) {
-    this.position = impactPosition;
-    this.radius = 10;
-    this.maxRadius = 50;
-    this.terrain = terrainRef;          
-    this.hasAppliedTerrain = false;
-    this.finished = false;  
-    this.enemyFeedbackTriggered = false;
-    this.selfFeedbackTriggered = false;            
-  }
+   #position;
+   #terrain;
+   #currentRadius = 0;
+   #maxRadius = 50;
+   #duration = 1000;
+   #timer = 0;
+   #finished = false;
 
-  update() {
-    if (this.finished) return;
-    this.radius += 0.5;
-    if (!this.hasAppliedTerrain && this.radius >= this.maxRadius) {
-      if (this.terrain) {
-        //this.terrain.applyExplosion(createVector(this.position.x, this.position.y), this.maxRadius);
+   constructor(impactPosition, terrainRef = null) {
+      this.#position = impactPosition;
+      this.#terrain = terrainRef;
+      this.enemyFeedbackTriggered = false;
+      this.selfFeedbackTriggered = false;
+   }
+
+   update(turnController, dt) {
+      if (this.#finished) return;
+      this.#timer += dt;
+      this.#currentRadius = lerp(0, this.#maxRadius, this.#timer / this.#duration);
+      if (this.#timer >= this.#duration) {
+         this.#terrain.applyExplosion(this.#position.copy(), this.#maxRadius);
+         this.#finished = true;
+         turnController.advancePhase();
       }
-      this.hasAppliedTerrain = true;
-      this.finished = true;
-    }
-  }
+   }
 
-  draw() {
-    if (this.finished) return;
-    noFill();
-    stroke(255, 150, 0);
-    strokeWeight(3);
-    circle(this.position.x, this.position.y, this.radius);
-  }
+   draw() {
+      if (this.#finished) return;
+      push();
+      strokeWeight(3);
+      stroke('orange');
+      fill('yellow');
+      circle(this.#position.x, this.#position.y, this.#currentRadius);
+      pop();
+   }
+
+   get position() { return this.#position; }
+   get radius() { return this.#currentRadius }
+   get maxRadius() { return this.#maxRadius }
+   get finished() { return this.#finished; }
 }
