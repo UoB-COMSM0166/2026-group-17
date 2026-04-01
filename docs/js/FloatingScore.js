@@ -8,11 +8,11 @@ class FloatingScore {
     this.y = y;
     this.value = value;
     this.col = col;
-    this.t = 0;     
-    this.life = 1.0; 
+    this.t = 0;
+    this.life = 1.0;
     this.dead = false;
 
-    this._framesLeft = 90; 
+    this._framesLeft = 90;
   }
 
   _clamp(v, a, b) {
@@ -21,13 +21,13 @@ class FloatingScore {
   update() {
     this.t += 0.14;
     const tt = this._clamp(this.t, 0, 1);
-    const eased = 1 - Math.pow(1 - tt, 3); 
+    const eased = 1 - Math.pow(1 - tt, 3);
     this.x = lerp(this.x0, this.x1, eased);
     this.y = lerp(this.y0, this.y1, eased);
-if (tt >= 1) {
-  this._hold = (this._hold ?? 18) - 1; 
-  if (this._hold <= 0) this.life -= 0.12;
-}
+    if (tt >= 1) {
+      this._hold = (this._hold ?? 18) - 1;
+      if (this._hold <= 0) this.life -= 0.12;
+    }
   }
   draw() {
     push();
