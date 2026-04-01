@@ -12,10 +12,10 @@ class Projectile {
    }
 
    // returns outcome object which is either null or signals OOB or impact position
-   updatePhysics(dt, gravity, wind, rain, terrain, controlPanel, canvasWidth) {
+   updatePhysics(dt, gravity, wind, rain, quake, terrain, controlPanel, canvasWidth) {
       if (!this.#isActive) return null;
       this.#velocity.add(gravity.copy().mult(dt));
-      this.#applyEventEffects(wind, rain, dt);
+      this.#applyEventEffects(wind, rain, quake, dt);
       this.#position.add(this.#velocity.copy().mult(dt));
       let outcome = this.#checkBoundaries(canvasWidth);
       if (outcome) return outcome;
@@ -31,9 +31,10 @@ class Projectile {
       return outcome;
    }
 
-   #applyEventEffects(wind, rain, dt) {
-      if (wind) wind.applyTo(this, dt);
-      if (rain) rain.applyTo(this, dt);
+   #applyEventEffects(wind, rain, earthquake, dt) {
+      wind?.applyTo(this, dt);
+      rain?.applyTo(this, dt);
+      earthquake?.applyTo(this, dt);
    }
 
    #checkBoundaries(canvasWidth) {
