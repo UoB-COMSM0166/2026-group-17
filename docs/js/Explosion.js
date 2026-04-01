@@ -3,23 +3,22 @@ class Explosion {
    #terrain;
    #currentRadius = 0;
    #maxRadius = 50;
-   #startTime = frameCount;
-   #finished;
+   #duration = 1000;
+   #timer = 0;
+   #finished = false;
 
    constructor(impactPosition, terrainRef = null) {
       this.#position = impactPosition;
       this.#terrain = terrainRef;
-      this.#finished = false;
       this.enemyFeedbackTriggered = false;
       this.selfFeedbackTriggered = false;
    }
 
-   update(turnController) {
+   update(turnController, dt) {
       if (this.#finished) return;
-      const age = frameCount - this.#startTime;
-      const progress = constrain(map(age, 0, this.#maxRadius, 0, 1), 0, 1);
-      this.#currentRadius = this.#maxRadius * progress;
-      if (this.#currentRadius >= this.#maxRadius) {
+      this.#timer += dt;
+      this.#currentRadius = lerp(0, this.#maxRadius, this.#timer / this.#duration);
+      if (this.#timer >= this.#duration) {
          this.#terrain.applyExplosion(this.#position.copy(), this.#maxRadius);
          this.#finished = true;
          turnController.advancePhase();
@@ -29,8 +28,8 @@ class Explosion {
    draw() {
       if (this.#finished) return;
       push();
-      stroke(255, 150, 0);
       strokeWeight(3);
+      stroke('orange');
       fill('yellow');
       circle(this.#position.x, this.#position.y, this.#currentRadius);
       pop();

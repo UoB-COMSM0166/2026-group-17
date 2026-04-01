@@ -67,7 +67,7 @@ class Match {
       this.#syncControlPanel();
       this.#updateShot(dt);
       this.#updatePlayers();
-      if (this.#currentExplosion) this.#updateExplosion();
+      if (this.#currentExplosion) this.#updateExplosion(dt);
       this.#updateFloatingScores();
    }
 
@@ -208,9 +208,9 @@ class Match {
       }
    }
 
-   #updateExplosion() {
+   #updateExplosion(dt) {
       if (!this.#currentExplosion) return;
-      this.#currentExplosion.update(this.#turnController);
+      this.#currentExplosion.update(this.#turnController, dt);
       if (!this.#currentExplosion.finished) this.#handleExplosionFeedback();
       else {
          this.#handleExplosionScoring();
