@@ -4,10 +4,11 @@ class Projectile {
    #radius;
    #isActive;
 
-   constructor(muzzlePos, vel, rad) {
+   constructor(muzzlePos, vel, rad, weapon = null) {
       this.#position = muzzlePos;
       this.#velocity = vel;
       this.#radius = rad;
+      this.#weapon = weapon;
       this.#isActive = true;
    }
 
@@ -58,12 +59,20 @@ class Projectile {
       this.#position.set(floor(testPosition.x), floor(testPosition.y));
    }
 
-   drawShot() {
+   #drawShot() {
       if (!this.#isActive) return;
-      strokeWeight(2);
-      stroke('whitesmoke');
-      fill('snow');
-      circle(this.#position.x, this.#position.y, this.#radius);
+      push();
+      if (weapon) {
+         translate(this.#position.x, this.#position.y);
+         rotate(this.#velocity.heading());
+         this.#weapon.drawProjectile(0, 0, this.#radius);
+      else {
+         strokeWeight(2);
+         stroke('whitesmoke');
+         fill('snow');
+         circle(this.#position.x, this.#position.y, this.#radius);
+      }
+      pop();
    }
 
    get position() { return this.#position; }

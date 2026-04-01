@@ -12,6 +12,7 @@ class Grapeshot extends AbstractWeapon {
       shotRadius: 6, 
       explosionRadius: 120,
     });
+    this.used = false;
   }
 
  drawProjectile(cx, cy, r) {

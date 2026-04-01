@@ -12,6 +12,7 @@ class Submarinshot extends AbstractWeapon {
       shotRadius: 5, 
       explosionRadius: 95,
     });
+    this.used = false;
   }
 drawProjectile(cx, cy, r) {
   push();

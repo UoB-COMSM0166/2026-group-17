@@ -1,4 +1,5 @@
 class MovePadWidget {
+  static BOARD_HEIGHT = 78;
   #positionVector;
   #plateOutlineColor;
   #plateFillColor;
@@ -91,7 +92,7 @@ class MovePadWidget {
     fill(this.#plateFillColor);
 
     const w = this.#btnWidth * 2 + this.#gap + 80;
-    const h = this.#btnHeight + 18;
+    const h = MovePadWidget.BOARD_HEIGHT;
     rect(this.#positionVector.x, this.#positionVector.y, w, h, 10);
     pop();
   }
