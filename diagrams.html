@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interactive SVG Diagrams</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/svg.pan-zoom.js/2.8.0/svg.pan-zoom.min.js"></script>
+
+<style>
+  body { text-align:center; font-family:sans-serif; }
+  figure { margin:40px auto; }
+  object { border:1px solid #ccc; }
+</style>
+
+</head>
+<body>
+
+<h2>Stage 1 - Initial Prototype</h2>
+<figure>
+  <object id="svg1" type="image/svg+xml" data="images/stage1.svg" width="800" height="600"></object>
+  <figcaption>Figure 1: Stage 1 - Initial Prototype</figcaption>
+</figure>
+
+<h2>Stage 2 - Refactored Prototype</h2>
+<figure>
+  <object id="svg2" type="image/svg+xml" data="images/stage2.svg" width="800" height="600"></object>
+  <figcaption>Figure 2: Stage 2 - Refactored Prototype</figcaption>
+</figure>
+
+<h2>Stage 3 - Final Implementation</h2>
+<figure>
+  <object id="svg3" type="image/svg+xml" data="images/stage3.svg" width="800" height="600"></object>
+  <figcaption>Figure 3: Stage 3 - Final Implementation</figcaption>
+</figure>
+
+<script>
+  function initPanZoom(id) {
+    var obj = document.getElementById(id);
+    obj.addEventListener('load', function() {
+      var svgDoc = obj.contentDocument;
+      var svgEl = svgDoc.querySelector('svg');
+      if (svgEl) {
+        svgPanZoom(svgEl, {
+          zoomEnabled: true,
+          panEnabled: true,
+          controlIconsEnabled: true,
+          mouseWheelZoomEnabled: true,
+          dblClickZoomEnabled: true,
+          fit: true,
+          center: true
+        });
+      }
+    });
+  }
+
+  initPanZoom('svg1');
+  initPanZoom('svg2');
+  initPanZoom('svg3');
+</script>
+
+</body>
+</html>

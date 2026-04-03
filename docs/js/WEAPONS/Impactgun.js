@@ -26,4 +26,5 @@ class ImpactGun extends AbstractWeapon {
     ellipse(cx, cy, r*0.5, r*0.5);
     pop();
   }
+
 }

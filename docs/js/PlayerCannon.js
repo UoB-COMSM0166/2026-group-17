@@ -10,6 +10,8 @@ class PlayerCannon {
    #targetX;
    #moveSteps = 3;
    #hitFlashFrames = 0;
+   #weaponLoadout = [];
+   #currentWeaponIndex = 0;
 
 
    constructor(posVec, wheelRad, barrelSz, barrAngle, moveSteps, fillColor, outColor) {
@@ -28,20 +30,21 @@ class PlayerCannon {
       this.#positionVector.x = lerp(this.#positionVector.x, this.#targetX, follow);
    }
 
-   fireShot(weapon = null, shotRadius = 4) {
+   fireShot(weapon = null, target = null) {
       // offset of muzzle tip from positionVector
       this.#savedBarrelPower = this.#barrelPower;
       let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
-      let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(this.#barrelPower);
+      const speedMultiplier = weapon ? weapon.speed / 6 : 1;
+      let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle))
+         .mult(this.#barrelPower * speedMultiplier);
       offset.rotate(this.#barrelAngle);
-      const projectile = new Projectile(
+      return new Projectile(
          p5.Vector.add(this.#positionVector, offset),
          velocity,
-         weapon?.shotRadius ?? shotRadius,
-         weapon
+         weapon?.shotRadius ?? 4,
+         weapon,
+         target
       );
-      projectile.maxExplosionRadius = weapon?.explosionRadius ?? 50;
-      return projectile;
    }
    drawPlayer() {
       fill(this.#fillColor);
@@ -96,6 +99,23 @@ class PlayerCannon {
    get moveSteps() { return this.#moveSteps; }
    set moveSteps(s) { this.#moveSteps = s; }
    get barrelSize() { return this.#barrelSize; }
+   get weaponLoadout() { return this.#weaponLoadout; }
+   set weaponLoadout(loadout) { this.#weaponLoadout = loadout ?? []; }
+   get currentWeaponIndex() { return this.#currentWeaponIndex; }
+   set currentWeaponIndex(index) {
+      const lastIndex = max(0, this.#weaponLoadout.length - 1);
+      this.#currentWeaponIndex = constrain(index, 0, lastIndex);
+   }
+   get currentWeapon() {
+      if (this.#weaponLoadout.length === 0) return null;
+      return this.#weaponLoadout[this.#currentWeaponIndex] ?? this.#weaponLoadout[0];
+   }
+
+   cycleWeapon(step = 1) {
+      if (this.#weaponLoadout.length === 0) return;
+      this.#currentWeaponIndex = (this.#currentWeaponIndex + step + this.#weaponLoadout.length)
+         % this.#weaponLoadout.length;
+   }
 
    setTargetX(x, canvasWidth) {
       this.#targetX = constrain(x, this.#wheelRadius, canvasWidth - this.wheelRadius);
