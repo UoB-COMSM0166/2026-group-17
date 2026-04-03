@@ -12,6 +12,7 @@ class CannonBall extends AbstractWeapon {
       shotRadius: 5,
       explosionRadius: 65
     });
+    this.used = false;
   }
 
   drawProjectile(cx, cy, r) {
@@ -36,20 +37,5 @@ class CannonBall extends AbstractWeapon {
     ellipse(cx, cy, r, r);
 
     pop();
-  }
-
-  drawExplosion(explosion) {
-    this.drawStyledExplosion(explosion, {
-      coreColor: color(255, 210, 120, 230),
-      ringColor: color(255, 145, 60, 220),
-      ringWeight: 4,
-      coreScale: 0.3,
-      ringScale: 0.86,
-      glowInner: 'rgba(255,240,170,0.92)',
-      glowMid: 'rgba(255,150,50,0.36)',
-      glowOuter: 'rgba(255,90,0,0)',
-      accent: 'spark',
-      accentColor: color(255, 225, 140, 190)
-    });
   }
 }

@@ -24,18 +24,24 @@ class AbstractWeapon {
     this.shotRadius = cfg.shotRadius ?? 4;
     // radius of the explosion when it hits
     this.explosionRadius = cfg.explosionRadius ?? 60;
-    //initialize ammoLeft to ammo
+    this.ammoLeft = this.ammo;
+    this.used = false;
+  }
+  resetUsage() {
+    this.used = false;
     this.ammoLeft = this.ammo;
   }
-  //manage ammo used in battle, reset ammo when new battle starts
-  resetAmmo() {
-    this.ammoLeft = this.ammo;
-  }
-//returns true if ammo is used successfully, false if no ammo left
-  useAmmo() {
-    if (this.ammoLeft <= 0) return false;
-    this.ammoLeft--;
+  consume() {
+    if (this.used) return false;
+    this.used = true;
+    this.ammoLeft = Math.max(0, this.ammoLeft - 1);
     return true;
+  }
+  resetAmmo() {
+    this.resetUsage();
+  }
+  useAmmo() {
+    return this.consume();
   }
 //subclasses must implement this method to draw the projectile when shot
   drawProjectile(cx, cy, r) {
@@ -57,18 +63,12 @@ class AbstractWeapon {
   }
 
   drawExplosion(explosion) {
-    this.drawStyledExplosion(explosion, {
-      coreColor: color(255, 225, 90, 225),
-      ringColor: color(255, 140, 40, 210),
-      ringWeight: 4,
-      coreScale: 0.3,
-      ringScale: 0.88,
-      glowInner: 'rgba(255,245,170,0.9)',
-      glowMid: 'rgba(255,150,40,0.35)',
-      glowOuter: 'rgba(255,80,0,0)',
-      accent: 'spark',
-      accentColor: color(255, 220, 120, 185)
-    });
+    push();
+    strokeWeight(3);
+    stroke('orange');
+    fill('yellow');
+    circle(explosion.position.x, explosion.position.y, explosion.radius);
+    pop();
   }
 
   drawStyledExplosion(explosion, style) {

@@ -91,6 +91,11 @@ class Match {
       const wasLeftMousePress = this.#lastMouseButton === true;
       this.#lastMouseButton = false;
       if (!this.#physicsDone() || !wasLeftMousePress) return;
+      const currentPlayer = this.#players[this.#turnController.activePlayerId];
+      const inventoryResult = this.#controlPanel.handleWeaponInventoryClick();
+      if (inventoryResult.selectedIndex !== null)
+         currentPlayer.currentWeaponIndex = inventoryResult.selectedIndex;
+      if (inventoryResult.handled) return;
       this.#handleAngleDialToggle();
       this.#handlePowerAdjustToggle();
       this.#triggerMouseCannonShot();
@@ -137,7 +142,7 @@ class Match {
       const resolvedLoadout = (loadout && loadout.length > 0) ? loadout : fallbackLoadout;
       this.#players[id].weaponLoadout = resolvedLoadout;
       this.#players[id].currentWeaponIndex = 0;
-      resolvedLoadout.forEach(w => w.resetAmmo());
+      resolvedLoadout.forEach(w => w.resetUsage?.());
    }
 
    #handleRoundTransition() {
@@ -181,6 +186,10 @@ class Match {
          this.#controlPanel.angleDial.needleRotation = this.#players[currentPID].barrelAngle + 90;
          this.#controlPanel.powerAdjust.power = this.#players[currentPID].barrelPower / 7;
          this.#controlPanel.setMoveSteps(this.#players[currentPID].moveSteps);
+         this.#controlPanel.setWeaponLoadouts(
+            this.#players[currentPID].weaponLoadout ?? [],
+            this.#players[currentPID].currentWeaponIndex ?? 0
+         );
          this.#lastActivePlayerId = currentPID;
       }
    }
@@ -254,11 +263,8 @@ class Match {
          this.#turnController.advancePhase();
       }
    }
-
    #handleExplosionFeedback(explosion) {
-      // lastShooterId for self, 1 - lastShooterId for enemy
       let distance = this.#calculateExplosionDistance(explosion, 1 - this.#lastShooterId);
-      // last 3 arguments to applyExplosionFeedback() relate to visual effects
       this.#applyExplosionFeedback(explosion, 'enemyFeedbackTriggered', distance, 1 - this.#lastShooterId, 12, 6, 8);
       distance = this.#calculateExplosionDistance(explosion, this.#lastShooterId);
       this.#applyExplosionFeedback(explosion, 'selfFeedbackTriggered', distance, this.#lastShooterId, 10, 5, 6);
@@ -377,17 +383,35 @@ class Match {
    #executeCannonShot() {
       if (this.#physicsDone()) {
          this.#lastShooterId = this.#turnController.activePlayerId;
-         const player = this.#players[this.#lastShooterId];
-         const weapon = player.currentWeapon;
+         const shooter = this.#players[this.#lastShooterId];
+         const selectedIndex = shooter.currentWeaponIndex ?? 0;
+         const selectedWeapon = shooter.weaponLoadout?.[selectedIndex] ?? null;
+         if (selectedWeapon && !selectedWeapon.consume()) return;
          const target = this.#players[1 - this.#lastShooterId];
-         if (weapon && !weapon.useAmmo()) return;
-         this.#currentShot = player.fireShot(weapon, target);
+         this.#currentShot = shooter.fireShot(selectedWeapon, target);
+         if (selectedWeapon && Array.isArray(shooter.weaponLoadout)) {
+            shooter.weaponLoadout.splice(selectedIndex, 1);
+            shooter.currentWeaponIndex = constrain(
+               selectedIndex,
+               0,
+               Math.max(shooter.weaponLoadout.length - 1, 0)
+            );
+         }
+         this.#controlPanel.setWeaponLoadouts(
+            shooter.weaponLoadout ?? [],
+            shooter.currentWeaponIndex ?? 0
+         );
       }
    }
 
    #switchCurrentWeapon(step) {
       if (!this.#physicsDone()) return;
-      this.#players[this.#turnController.activePlayerId].cycleWeapon(step);
+      const player = this.#players[this.#turnController.activePlayerId];
+      player.cycleWeapon(step);
+      this.#controlPanel.setWeaponLoadouts(
+         player.weaponLoadout ?? [],
+         player.currentWeaponIndex ?? 0
+      );
    }
 
    #triggerMouseCannonMovement() {

@@ -12,6 +12,7 @@ class Lazershot extends AbstractWeapon {
       shotRadius: 10, 
       explosionRadius: 160,
     });
+    this.used = false;
   }
 
  drawProjectileInstance(projectile) {
@@ -98,17 +99,38 @@ class Lazershot extends AbstractWeapon {
 }
 
  drawExplosion(explosion) {
-  this.drawStyledExplosion(explosion, {
-    coreColor: color(255, 255, 255, 230),
-    ringColor: color(60, 255, 255, 220),
-    ringWeight: 5,
-    coreScale: 0.28,
-    ringScale: 0.92,
-    glowInner: 'rgba(180,255,255,0.95)',
-    glowMid: 'rgba(0,170,255,0.45)',
-    glowOuter: 'rgba(80,0,255,0)',
-    accent: 'cross',
-    accentColor: color(170, 255, 255, 220)
-  });
+  const progress = explosion.progress;
+  const slash = explosion.radius * (1.4 + progress * 1.9);
+  const sideSlash = explosion.radius * (0.55 + progress * 0.65);
+
+  push();
+  translate(explosion.position.x, explosion.position.y);
+  rotate(35);
+  blendMode(ADD);
+  noFill();
+
+  stroke(60, 220, 255, 110);
+  strokeWeight(12 - progress * 4);
+  line(-slash, 0, slash, 0);
+
+  stroke(255, 255, 255, 220);
+  strokeWeight(4.5);
+  line(-slash * 0.92, 0, slash * 0.92, 0);
+
+  stroke(150, 245, 255, 120);
+  strokeWeight(3);
+  line(-sideSlash, -explosion.radius * 0.22, sideSlash, -explosion.radius * 0.22);
+  line(-sideSlash * 0.82, explosion.radius * 0.24, sideSlash * 0.82, explosion.radius * 0.24);
+
+  noStroke();
+  const glow = drawingContext.createRadialGradient(0, 0, 0, 0, 0, max(14, explosion.radius * 0.95));
+  glow.addColorStop(0, 'rgba(255,255,255,0.82)');
+  glow.addColorStop(0.14, 'rgba(120,245,255,0.55)');
+  glow.addColorStop(0.4, 'rgba(0,180,255,0.12)');
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  drawingContext.fillStyle = glow;
+  ellipse(0, 0, explosion.radius * 0.95, explosion.radius * 0.95);
+
+  pop();
  }
 }

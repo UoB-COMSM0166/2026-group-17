@@ -12,6 +12,7 @@ class Grapeshot extends AbstractWeapon {
       shotRadius: 9, 
       explosionRadius: 120,
     });
+    this.used = false;
   }
 
  beforeProjectileStep(projectile, context) {

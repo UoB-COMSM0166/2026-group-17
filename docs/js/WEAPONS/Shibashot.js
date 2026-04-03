@@ -12,6 +12,7 @@ class Shibashot extends AbstractWeapon {
       shotRadius: 6, 
       explosionRadius: 75,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();
@@ -26,20 +27,5 @@ class Shibashot extends AbstractWeapon {
     fill(255, 240, 80);
     ellipse(cx, cy, r*0.6, r*0.6);
     pop();
-  }
-
-  drawExplosion(explosion) {
-    this.drawStyledExplosion(explosion, {
-      coreColor: color(255, 230, 120, 235),
-      ringColor: color(255, 130, 30, 210),
-      ringWeight: 5,
-      coreScale: 0.32,
-      ringScale: 0.85,
-      glowInner: 'rgba(255,235,130,0.95)',
-      glowMid: 'rgba(255,120,20,0.42)',
-      glowOuter: 'rgba(130,20,0,0)',
-      accent: 'embers',
-      accentColor: color(255, 180, 60, 180)
-    });
   }
 }

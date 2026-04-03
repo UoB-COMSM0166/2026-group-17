@@ -12,6 +12,7 @@ class Pineappleshot extends AbstractWeapon {
       shotRadius: 4, 
       explosionRadius: 20,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();
@@ -29,20 +30,5 @@ class Pineappleshot extends AbstractWeapon {
     fill(60);
     ellipse(0, 0, r*0.4, r*0.4);
     pop();
-  }
-
-  drawExplosion(explosion) {
-    this.drawStyledExplosion(explosion, {
-      coreColor: color(255, 245, 190, 230),
-      ringColor: color(220, 255, 130, 200),
-      ringWeight: 3,
-      coreScale: 0.18,
-      ringScale: 0.74,
-      glowInner: 'rgba(255,255,220,0.88)',
-      glowMid: 'rgba(230,255,120,0.30)',
-      glowOuter: 'rgba(140,180,0,0)',
-      accent: 'shards',
-      accentColor: color(245, 255, 200, 180)
-    });
   }
 }

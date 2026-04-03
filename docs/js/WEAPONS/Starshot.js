@@ -12,6 +12,7 @@ class Starshot extends AbstractWeapon {
       shotRadius: 5, 
       explosionRadius: 80,
     });
+    this.used = false;
   }
   drawProjectile(cx, cy, r) {
     push();
@@ -31,20 +32,5 @@ class Starshot extends AbstractWeapon {
       line(cx, cy, ax, ay);
     }
     pop();
-  }
-
-  drawExplosion(explosion) {
-    this.drawStyledExplosion(explosion, {
-      coreColor: color(225, 245, 255, 235),
-      ringColor: color(170, 220, 255, 200),
-      ringWeight: 4,
-      coreScale: 0.25,
-      ringScale: 0.9,
-      glowInner: 'rgba(240,250,255,0.95)',
-      glowMid: 'rgba(130,190,255,0.35)',
-      glowOuter: 'rgba(80,140,255,0)',
-      accent: 'shards',
-      accentColor: color(220, 245, 255, 210)
-    });
   }
 }
