@@ -7,7 +7,7 @@ class Submarinshot extends AbstractWeapon {
       damage: 9, 
       speed: 7, 
       blastRadius: 8, 
-      ammo: 3, 
+      ammo: 1, 
       rarity: 'legendary',
       shotRadius: 8, 
       explosionRadius: 95,
