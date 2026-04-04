@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,29 +9,71 @@
     <script src="js/p5.js"></script>
     <script src="js/addons/p5.sound.min.js"></script>
 </head>
+
 <body>
+    <!-- Core -->
+    <script src="js/Effects.js"></script>
+    <script src="js/Game.js"></script>
+
+    <!-- States -->
+    <script src="js/States/State.js"></script>
+    <script src="js/States/MenuState.js"></script>
+    <script src="js/States/ShopState.js"></script>
+    <script src="js/States/MatchState.js"></script>
+    <script src="js/States/EndState.js"></script>
+
+    <!-- Utilities -->
+    <script src="js/DrawUtils.js"></script>
+    <script src="js/TrajectoryPreview.js"></script>
+
+    <!-- Match systems -->
     <script src="js/TurnCounter.js"></script>
     <script src="js/TurnController.js"></script>
     <script src="js/ShootButton.js"></script>
     <script src="js/AngleDialWidget.js"></script>
     <script src="js/WindSystem.js"></script>
+    <script src="js/RainSystem.js"></script>
     <script src="js/PowerAdjustWidget.js"></script>
     <script src="js/ControlPanel.js"></script>
     <script src="js/MovePadWidget.js"></script>
+
+    <!-- Terrain -->
     <script src="js/Terrain/TerrainColumn.js"></script>
     <script src="js/Terrain/Terrain.js"></script>
-    <script src="js/PoisonCloud.js"></script>
-    <script src="js/ShibaImpactEffect.js"></script>
+
+    <!-- Gameplay entities -->
     <script src="js/Projectile.js"></script>
     <script src="js/PlayerCannon.js"></script>
-    <script src="js/ScoreBoard.js"></script>
-    <script src="js/Explosion.js"></script>
     <script src="js/FloatingScore.js"></script>
+    <script src="js/ScoreBoard.js"></script>
     <script src="js/ScoreCalculator.js"></script>
+    <script src="js/Explosion.js"></script>
+    <script src="js/PoisonCloud.js"></script>
+    <script src="js/ShibaImpactEffect.js"></script>
     <script src="js/StartMenu.js"></script>
-    <script src="js/WeaponSystem.js"></script>
+
+    <!-- Weapons -->
+    <script src="js/WEAPONS/AbstractWeapon.js"></script>
+    <script src="js/WEAPONS/CannonBall.js"></script>
+    <script src="js/WEAPONS/Bubblegumshot.js"></script>
+    <script src="js/WEAPONS/Earthworm.js"></script>
+    <script src="js/WEAPONS/Grapeshot.js"></script>
+    <script src="js/WEAPONS/Impactgun.js"></script>
+    <script src="js/WEAPONS/Lazershot.js"></script>
+    <script src="js/WEAPONS/Pineappleshot.js"></script>
+    <script src="js/WEAPONS/Shibashot.js"></script>
+    <script src="js/WEAPONS/Starshot.js"></script>
+    <script src="js/WEAPONS/Submarinshot.js"></script>
+
+    <!-- Registry / shop -->
+    <script src="js/WEAPON_REGISTRY.js"></script>
+    <script src="js/WeaponShop.js"></script>
+
+    <!-- Match -->
+    <script src="js/Match.js"></script>
+
+    <!-- Entry -->
     <script src="main.js"></script>
-</head>
-<body>
 </body>
+
 </html>
