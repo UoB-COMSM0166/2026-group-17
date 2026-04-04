@@ -18,10 +18,7 @@ class MatchState extends State {
    }
 
    drawState() {
-      push();
-      this.game.effects.applyShake();
-      this.#match.drawMatch();
-      pop();
+      this.#match.drawMatch(() => this.game.effects.applyShake());
    }
 
    onMousePressed(cursorX, cursorY, button) {

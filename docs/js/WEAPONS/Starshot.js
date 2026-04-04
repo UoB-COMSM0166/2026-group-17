@@ -5,26 +5,27 @@ class Starshot extends AbstractWeapon {
       name: 'Starshot',
       description: 'Star burst shot.',
       damage: 5,
-      speed: 5,
+      speed: 6,
       blastRadius: 7,
       ammo: 4,
       rarity: 'rare',
       shotRadius: 5,
       explosionRadius: 80,
     });
+    this.used = false;
   }
 
   drawProjectile(cx, cy, r) {
-  if (typeof starImg !== "undefined" && starImg) {
-    push();
-    imageMode(CENTER);
-    image(starImg, cx, cy, 66, 66);
-    pop();
-    return;
-  }
+    if (typeof starImg !== "undefined" && starImg) {
+      push();
+      imageMode(CENTER);
+      image(starImg, cx, cy, 66, 66);
+      pop();
+      return;
+    }
 
-  this.#drawVectorStar(cx, cy, r);
-}
+    this.#drawVectorStar(cx, cy, r);
+  }
 
   drawIcon(cx, cy, r) {
     this.drawProjectile(cx, cy, r);

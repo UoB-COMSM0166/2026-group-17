@@ -87,17 +87,15 @@ class Match {
       if (this.#currentExplosion) this.#updateExplosion(dt);
       this.#updateFloatingScores();
 
-      // delayed turn advance for lingering special effects
-     if (
-   this.#pendingTurnAdvance &&
-   !this.#currentExplosion &&
-   this.#secondaryShots.length === 0 &&
-   this.#poisonClouds.length === 0
-) {
-   console.log("delayed advance triggered");
-   this.#turnController.advancePhase();
-   this.#pendingTurnAdvance = false;
-}
+      if (
+         this.#pendingTurnAdvance &&
+         !this.#currentExplosion &&
+         this.#secondaryShots.length === 0 &&
+         this.#poisonClouds.length === 0
+      ) {
+         this.#turnController.advancePhase();
+         this.#pendingTurnAdvance = false;
+      }
    }
 
    drawMatch() {
@@ -119,8 +117,9 @@ class Match {
       this.#triggerMouseCannonShot();
       this.#triggerMouseCannonMovement();
    }
+
    onMouseMoved(cursorX, cursorY) {
-      // reserved for widgets that need explicit mouse move syncing
+      // reserved
    }
 
    onKeyReleased(inputKey, keyId) {
@@ -252,18 +251,26 @@ class Match {
       );
 
       if (impactEvent?.type === "STAR_SPLIT") {
-   this.#shakeCallback?.(10, 10);
-   this.spawnWeaponExplosion(this.#currentShot.position.copy(), "star", this.#currentShot, null);
-   this.#secondaryShots.push(...impactEvent.fragments);
-   this.#currentShot = null;
-   return;
-}
+         const shooter = this.#players[this.#lastShooterId];
+         const weapon = shooter?.weaponLoadout?.find(w => w.id === "star") ?? null;
+
+         this.#shakeCallback?.(10, 10);
+         this.spawnWeaponExplosion(
+            this.#currentShot.position.copy(),
+            "star",
+            this.#currentShot,
+            weapon
+         );
+         this.#secondaryShots.push(...impactEvent.fragments);
+         this.#currentShot = null;
+         return;
+      }
+
       if (impactEvent) this.#handleShotImpact(impactEvent);
    }
 
    #handleShotImpact(impactEvent) {
       const shot = this.#currentShot;
-      console.log("impact weaponId =", shot?.weaponId);
       this.#currentShot = null;
 
       if (impactEvent.type === 'OUT_OF_BOUNDS') {
@@ -274,7 +281,10 @@ class Match {
       if (impactEvent.type !== 'TERRAIN_IMPACT') return;
 
       if (shot?.weaponId === "starFragment") {
-         this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, null);
+         const starWeapon = this.#players[this.#lastShooterId]
+            ?.weaponLoadout?.find(w => w.id === "star") ?? null;
+
+         this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, starWeapon);
          return;
       }
 
@@ -288,32 +298,37 @@ class Match {
       }
 
       const kind = shot?.weaponId ?? "ball";
-      this.#handleWeaponEffectFallback(kind, impactEvent, shot);
+      this.#handleWeaponEffectFallback(kind, impactEvent, shot, weapon);
    }
 
-   #handleWeaponEffectFallback(kind, impactEvent, shot) {
+   #handleWeaponEffectFallback(kind, impactEvent, shot, weapon = null) {
       if (kind === "pineapple") {
-         this.spawnWeaponExplosion(impactEvent.pos, "pineapple", shot, null);
+         this.spawnWeaponExplosion(impactEvent.pos, "pineapple", shot, weapon);
          this.spawnPoisonCloud(impactEvent.pos);
          return;
       }
 
       if (kind === "shiba") {
-         this.spawnWeaponExplosion(impactEvent.pos, "shiba", shot, null);
+         this.spawnWeaponExplosion(impactEvent.pos, "shiba", shot, weapon);
          this.spawnShibaImpact(impactEvent.pos);
          return;
       }
 
       if (kind === "star") {
-         this.spawnWeaponExplosion(impactEvent.pos, "star", shot, null);
+         this.spawnWeaponExplosion(impactEvent.pos, "star", shot, weapon);
          return;
       }
 
-      this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, null);
+      this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, weapon);
    }
 
    spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null) {
-      this.#currentExplosion = new Explosion(pos.copy(), this.#terrain, kind);
+      this.#currentExplosion = new Explosion(
+         pos.copy(),
+         this.#terrain,
+         weapon,
+         { kind }
+      );
    }
 
    spawnPoisonCloud(pos) {
@@ -377,10 +392,8 @@ class Match {
          let a;
 
          if (shooterId === 0) {
-            // 左边炮，往右半边散
             a = random(-55, 55);
          } else {
-            // 右边炮，往左半边散
             a = random(125, 235);
          }
 
@@ -412,26 +425,16 @@ class Match {
          );
 
          if (impactEvent?.type === 'TERRAIN_IMPACT') {
-            this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, null);
+            const starWeapon = this.#players[this.#lastShooterId]
+               ?.weaponLoadout?.find(w => w.id === "star") ?? null;
+
+            this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, starWeapon);
             this.#secondaryShots.splice(i, 1);
             continue;
          }
 
          if (impactEvent?.type === 'OUT_OF_BOUNDS' || !shot.isActive) {
             this.#secondaryShots.splice(i, 1);
-         }
-      }
-
-      // if main star shot is already gone, no active explosion, and all fragments are done,
-      // then the turn can advance
-      if (
-         this.#secondaryShots.length === 0 &&
-         !this.#currentShot &&
-         !this.#currentExplosion
-      ) {
-         // avoid advancing during poison/shiba aftermath
-         if (this.#poisonClouds.length === 0 && this.#shibaImpacts.length === 0) {
-            // only safe for star-style fragment resolution
          }
       }
    }
@@ -516,61 +519,54 @@ class Match {
    }
 
    #updateExplosion(dt) {
-   if (!this.#currentExplosion) return;
+      if (!this.#currentExplosion) return;
 
-   this.#currentExplosion.update(this.#turnController, dt);
+      this.#currentExplosion.update(dt);
 
-   if (!this.#currentExplosion.finished) {
-      this.#handleExplosionFeedback();
-      return;
-   }
+      if (!this.#currentExplosion.finished) {
+         this.#handleExplosionFeedback();
+         return;
+      }
 
-   const finishedKind = this.#currentExplosion.kind;
+      const finishedKind = this.#currentExplosion.kind;
 
-   this.#handleExplosionScoring();
-   this.#currentExplosion = null;
-   this.#hasScoredThisExplosion = false;
+      this.#handleExplosionScoring();
+      this.#currentExplosion = null;
+      this.#hasScoredThisExplosion = false;
 
-   // normal weapons: advance immediately after explosion ends
-   if (
-      finishedKind === "ball" ||
-      finishedKind === "cannon_ball" ||
-      finishedKind === "shiba"
-   ) {
-      this.#pendingTurnAdvance = false;
-      this.#turnController.advancePhase();
-      return;
-   }
-
-   // pineapple: only use delayed advance
-   if (finishedKind === "pineapple") {
-      if (this.#poisonClouds.length === 0) {
+      if (
+         finishedKind === "ball" ||
+         finishedKind === "cannon_ball" ||
+         finishedKind === "shiba"
+      ) {
          this.#pendingTurnAdvance = false;
          this.#turnController.advancePhase();
-      } else {
-         this.#pendingTurnAdvance = true;
+         return;
       }
-      return;
-   }
 
-   // star main explosion: NEVER advance here
-   // wait until all fragments are gone, then delayed block will advance once
-   if (finishedKind === "star") {
-      this.#pendingTurnAdvance = true;
-      return;
-   }
+      if (finishedKind === "pineapple") {
+         if (this.#poisonClouds.length === 0) {
+            this.#pendingTurnAdvance = false;
+            this.#turnController.advancePhase();
+         } else {
+            this.#pendingTurnAdvance = true;
+         }
+         return;
+      }
 
-   // star fragment explosion: also NEVER advance here
-   // only mark pending; delayed block will do the single advance once all are done
-   if (finishedKind === "starFragment") {
-      this.#pendingTurnAdvance = true;
-      return;
-   }
+      if (finishedKind === "star") {
+         this.#pendingTurnAdvance = true;
+         return;
+      }
 
-   // fallback
-   this.#pendingTurnAdvance = false;
-   this.#turnController.advancePhase();
-}
+      if (finishedKind === "starFragment") {
+         this.#pendingTurnAdvance = true;
+         return;
+      }
+
+      this.#pendingTurnAdvance = false;
+      this.#turnController.advancePhase();
+   }
 
    #handleExplosionFeedback() {
       let distance = this.#calculateExplosionDistance(1 - this.#lastShooterId);
@@ -700,6 +696,7 @@ class Match {
       text(`Weapon: ${currentWeapon ? currentWeapon.name : "NONE"}`, 20, 80);
       textSize(14);
       text("Q / E to switch", 20, 105);
+
       this.#controlPanel.drawCtrlPanel(
          this.#players[activePlayerId],
          this.#physicsDone()
@@ -741,17 +738,16 @@ class Match {
    }
 
    #executeCannonShot() {
-   if (!this.#physicsDone()) return;
+      if (!this.#physicsDone()) return;
 
-   this.#pendingTurnAdvance = false;
+      this.#pendingTurnAdvance = false;
 
-   this.#lastShooterId = this.#turnController.activePlayerId;
-   const shooter = this.#players[this.#lastShooterId];
-   const weapon = shooter.getCurrentWeapon?.() ?? null;
-   console.log("fire weapon =", weapon?.id, weapon?.name);
+      this.#lastShooterId = this.#turnController.activePlayerId;
+      const shooter = this.#players[this.#lastShooterId];
+      const weapon = shooter.getCurrentWeapon?.() ?? null;
 
-   this.#currentShot = shooter.fireShot(4, weapon);
-}
+      this.#currentShot = shooter.fireShot(4, weapon);
+   }
 
    #triggerMouseCannonMovement() {
       const moveType = this.#controlPanel.handleMovePadClick();

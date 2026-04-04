@@ -5,13 +5,14 @@ class Pineappleshot extends AbstractWeapon {
       name: 'Pineappleshot',
       description: 'Explosive pineapple.',
       damage: 6,
-      speed: 4,
+      speed: 6,
       blastRadius: 5,
       ammo: 3,
       rarity: 'rare',
       shotRadius: 4,
       explosionRadius: 20,
     });
+    this.used = false;
   }
 
   drawProjectile(cx, cy, r) {

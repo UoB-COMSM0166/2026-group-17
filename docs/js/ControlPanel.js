@@ -1,18 +1,23 @@
 class ControlPanel {
-   #baseAltitude = height * 0.25;
-   #backgroundColor;
-   #angleDial;
-   #shootButton;
-   #powerAdjust;
-   #movePad;
+    #baseAltitude = height * 0.25;
+    #backgroundColor;
+    #angleDial;
+    #shootButton;
+    #powerAdjust;
+    #movePad;
+    #weaponInventory;
 
-   static #profile;
-   constructor(bgColor) {
-      this.#backgroundColor = bgColor;
-      this.#angleDial = new AngleDialWidget(createVector(width / 6, height - this.#baseAltitude / 2));
-      this.#shootButton = new ShootButton();
-      this.#powerAdjust = new PowerAdjustWidget();
-      this.#movePad = new MovePadWidget();
+    static #profile;
+    constructor(bgColor) {
+        this.#backgroundColor = bgColor;
+        this.#angleDial = new AngleDialWidget(createVector(width / 6, height - this.#baseAltitude / 2));
+        this.#shootButton = new ShootButton();
+        this.#powerAdjust = new PowerAdjustWidget();
+        this.#movePad = new MovePadWidget();
+        this.#weaponInventory = new WeaponInventory(
+            createVector(width / 3, height * 0.85),
+            color('teal')
+        );
 
       // array of vectors for the position of each point forming the top of the control panel shape
       ControlPanel.#profile = [
@@ -63,32 +68,43 @@ class ControlPanel {
       line(width * 0.80, height - this.#baseAltitude * 1.2, width * 0.84, height - this.#baseAltitude * 1.2);
       pop();
 
-      this.#angleDial.drawAngleDial(player, isEnabled);
-      this.#shootButton.drawButton(isEnabled, this.#baseAltitude);
-      this.#powerAdjust.drawPowerAdjust(isEnabled);
-      this.#movePad.drawMovePad(isEnabled);
-   }
-   getAltitudeAt(panelTopX) {
-      for (let vecId = 0; vecId < ControlPanel.#profile.length - 1; vecId++) {
-         const segStartVec = ControlPanel.#profile[vecId];
-         const segEndVec = ControlPanel.#profile[vecId + 1];
-         if (panelTopX >= segStartVec.x && panelTopX <= segEndVec.x) {
-            const amount = map(panelTopX, segStartVec.x, segEndVec.x, 0, 1);
-            return ceil(lerp(segStartVec.y, segEndVec.y, amount));
-         }
-      }
-   }
+        this.#angleDial.drawAngleDial(player, isEnabled);
+        this.#shootButton.drawButton(isEnabled, this.#baseAltitude);
+        this.#powerAdjust.drawPowerAdjust(isEnabled);
+        this.#movePad.drawMovePad(isEnabled);
+        this.#weaponInventory.drawInventory(this.#baseAltitude);
+    }
+    getAltitudeAt(panelTopX) {
+        for (let vecId = 0; vecId < ControlPanel.#profile.length - 1; vecId++) {
+            const segStartVec = ControlPanel.#profile[vecId];
+            const segEndVec = ControlPanel.#profile[vecId + 1];
+            if (panelTopX >= segStartVec.x && panelTopX <= segEndVec.x) {
+                const amount = map(panelTopX, segStartVec.x, segEndVec.x, 0, 1);
+                return lerp(segStartVec.y, segEndVec.y, amount);
+            }
+        }
+    }
 
-   get baseAltitude() { return this.#baseAltitude; }
-   get angleDial() { return this.#angleDial; }
-   get powerAdjust() { return this.#powerAdjust; }
-   get shootButton() { return this.#shootButton; }
-   handleMovePadClick() { return this.#movePad.mousePressed(); }
-   setMoveSteps(steps) { this.#movePad.step = steps; }
+    get baseAltitude() { return this.#baseAltitude; }
+    get angleDial() { return this.#angleDial; }
+    get powerAdjust() { return this.#powerAdjust; }
+    get shootButton() { return this.#shootButton; }
+    handleMovePadClick() { return this.#movePad.mousePressed(); }
+    setMoveSteps(steps) { this.#movePad.step = steps; }
+    setWeaponLoadouts(loadouts, currentWeaponIndex = 0) {
+        this.#weaponInventory.setWeaponLoadouts(loadouts);
+        this.#weaponInventory.setCurrentWeaponIndex(currentWeaponIndex);
+    }
+    get currentWeaponIndex() { return this.#weaponInventory.currentWeaponIndex; }
 
-   #drawBackground() {
-      fill(this.#backgroundColor);
-      rectMode(CORNER);
-      rect(0, height - this.#baseAltitude, width, this.#baseAltitude);
-   }
+    #drawBackground() {
+        fill(this.#backgroundColor);
+        rectMode(CORNER);
+        rect(0, height - this.#baseAltitude, width, this.#baseAltitude);
+    }
+
+    
+    handleWeaponInventoryClick() {
+        return this.#weaponInventory.handleMousePressed(this.#baseAltitude);
+    }
 }

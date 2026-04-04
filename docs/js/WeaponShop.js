@@ -345,16 +345,11 @@ class WeaponShop {
          drawingContext.shadowBlur = 0;
       }
 
-      // Ammo dots
-      noStroke(); fill(100, 115, 145); textAlign(LEFT, CENTER); textSize(8);
-      text('AMMO', 8, 144);
-      for (let a = 0; a < weapon.ammo; a++) {
-         fill(255, 215, 55);
-         drawingContext.shadowBlur = 4;
-         drawingContext.shadowColor = 'rgba(255,215,55,0.9)';
-         ellipse(44 + a * 11, 144, 5, 5);
-      }
-      drawingContext.shadowBlur = 0;
+      noStroke();
+      fill(100, 115, 145);
+      textAlign(LEFT, CENTER);
+      textSize(8);
+      text('ONE USE', 8, 144);
 
       if (takenByOther) drawingContext.globalAlpha = 1;
       pop();

@@ -8,21 +8,22 @@ class TrajectoryPreview {
 
    drawPreview(player, enemy, terrain, gravityVec, windVec) {
       // Calculate projectile starting point
-      const { launchPos, launchVel } = this.#getLaunchState(player);
+      const weapon = player.currentWeapon;
+      const { launchPos, launchVel } = this.#getLaunchState(player, weapon);
       // Environment forces
       const wind = createVector(windVec?.x ?? 0, windVec?.y ?? 0);
-      const targetHitRadius = enemy.wheelRadius + this.#hitTolerance;
+      const targetHitRadius = enemy.wheelRadius + (weapon?.explosionRadius ?? this.#hitTolerance);
       // identify if this shot would hit the enemy by simulating the trajectory in advance
       const simResult = this.#runSimulation(
-         launchPos, launchVel, gravityVec, wind, terrain, enemy, targetHitRadius
+         launchPos, launchVel, gravityVec, wind, terrain, enemy, targetHitRadius, weapon
       );
       this.#renderPath(simResult.path, simResult.willHit);
       if (simResult.willHit) this.#renderHitMarker(enemy.positionVector, targetHitRadius);
    }
 
-   #getLaunchState(player) {
+   #getLaunchState(player, weapon = null) {
       const angle = player.barrelAngle;
-      const speed = player.barrelPower;
+      const speed = player.barrelPower * (weapon ? weapon.speed / 6 : 1);
       const offset = createVector(player.wheelRadius + player.barrelSize.x / 2, 0);
       offset.rotate(angle);
       return {
@@ -31,15 +32,35 @@ class TrajectoryPreview {
       }
    }
 
-   #runSimulation(pos, vel, gravity, wind, terrain, enemy, hitRadius) {
+   #runSimulation(pos, vel, gravity, wind, terrain, enemy, hitRadius, weapon = null) {
       const stepForce = p5.Vector.add(gravity, wind).mult(this.#simTimeStep);
       const path = [];
       let willHit = false;
+      const previewProjectile = {
+         position: pos,
+         vel,
+         age: 0,
+         radius: weapon?.shotRadius ?? 4,
+         target: enemy,
+         state: {}
+      };
+
       for (let i = 0; i < this.#maxSteps; i++) {
+         previewProjectile.age += this.#simTimeStep;
          vel.add(stepForce);
+         weapon?.beforeProjectileStep?.(previewProjectile, {
+            dt: this.#simTimeStep,
+            gravity,
+            wind,
+            terrain
+         });
          pos.add(p5.Vector.mult(vel, this.#simTimeStep));
          this.#addToPath(pos, i, path);
-         if (this.#isOutOfBounds(pos) || this.#hitsTerrain(pos, terrain)) break;
+         if (this.#isOutOfBounds(pos)) break;
+         if (this.#hitsTerrain(pos, terrain)) {
+            willHit = this.#explosionHitsEnemy(pos, enemy, hitRadius);
+            break;
+         }
          if (this.#hitsEnemy(pos, enemy, hitRadius)) {
             willHit = true;
             break;
@@ -57,6 +78,10 @@ class TrajectoryPreview {
    }
 
    #hitsEnemy(pos, enemy, hitRadius) {
+      return p5.Vector.dist(pos, enemy.positionVector) < hitRadius;
+   }
+
+   #explosionHitsEnemy(pos, enemy, hitRadius) {
       return p5.Vector.dist(pos, enemy.positionVector) < hitRadius;
    }
 

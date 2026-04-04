@@ -5,7 +5,7 @@ class Shibashot extends AbstractWeapon {
       name: 'Shibashot',
       description: 'Burning fuel blob.',
       damage: 6,
-      speed: 3,
+      speed: 6,
       blastRadius: 6,
       ammo: 5,
       rarity: 'rare',
@@ -36,6 +36,10 @@ class Shibashot extends AbstractWeapon {
     fill(255, 240, 80);
     ellipse(cx, cy, r * 0.6, r * 0.6);
     pop();
+  }
+
+  drawIcon(cx, cy, r) {
+    this.drawProjectile(cx, cy, r);
   }
 
   onImpact(match, impactEvent, shot) {

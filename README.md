@@ -53,8 +53,88 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 
 ### Design
 
-- 15% ~750 words 
-- System architecture. Class diagrams, behavioural diagrams. 
+### Initial Design
+In the early stages of development, our primary goal was to establish a functional prototype centered on core mechanics: turn-based artillery combat and a destructible environment. We initially conceived a centralized architecture where a single manager coordinated the game's high-level flow. This initial design is illustrated in the class diagram below (Figure xx).
+
+<figure style="text-align:center;">
+  <img src="images/stage1.png"
+       alt="Initial design class diagram"
+       style="width:900px; height:auto;">
+
+  <figcaption>
+    <b>Figure x:</b> bInitial Design diagram
+  </figcaption>
+</figure>
+
+In the early development stage, a central **GameStateManager** class was responsible for coordinating most aspects of the gameplay loop, including terrain generation, turn handling, player management, event processing, and UI control. While this structure was effective for initial prototyping, the addition of projectile behaviour, scoring logic, explosion handling, and environmental systems gradually increased the responsibilities of this controller. Any modification in one module, such as the UI logic, could inadvertently affect other systems like the physics engine. This "ripple effect" made the codebase difficult to manage, hard to read, and prone to errors, ultimately motivating a refactor toward a more modular architecture.
+
+---
+### Final Design
+
+To solve those problems, we transitioned to a State Pattern to decouple the various domains of the game. The final high-level architecture is illustrated in Figure x. Based on that, we created the overview behavioural diagram (see figure x).
+
+
+<figure style="text-align:center;">
+  <img src="images/stage3.png"
+       alt="Final design class diagram"
+       style="width:900px; height:auto;">
+
+  <figcaption>
+    <b>Figure x:</b> Figure x: Final design class diagram
+  </figcaption>
+</figure>
+
+<div style="width:100%; overflow-x:scroll; text-align:center;">
+  <img src="images/behaviouraldiagram.svg"
+       alt="behavioural diagram"
+       style="width:900px;height:420px; display:inline-block;">
+</div>
+
+<p style="text-align:center;">
+  <b>Figure x:</b> behavioural diagram
+</p>
+
+---
+**Key Differences and Improvements:**
+* **State-Driven Lifecycle**: Unlike Stage 1, where all game logic was resident in memory simultaneously, the final design introduced an abstract `State` class. The `Game` class now only manages state transitions (e.g., switching from `MenuState` to `MatchState`). This ensures that heavy simulation logic, such as the terrain engine, is only instantiated during an active match and is disposed of when returning to the menu, significantly optimizing memory performance.
+* **Logic Decoupling**: By isolating the "Shop" and "Match" logic into separate state classes, we ensured that UI interactions in the shop cannot interfere with the complex physics updates during combat.
+* **Polymorphic Weaponry**: The final version utilizes **Polymorphism** to manage the weapon inventory. The player's loadout is stored in a unified `Weapon` array, allowing the system to handle diverse projectiles (like `ShibaShot` or `LazerShot`) through a single interface without modifying the core firing logic.
+
+### Class Diagrams
+To illustrate the structural growth and refactoring of the system, we have documented the class diagrams across three key development stages. These diagrams reflect the transition from a monolithic prototype to a modular, state-driven architecture.
+
+## Stage 1 - Initial Prototype
+
+In Stage 1, the GameStateManager was a "God Object" that tried to do everything—managing players, generating terrain, and controlling the UI all at once. This made the code risky to change. 
+<p style="text-align:center;">
+  <img src="images/stage1.svg" alt="Stage 1" width="600px" height="300px">
+</p>
+
+**Figure x:** Stage 1 - Initial Prototype
+
+---
+
+### Stage 2 - Refactored Prototype
+
+<p style="text-align:center;">
+  <img src="images/stage2.svg" alt="Stage 1" width="600px" height="300px" >
+</p>
+
+**Figure x:** Stage 2 - Refactored Prototype
+
+---
+
+### Stage 3 - Final Implementation
+
+As the game grew, we refined these relationships without necessarily deleting the original components. For example, while UI widgets like AngleDialWidget and PowerAdjustWidget existed from the start, they were moved in Stage 3 to be part of a dedicated ControlPanel inside the Match class.
+<p style="text-align:center;">
+  <img src="images/stage3.svg" alt="Stage 1" width="600px" height="300px" >
+</p>
+
+**Figure x:** Stage 3 - Final Implementation
+
+> For interactive SVG diagrams with **zoom & drag** functionality, please open the [interactive diagrams page](https://uob-comsm0166.github.io/2026-group-17/diagrams.html).
+
 
 ### Implementation
 
@@ -108,8 +188,78 @@ At this stage the game represented a minimum viable product. The core gameplay l
 <br/>
 <br/>
 
-- One quantitative evaluation (of your choice) 
-- Description of how code was tested. 
+#### Quantitative: NASA Task Load Index (NASA-TLX) and System Usability Survey (SUS)
+
+The number of valid samples for both the NASA-TLX and SUS questionnaires was 10. This analysis aims to investigate whether there is a significant difference between the easy and hard levels in perceived workload and usability. The tables below present the total scores for the easy and the hard level in both NASA-TLX and SUS.
+
+<p align="center"><strong>Table x.<strong> Score of NASA-TLX and SUS</p>
+
+<div align="center">
+
+|User ID|NASA-TLX Easy|NASA-TLX Hard|SUS Easy|SUS Hard|
+|:-------|---------------:|---------------:|---------------:|---------------:|
+|User1|51.0|52.0|62.5|67.5|
+|User2|33.0|52.0|57.5|50.0|
+|User3|24.0|50.0|82.5|57.5|
+|User4|16.0|68.0|65.0|86.0|
+|User5|5.0|33.0|95.0|80.0|
+|User6|38.0|33.0|65.0|52.5|
+|User7|8.0|12.0|85.0|75.0|
+|User8|7.0|22.0|60.0|55.0|
+|User9|18.0|47.0|67.5|77.5|
+|User10|13.0|22.0|87.5|85.0|
+|**Average**|**21.3**|**39.1**|**72.75**|**68.5**|
+
+</div>
+
+**NASA-TLX**
+
+1. Descriptive statistics and visualisation
+
+>The distributions of the six dimensions differed between the easy and hard levels. Overall, the easy level appeared to have lower scores, and the average scores showed the same pattern.
+
+<p align="center">
+  <img src="images/NASA-TLX Metric.png" alt="NASA TLX Metric" width="600">
+</p>
+
+<p align="center"><strong>Figure x.</strong> Boxplot of NASA-TLX.</p>
+
+<p align="center">
+  <img src="images/NASA-TLX Radar.png" alt="NASA TLX Radar" width="600">
+</p>
+
+<p align="center"><strong>Figure x.</strong>Radar chart of the average NASA-TLX scores across dimensions.</p>
+
+2. Wilcoxon signed-rank test
+
+>At the 95% confidence level, the Wilcoxon signed-rank test results suggested that level significantly affected Performance, Effort and the overall NASA-TLX score. However, the differences in Mental Demand, Physical Demand, Temporal Demand, and Frustration between the easy and hard levels were not statistically significant difference.
+
+<p align="center">
+
+$$\begin{cases}
+  H_0 &: \text{There's no significant difference between the easy and hard levels.}\\
+  H_1 &: \text{There's significant difference between the easy and hard levels.}\\
+\end{cases}$$
+
+</p>
+
+<p align="center"><strong>Table x.<strong> Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</p>
+
+<div align="center">
+
+|Metric|W|p-value|Interpretation|
+|:------------------|------:|------:|:---------------------------|
+|Mental Demand|1.500|0.0938|No statistically significant difference|
+|Physical Demand|5.500|0.6875|No statistically significant difference|
+|Temporal Demand|4.500|0.5625|No statistically significant difference|
+|Performance|0.000|0.0078|Statistically significant difference|
+|Effort|0.0000|0.0078|Stat istically significant difference|
+|Frustration|1.000|0.0625|No statistically significant difference|
+|Total|3.000|0.0098|Statistically significant difference|
+
+</div>
+
+**SUS**
 
 ### Process 
 
