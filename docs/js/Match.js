@@ -52,9 +52,7 @@ class Match {
       const terrainSeed = floor(random(99999));
       this.#terrain.generateInitialTerrain(terrainSeed);
       // Player initialisation
-      this.#spawnPlayers();
-      this.#applyLoadout(loadout0, 0);
-      this.#applyLoadout(loadout1, 1);
+      this.#spawnPlayers(loadout0, loadout1);
       // Turn logic
       this.#turnController = new TurnController(this.#wind);
       // Difficulty-related
@@ -114,29 +112,36 @@ class Match {
       }
    }
 
-
-   #spawnPlayers() {
+   #spawnPlayers(loadout0, loadout1) {
       const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
       // left cannon
-      this.#addPlayer(wheelRadius, this.#width / 4, wheelRadius,
-         barrelSizeVector, -45, 3, color('silver'), color('lightslategray'));
+      this.#addPlayer({
+         position: createVector(random(wheelRadius, this.#width / 4), 0),
+         wheelRadius: wheelRadius,
+         barrelSize: barrelSizeVector,
+         barrelAngle: -45,
+         moveSteps: 3,
+         fillColor: color('silver'),
+         strokeColor: color('lightslategray'),
+         weaponLoadout: loadout0
+      });
       // right cannon
-      this.#addPlayer(this.#width - this.#width / 5, this.#width - wheelRadius, wheelRadius,
-         barrelSizeVector, 220, 3, color('moccasin'), color('navajowhite'));
+      this.#addPlayer({
+         position: createVector(random(this.#width - this.#width / 5, this.#width - wheelRadius), 0),
+         wheelRadius: wheelRadius,
+         barrelSize: barrelSizeVector,
+         barrelAngle: 220,
+         moveSteps: 3,
+         fillColor: color('moccasin'),
+         strokeColor: color('navajowhite'),
+         weaponLoadout: loadout1
+      });
    }
 
-   #addPlayer(randMin, randMax, radius, barrSz, barrAngle, steps, fillCol, outCol) {
-      const posX = random(randMin, randMax);
-      const posVec = createVector(posX, this.#terrain.getHeightAt(posX) - radius);
-      this.#players.push(new PlayerCannon(posVec, radius, barrSz, barrAngle, steps, fillCol, outCol));
-   }
-
-   #applyLoadout(loadout, id) {
-      if (loadout && loadout.length > 0) {
-         this.#players[id].weaponLoadout = loadout;
-         this.#players[id].currentWeaponIndex = 0;
-         loadout.forEach(w => w.resetUsage());
-      }
+   #addPlayer(playerConfig) {
+      const { position, wheelRadius } = playerConfig;
+      position.y = this.#terrain.getHeightAt(position.x) - wheelRadius;
+      this.#players.push(new PlayerCannon(playerConfig));
    }
 
    #handleRoundTransition() {
@@ -190,22 +195,22 @@ class Match {
 
    #updateShot(dt) {
       if (!this.#currentShot?.isActive) return;
-      const impactEvent = this.#currentShot.updatePhysics(
-         dt / 1000,
-         Match.#GRAVITY,
-         this.#wind,
-         this.#rain,
-         this.#earthquake,
-         this.#terrain,
-         this.#controlPanel,
-         this.#width
-      );
+      const impactEvent = this.#currentShot.updatePhysics({
+         dt: dt / 1000,
+         gravity: Match.#GRAVITY,
+         wind: this.#wind,
+         rain: this.#rain,
+         earthquake: this.#earthquake,
+         terrain: this.#terrain,
+         players: this.#players,
+         width: this.#width
+   });
       if (impactEvent) this.#spawnExplosion(impactEvent);
    }
 
    #spawnExplosion(impactEvent) {
       this.#currentShot = null;
-      if (impactEvent.type === 'TERRAIN_IMPACT') {
+      if (impactEvent.type === 'TERRAIN_IMPACT' || impactEvent.type === 'PLAYER_HIT') {
          this.#currentExplosion = new Explosion(impactEvent.pos, this.#terrain);
       }
       else if (impactEvent.type === 'OUT_OF_BOUNDS') this.#turnController.advancePhase();
@@ -218,10 +223,8 @@ class Match {
       if (this.#controlPanel.powerAdjust.isFollowing)
          currentPlayer.barrelPower = this.#controlPanel.powerAdjust.power * 7;
       currentPlayer.updateMove(0.18);
-      for (let player of this.#players) player.positionVector.y = min(
-         this.#controlPanel.getAltitudeAt(player.positionVector.x) - player.wheelRadius,
-         this.#terrain.getHeightAt(player.positionVector.x) - player.wheelRadius
-      );
+      for (let player of this.#players)
+         player.position.y = this.#terrain.getHeightAt(player.position.x) - player.wheelRadius;
    }
 
    #updateFloatingScores() {
@@ -244,15 +247,11 @@ class Match {
 
    #handleExplosionFeedback() {
       // lastShooterId for self, 1 - lastShooterId for enemy
-      let distance = this.#calculateExplosionDistance(1 - this.#lastShooterId);
+      let distance = this.#players[1 - this.#lastShooterId].getDistanceTo(this.#currentExplosion.position);
       // last 3 arguments to applyExplosionFeedback() relate to visual effects
       this.#applyExplosionFeedback('enemyFeedbackTriggered', distance, 1 - this.#lastShooterId, 12, 6, 8);
-      distance = this.#calculateExplosionDistance(this.#lastShooterId);
+      distance = this.#players[this.#lastShooterId].getDistanceTo(this.#currentExplosion.position);
       this.#applyExplosionFeedback('selfFeedbackTriggered', distance, this.#lastShooterId, 10, 5, 6);
-   }
-
-   #calculateExplosionDistance(playerId) {
-      return this.#players[playerId].position.dist(this.#currentExplosion.position);
    }
 
    #applyExplosionFeedback(id, distance, playerId, flashFrames, shakeFrames, shakeMag) {
@@ -281,8 +280,8 @@ class Match {
       if (this.#lastShooterId === 0) this.#scoreBoard.score1 += extraPoints;
       else this.#scoreBoard.score2 += extraPoints;
       this.#floatingScores.push(new FloatingScore(
-         this.#players[this.#lastShooterId].positionVector.x,
-         this.#players[this.#lastShooterId].positionVector.y - 60,
+         this.#players[this.#lastShooterId].position.x,
+         this.#players[this.#lastShooterId].position.y - 60,
          extraPoints,
          scoreColor
       ));
@@ -331,7 +330,8 @@ class Match {
 
    #handlePowerAdjustToggle() {
       const powerWidget = this.#controlPanel.powerAdjust;
-      powerWidget.isFollowing = (!this.#controlPanel.angleDial.isFollowing && powerWidget.isHovered && !powerWidget.isFollowing);
+      powerWidget.isFollowing =
+         (!this.#controlPanel.angleDial.isFollowing && powerWidget.isHovered && !powerWidget.isFollowing);
    }
 
    #triggerMouseCannonShot() {
@@ -343,22 +343,8 @@ class Match {
       if (this.#physicsDone()) {
          this.#lastShooterId = this.#turnController.activePlayerId;
          const shooter = this.#players[this.#lastShooterId];
-         const selectedIndex = shooter.currentWeaponIndex ?? 0;
-         const selectedWeapon = shooter.weaponLoadout?.[selectedIndex] ?? null;
-         if (selectedWeapon && !selectedWeapon.consume()) return;
-         this.#currentShot = shooter.fireShot(selectedWeapon, 4);
-         if (selectedWeapon && Array.isArray(shooter.weaponLoadout)) {
-            shooter.weaponLoadout.splice(selectedIndex, 1);
-            shooter.currentWeaponIndex = constrain(
-               selectedIndex,
-               0,
-               Math.max(shooter.weaponLoadout.length - 1, 0)
-            );
-         }
-         this.#controlPanel.setWeaponLoadouts(
-            shooter.weaponLoadout ?? [],
-            shooter.currentWeaponIndex ?? 0
-         );
+         this.#currentShot = shooter.fireCurrentWeapon();
+         this.#controlPanel.setWeaponLoadouts(shooter.weaponLoadout, shooter.currentWeaponIndex);
       }
    }
 

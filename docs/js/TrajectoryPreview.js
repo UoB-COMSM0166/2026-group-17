@@ -17,7 +17,7 @@ class TrajectoryPreview {
          launchPos, launchVel, gravityVec, wind, terrain, enemy, targetHitRadius
       );
       this.#renderPath(simResult.path, simResult.willHit);
-      if (simResult.willHit) this.#renderHitMarker(enemy.positionVector, targetHitRadius);
+      if (simResult.willHit) this.#renderHitMarker(enemy.position, targetHitRadius);
    }
 
    #getLaunchState(player) {
@@ -26,7 +26,7 @@ class TrajectoryPreview {
       const offset = createVector(player.wheelRadius + player.barrelSize.x / 2, 0);
       offset.rotate(angle);
       return {
-         launchPos: player.positionVector.copy().add(offset),
+         launchPos: player.position.copy().add(offset),
          launchVel: createVector(cos(angle) * speed, sin(angle) * speed)
       }
    }
@@ -57,7 +57,7 @@ class TrajectoryPreview {
    }
 
    #hitsEnemy(pos, enemy, hitRadius) {
-      return p5.Vector.dist(pos, enemy.positionVector) < hitRadius;
+      return p5.Vector.dist(pos, enemy.position) < hitRadius;
    }
 
    #addToPath(pos, i, path) {
