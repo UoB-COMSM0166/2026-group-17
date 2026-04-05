@@ -15,12 +15,10 @@ class MenuState extends State {
       // Ask the menu if a button was clicked and get the corresponding mode (easy/hard)
       const mode = this.#startMenu.handleMousePressed();
       document.querySelector('canvas').focus();
-      if (!mode) return;
-      // Go to weapon shop
-      this.game.pendingMode = mode;
-      this.game.switchState(
-         new ShopState(this.game, this.resolution)
-      );
+      if (mode) {
+         this.game.pendingMode = mode;
+         // Go to shop screen
+         this.game.switchState(new ShopState(this.game, this.resolution));
+      }
    }
 }
-
