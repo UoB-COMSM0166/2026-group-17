@@ -221,7 +221,8 @@ class WeaponShop {
    // Weapon card grid to show 10 weapons, 5 per row
 
    _drawGrid() {
-      for (let i = 0; i < WEAPON_REGISTRY.length; i++) {
+      //console.log("weapons:", WEAPON_REGISTRY);
+      for (let i = 0; i < Object.keys(WEAPON_REGISTRY).length; i++) {
          const col = i % this._cols;
          const row = Math.floor(i / this._cols);
          const x = this._gridX + col * (this._cardW + this._gapX);
