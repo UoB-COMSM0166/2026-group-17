@@ -74,13 +74,25 @@ class Grapeshot extends AbstractWeapon {
     createVector(-0.35, 0.8)
   ];
 
-  return directions.map((dir, index) => {
+  // Only the center blast modifies terrain.
+  // The smaller side bursts are visual-only so terrain settling stays stable.
+  const visuals = directions.map((dir, index) => {
     const offset = dir.copy().setMag(spread * (0.8 + index * 0.08));
     return {
       position: impactPosition.copy().add(offset),
-      maxRadius: 52
+      maxRadius: 36,
+      affectsTerrain: false
     };
   });
+
+  return [
+    {
+      position: impactPosition.copy(),
+      maxRadius: 60,
+      affectsTerrain: true
+    },
+    ...visuals
+  ];
  }
 
  drawProjectile(cx, cy, r) {

@@ -12,7 +12,8 @@ class TrajectoryPreview {
       const { launchPos, launchVel } = this.#getLaunchState(player, weapon);
       // Environment forces
       const wind = createVector(windVec?.x ?? 0, windVec?.y ?? 0);
-      const targetHitRadius = enemy.wheelRadius + (weapon?.explosionRadius ?? this.#hitTolerance);
+      // Keep the easy-mode hit marker small and consistent for every weapon.
+      const targetHitRadius = enemy.wheelRadius + this.#hitTolerance;
       // identify if this shot would hit the enemy by simulating the trajectory in advance
       const simResult = this.#runSimulation(
          launchPos, launchVel, gravityVec, wind, terrain, enemy, targetHitRadius, weapon
@@ -23,7 +24,8 @@ class TrajectoryPreview {
 
    #getLaunchState(player, weapon = null) {
       const angle = player.barrelAngle;
-      const speed = player.barrelPower * (weapon ? weapon.speed / 6 : 1);
+      // Preview should match the shared projectile speed model.
+      const speed = player.barrelPower;
       const offset = createVector(player.wheelRadius + player.barrelSize.x / 2, 0);
       offset.rotate(angle);
       return {
