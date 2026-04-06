@@ -12,7 +12,6 @@ class CannonBall extends AbstractWeapon {
       shotRadius: 5,
       explosionRadius: 65
     });
-    this.used = false;
   }
 
   drawProjectile(cx, cy, r) {
