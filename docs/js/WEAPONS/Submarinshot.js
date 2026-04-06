@@ -16,14 +16,7 @@ class Submarinshot extends AbstractWeapon {
   }
 
 beforeProjectileStep(projectile, context) {
-  const targetPos = projectile.target?.positionVector ?? projectile.target?.position;
-  if (!targetPos) return;
-
-  const desired = p5.Vector.sub(targetPos, projectile.position);
-  if (desired.mag() < 1) return;
-
-  desired.setMag(85 * context.dt);
-  projectile.vel.add(desired);
+  // Keep the base trajectory consistent with the other projectile weapons.
 }
 
 drawProjectileInstance(projectile) {

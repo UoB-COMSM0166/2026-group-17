@@ -54,12 +54,17 @@ class AbstractWeapon {
   }
 
   onImpact(match, impactEvent, shot) {
-    match.spawnWeaponExplosion(
-      impactEvent.pos,
-      this.id === "ball" ? "ball" : this.id,
-      shot,
-      this
-    );
+    // Weapons can return one or many explosion specs from a single impact.
+    const specs = this.createExplosionsFromImpact(impactEvent.pos, shot);
+    for (const spec of specs) {
+      match.spawnWeaponExplosion(
+        spec.position ?? impactEvent.pos,
+        spec.kind ?? (this.id === "ball" ? "ball" : this.id),
+        shot,
+        spec.weapon ?? this,
+        spec
+      );
+    }
   }
 
   createExplosionsFromImpact(impactPosition, projectile) {
