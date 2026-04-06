@@ -63,11 +63,11 @@ class PlayerCannon {
       const offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
       offset.rotate(this.#barrelAngle);
 
-      const speedMultiplier = weapon?.speed ? weapon.speed / 6 : 1;
+      // Keep the same base trajectory for all projectile weapons.
       const velocity = createVector(
          cos(this.#barrelAngle),
          sin(this.#barrelAngle)
-      ).mult(this.#barrelPower * speedMultiplier);
+      ).mult(this.#barrelPower);
 
       return new Projectile(
          p5.Vector.add(this.#positionVector, offset),

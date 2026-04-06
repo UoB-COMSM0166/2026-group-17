@@ -300,9 +300,8 @@ class Match {
          return;
       }
 
-      const shooter = this.#players[this.#lastShooterId];
-      const weapon =
-         shooter?.weaponLoadout?.find(w => w.id === shot?.weaponId) ?? null;
+      // Always trust the weapon stored on the projectile itself.
+      const weapon = shot?.weapon ?? null;
 
       if (weapon?.onImpact) {
          weapon.onImpact(this, impactEvent, shot);
@@ -334,13 +333,18 @@ class Match {
       this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, weapon);
    }
 
-   spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null) {
+   spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null, options = {}) {
       this.#currentExplosions.push(
          new Explosion(
             pos.copy(),
             this.#terrain,
             weapon,
-            { kind }
+            {
+               kind,
+               maxRadius: options.maxRadius,
+               duration: options.duration,
+               affectsTerrain: options.affectsTerrain
+            }
          )
       );
    }
@@ -648,21 +652,22 @@ class Match {
       const weapon = player.currentWeapon;
       if (!weapon) return;
 
+      // Move the panel down so it does not overlap the score UI.
       push();
       rectMode(CORNER);
       noStroke();
       fill(10, 20, 30, 170);
-      rect(20, 20, 280, 68, 12);
+      rect(20, 82, 250, 58, 12);
 
       fill(255);
       textAlign(LEFT, TOP);
-      textSize(16);
-      text(`Weapon: ${weapon.name}`, 84, 30);
-      textSize(12);
-      text(`Ammo ${weapon.ammoLeft}/${weapon.ammo}  Radius ${weapon.explosionRadius}`, 84, 52);
-      text(`Q/E switch`, 210, 52);
+      textSize(14);
+      text(`Weapon: ${weapon.name}`, 74, 92);
+      textSize(11);
+      text(`Ammo ${weapon.ammoLeft}/${weapon.ammo}`, 74, 112);
+      text(`Q/E switch`, 190, 112);
 
-      weapon.drawIcon(52, 53, 16);
+      weapon.drawIcon(48, 110, 14);
       pop();
    }
 

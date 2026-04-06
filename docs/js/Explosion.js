@@ -7,11 +7,14 @@ class Explosion {
    #duration = 1000;
    #timer = 0;
    #finished = false;
+   #affectsTerrain = true;
 
    constructor(impactPosition, terrainRef = null, weapon = null, options = {}) {
       this.#position = impactPosition.copy ? impactPosition.copy() : impactPosition;
       this.#terrain = terrainRef;
       this.#weapon = weapon;
+      // Some child explosions are visual-only to avoid terrain edge cases.
+      this.#affectsTerrain = options.affectsTerrain ?? true;
 
       this.kind = options.kind ?? weapon?.id ?? "ball";
 
@@ -57,7 +60,7 @@ class Explosion {
       }
 
       if (!this.hasAppliedTerrain && this.#timer >= this.#duration) {
-         if (this.#terrain) {
+         if (this.#affectsTerrain && this.#terrain) {
             this.#terrain.applyExplosion(this.#position.copy(), this.#maxRadius);
          }
          this.hasAppliedTerrain = true;
@@ -177,6 +180,7 @@ class Explosion {
    get finished() { return this.#finished; }
    get weapon() { return this.#weapon; }
    get progress() { return constrain(this.#timer / this.#duration, 0, 1); }
+   get affectsTerrain() { return this.#affectsTerrain; }
 }
 
 class StarSpark {
