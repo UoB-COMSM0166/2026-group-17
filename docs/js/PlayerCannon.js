@@ -13,6 +13,7 @@ class PlayerCannon {
    #weaponLoadout = [];
    #currentWeaponIndex = 0;
 
+
    constructor(posVec, wheelRad, barrelSz, barrAngle, moveSteps, fillColor, outColor) {
       this.#positionVector = posVec;
       this.#wheelRadius = wheelRad;
@@ -21,72 +22,30 @@ class PlayerCannon {
       this.#savedBarrelPower = 350;
       this.#fillColor = fillColor;
       this.#outlineColor = outColor;
-      this.#targetX = posVec.x;
+      this.#targetX = posVec.x; // for smooth movement
       this.#moveSteps = moveSteps;
-
-      this.#weaponLoadout = [];
-      this.#currentWeaponIndex = 0;
-
-      // special-weapon / physics-related state
-      this.isAirborne = false;
-      this.verticalVelocity = 0;
-      this.pendingCraterRadius = 0;
    }
 
    updateMove(follow = 0.30) {
       this.#positionVector.x = lerp(this.#positionVector.x, this.#targetX, follow);
    }
 
-   getCurrentWeapon() {
-      if (this.#weaponLoadout.length === 0) return null;
-      return this.#weaponLoadout[this.#currentWeaponIndex] ?? this.#weaponLoadout[0];
-   }
-
-   nextWeapon() {
-      this.cycleWeapon(1);
-   }
-
-   prevWeapon() {
-      this.cycleWeapon(-1);
-   }
-
-   cycleWeapon(step = 1) {
-      if (this.#weaponLoadout.length === 0) return;
-      this.#currentWeaponIndex =
-         (this.#currentWeaponIndex + step + this.#weaponLoadout.length) %
-         this.#weaponLoadout.length;
-   }
-
-   fireShot(defaultShotRadius = 4, weapon = null) {
+   fireShot(weapon = null, target = null) {
+      // offset of muzzle tip from positionVector
       this.#savedBarrelPower = this.#barrelPower;
-
-      const actualWeapon = weapon ?? this.getCurrentWeapon();
-
-      const offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
+      let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
+      const speedMultiplier = weapon ? weapon.speed / 6 : 1;
+      let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle))
+         .mult(this.#barrelPower * speedMultiplier);
       offset.rotate(this.#barrelAngle);
-
-      const speedMultiplier = actualWeapon ? actualWeapon.speed / 6 : 1;
-      const velocity = createVector(
-         cos(this.#barrelAngle),
-         sin(this.#barrelAngle)
-      ).mult(this.#barrelPower * speedMultiplier);
-
-      if (actualWeapon?.useAmmo && !actualWeapon.useAmmo()) return null;
-
       return new Projectile(
          p5.Vector.add(this.#positionVector, offset),
          velocity,
-         actualWeapon?.shotRadius ?? defaultShotRadius,
-         actualWeapon?.id ?? "cannon_ball"
+         weapon?.shotRadius ?? 4,
+         weapon,
+         target
       );
    }
-
-   startShibaLaunch(strength, craterRadius) {
-      this.isAirborne = true;
-      this.verticalVelocity = -strength;
-      this.pendingCraterRadius = craterRadius;
-   }
-
    drawPlayer() {
       fill(this.#fillColor);
       if (this.#hitFlashFrames > 0) {
@@ -106,10 +65,10 @@ class PlayerCannon {
       push();
       noFill();
       strokeWeight(4);
+      // Red for player 1, blue for player 2
       const indicatorColor = (playerId === 0) ? color(255, 80, 80) : color(80, 180, 255);
       stroke(indicatorColor);
       circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius + 15);
-
       const arrowY = this.#positionVector.y - 50;
       fill(indicatorColor);
       noStroke();
@@ -128,43 +87,43 @@ class PlayerCannon {
    tickEffects() {
       if (this.#hitFlashFrames > 0) this.#hitFlashFrames--;
    }
-
-   setTargetX(x, canvasWidth) {
-      this.#targetX = constrain(x, this.#wheelRadius, canvasWidth - this.#wheelRadius);
-   }
-
    get barrelAngle() { return this.#barrelAngle; }
    get barrelPower() { return this.#barrelPower; }
    get lastFiredPower() { return this.#savedBarrelPower; }
+   set barrelAngle(a) { this.#barrelAngle = a; }
+   set barrelPower(p) { this.#barrelPower = p; }
    get positionVector() { return this.#positionVector; }
    get position() { return this.#positionVector; }
    get wheelRadius() { return this.#wheelRadius; }
    get targetX() { return this.#targetX; }
    get moveSteps() { return this.#moveSteps; }
+   set moveSteps(s) { this.#moveSteps = s; }
    get barrelSize() { return this.#barrelSize; }
-
    get weaponLoadout() { return this.#weaponLoadout; }
    set weaponLoadout(loadout) { this.#weaponLoadout = loadout ?? []; }
-
    get currentWeaponIndex() { return this.#currentWeaponIndex; }
    set currentWeaponIndex(index) {
       const lastIndex = max(0, this.#weaponLoadout.length - 1);
       this.#currentWeaponIndex = constrain(index, 0, lastIndex);
    }
-
    get currentWeapon() {
-      return this.getCurrentWeapon();
+      if (this.#weaponLoadout.length === 0) return null;
+      return this.#weaponLoadout[this.#currentWeaponIndex] ?? this.#weaponLoadout[0];
    }
 
-   set barrelAngle(a) { this.#barrelAngle = a; }
-   set barrelPower(p) { this.#barrelPower = p; }
-   set targetX(x) { this.#targetX = x; }
-   set moveSteps(s) { this.#moveSteps = s; }
+   cycleWeapon(step = 1) {
+      if (this.#weaponLoadout.length === 0) return;
+      this.#currentWeaponIndex = (this.#currentWeaponIndex + step + this.#weaponLoadout.length)
+         % this.#weaponLoadout.length;
+   }
+
+   setTargetX(x, canvasWidth) {
+      this.#targetX = constrain(x, this.#wheelRadius, canvasWidth - this.wheelRadius);
+   }
 
    #drawWheel() {
       circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);
    }
-
    #drawBarrel() {
       push();
       rectMode(CENTER);

@@ -18,43 +18,31 @@ class FloatingScore {
    _clamp(v, a, b) {
       return Math.max(a, Math.min(b, v));
    }
-
    update() {
       this.t += 0.14;
       const tt = this._clamp(this.t, 0, 1);
       const eased = 1 - Math.pow(1 - tt, 3);
-
       this.x = lerp(this.x0, this.x1, eased);
       this.y = lerp(this.y0, this.y1, eased);
-
       if (tt >= 1) {
          this._hold = (this._hold ?? 18) - 1;
          if (this._hold <= 0) this.life -= 0.12;
       }
-
       if (this.life <= 0) this.dead = true;
    }
-
    draw() {
       push();
       textAlign(CENTER, CENTER);
-
       let s;
-      if (typeof this.value === "number") {
-         s = this.value > 0 ? `+${this.value}` : `${this.value}`;
-      } else {
-         s = String(this.value);
-      }
-
+      if (typeof this.value === "number") s = (this.value > 0 ? `+${this.value}` : `${this.value}`);
+      else s = String(this.value);
       const scalePop = 1 + 0.35 * Math.exp(-6 * this.t);
       const baseSize = 34;
       textSize(baseSize * scalePop);
-
       if (typeof drawingContext !== "undefined") {
          drawingContext.shadowBlur = 18;
          drawingContext.shadowColor = "rgba(0,0,0,0.6)";
       }
-
       const lv = (this.col && this.col.levels) ? this.col.levels : [255, 255, 255];
       stroke(0, 200 * this.life);
       strokeWeight(6);

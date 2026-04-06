@@ -1,56 +1,36 @@
+
 class Starshot extends AbstractWeapon {
   constructor() {
     super({
-      id: 'star',
-      name: 'Starshot',
-      description: 'Star burst shot.',
+      id: 'star', name: 'Starshot',
+      description: 'Freezes on impact.',
       damage: 5,
-      speed: 6,
-      blastRadius: 7,
-      ammo: 4,
+      speed: 5, 
+      blastRadius: 7, 
+      ammo: 4, 
       rarity: 'rare',
-      shotRadius: 5,
+      shotRadius: 5, 
       explosionRadius: 80,
     });
     this.used = false;
   }
-
   drawProjectile(cx, cy, r) {
-    if (typeof starImg !== "undefined" && starImg) {
-      push();
-      imageMode(CENTER);
-      image(starImg, cx, cy, 66, 66);
-      pop();
-      return;
-    }
-
-    this.#drawVectorStar(cx, cy, r);
-  }
-
-  drawIcon(cx, cy, r) {
-    this.drawProjectile(cx, cy, r);
-  }
-
-  onImpact(match, impactEvent, shot) {
-    match.spawnWeaponExplosion(impactEvent.pos, "star", shot, this);
-  }
-
-  #drawVectorStar(cx, cy, r) {
     push();
-    translate(cx, cy);
     noStroke();
-    fill(255, 220, 90);
-
-    beginShape();
-    for (let i = 0; i < 10; i++) {
-      const ang = -HALF_PI + i * PI / 5;
-      const rr = i % 2 === 0 ? r * 1.8 : r * 0.8;
-      vertex(cos(ang) * rr, sin(ang) * rr);
+    const g = drawingContext.createRadialGradient(
+      cx - r*0.3, cy - r*0.3, r*0.05, cx, cy, r);
+    g.addColorStop(0,   '#eef8ff');
+    g.addColorStop(0.5, '#5599cc');
+    g.addColorStop(1,   '#112244');
+    drawingContext.fillStyle = g;
+    ellipse(cx, cy, r, r);
+    stroke(200, 240, 255, 180);
+    strokeWeight(r*0.1);
+    for (let a = 0; a < 6; a++) {
+      const ax = cx + cos(a * 60) * r * 0.85;
+      const ay = cy + sin(a * 60) * r * 0.85;
+      line(cx, cy, ax, ay);
     }
-    endShape(CLOSE);
-
-    fill(255, 255, 255, 160);
-    circle(0, 0, r * 0.8);
     pop();
   }
 }
