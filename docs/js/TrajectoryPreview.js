@@ -7,6 +7,7 @@ class TrajectoryPreview {
    constructor(resolution) {  this.#resolution = resolution; }
 
    drawPreview(player, enemy, terrain, gravityVec, windVec) {
+      const x = player.positionVector.x;
       // Calculate projectile starting point
       const { launchPos, launchVel } = this.#getLaunchState(player);
       // Environment forces

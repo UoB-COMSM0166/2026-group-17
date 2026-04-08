@@ -29,6 +29,17 @@ class Terrain {
       }
    }
 
+   getSlopeAngleAt(x, sampleOffset = 5) {
+      const leftX = constrain(x - sampleOffset, 0, width - 1);
+      const rightX = constrain(x + sampleOffset, 0, width - 1);
+      const leftY = this.getHeightAt(leftX);
+      const rightY = this.getHeightAt(rightX);
+      const dx = max(1, rightX - leftX);
+      const dy = abs(rightY - leftY);
+
+      return Math.atan2(dy, dx) * 180 / Math.PI;
+   }
+
    applyExplosion(center, radius) {
       //loop through all columns which are under the area of explosion
       let startId = floor(center.x - radius), endId = ceil(center.x + radius);

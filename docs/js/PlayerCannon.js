@@ -12,7 +12,6 @@ class PlayerCannon {
    #hitFlashFrames = 0;
    #hitFlashMax = 10;
 
-
    constructor(posVec, wheelRad, barrelSz, barrAngle, moveSteps, fillColor, outColor) {
       this.#positionVector = posVec;
       this.#wheelRadius = wheelRad;
@@ -25,16 +24,17 @@ class PlayerCannon {
       this.#moveSteps = moveSteps;
    }
 
-   updateMove(follow = 0.30) {
+   updateMove(follow = 0.10) {
       this.#positionVector.x = lerp(this.#positionVector.x, this.#targetX, follow);
    }
 
    fireShot(weapon = null, shotRadius = 4) {
       // offset of muzzle tip from positionVector
       this.#savedBarrelPower = this.#barrelPower;
+      let angle = this.#barrelAngle;
       let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
-      let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(this.#barrelPower);
-      offset.rotate(this.#barrelAngle);
+      let velocity = createVector(cos(angle), sin(angle)).mult(this.#barrelPower);
+      offset.rotate(angle);
       const projectile = new Projectile(
          p5.Vector.add(this.#positionVector, offset),
          velocity,
@@ -85,6 +85,7 @@ class PlayerCannon {
    tickEffects() {
       if (this.#hitFlashFrames > 0) this.#hitFlashFrames--;
    }
+
    get barrelAngle() { return this.#barrelAngle; }
    get barrelPower() { return this.#barrelPower; }
    get lastFiredPower() { return this.#savedBarrelPower; }
@@ -105,6 +106,7 @@ class PlayerCannon {
    #drawWheel() {
       circle(this.#positionVector.x, this.#positionVector.y, this.#wheelRadius);
    }
+   
    #drawBarrel() {
       push();
       rectMode(CENTER);

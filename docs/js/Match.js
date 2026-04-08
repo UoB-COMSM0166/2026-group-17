@@ -1,6 +1,7 @@
 class Match {
    static #GRAVITY;
    static #ZERO_VECTOR;
+   static #MAX_CANNON_SLOPE_ANGLE = 65;
    #width;
    #height;
    #bgTopColour;
@@ -202,7 +203,8 @@ class Match {
          currentPlayer.barrelAngle = this.#controlPanel.angleDial.needleRotation - 90;
       if (this.#controlPanel.powerAdjust.isFollowing)
          currentPlayer.barrelPower = this.#controlPanel.powerAdjust.power * 7;
-      currentPlayer.updateMove(0.18);
+      this.#stopPlayerAtSteepSlope(currentPlayer, 0.10);
+      currentPlayer.updateMove(0.10);
       for (let player of this.#players) player.positionVector.y = min(
          this.#controlPanel.getAltitudeAt(player.positionVector.x) - player.wheelRadius,
          this.#terrain.getHeightAt(player.positionVector.x) - player.wheelRadius
@@ -280,7 +282,10 @@ class Match {
 
    #drawPlayers() {
       const playerId = this.#turnController.activePlayerId;
-      for (const player of this.#players) player.drawPlayer();
+      for (const player of this.#players) {
+         const x = player.positionVector.x;
+         player.drawPlayer();
+      }
       if (!this.#turnController.isGameOver) this.#players[playerId].drawIndicator(playerId);
    }
 
@@ -350,9 +355,9 @@ class Match {
    #executeCannonMovement(direction) {
       const player = this.#players[this.#turnController.activePlayerId];
       if (player.moveSteps > 0) {
-         const moveDistance = 50;
+         const moveDistance = 100;
          const multiplier = (direction === 'left') ? -1 : 1;
-         player.setTargetX(player.targetX + (moveDistance * multiplier), this.#width);
+         player.setTargetX(player.targetX + (this.#getPlayerTangent().x * moveDistance * multiplier), this.#width);
          player.moveSteps -= 1;
          this.#controlPanel.setMoveSteps(player.moveSteps);
       }
@@ -360,6 +365,33 @@ class Match {
 
    #physicsDone() {
       return !this.#currentShot && !this.#currentExplosion && this.#terrain.isSettled;
+   }
+
+   #stopPlayerAtSteepSlope(player, follow) {
+      if (abs(player.targetX - player.positionVector.x) < 0.5) return;
+
+      const nextX = lerp(player.positionVector.x, player.targetX, follow);
+      const slopeAngle = this.#terrain.getSlopeAngleAt(nextX);
+
+      if (slopeAngle > Match.#MAX_CANNON_SLOPE_ANGLE) {
+         player.setTargetX(player.positionVector.x, this.#width);
+      }
+   }
+
+   #getPlayerTangent(){
+      let player = this.#players[this.#turnController.activePlayerId]
+      let sampleOffset = 5;
+
+      let leftY = this.#terrain.getHeightAt(player.positionVector.x - sampleOffset);
+      let rightY = this.#terrain.getHeightAt(player.positionVector.x + sampleOffset);
+
+      let dx = sampleOffset * 2;
+      let dy = rightY - leftY;
+
+      let tangent = createVector(dx, dy);
+      tangent.normalize();
+
+      return tangent;
    }
 
    get isMatchOver() {
