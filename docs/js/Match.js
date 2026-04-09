@@ -1,35 +1,27 @@
 class Match {
    static #GRAVITY;
    static #ZERO_VECTOR;
-
    #width;
    #height;
    #bgTopColour;
    #bgBottomColour;
-
    #players = [];
    #lastActivePlayerId = -1;
-
    #wind;
    #rain;
    #earthquake;
    #weatherQueue = [];
    #weatherIndex = 0;
-
    #terrain;
    #lastShooterId = 0;
-
    #scoreBoard;
    #scoreCalculator;
-
    #currentShot = null;
    #currentExplosions = [];
-
    #secondaryShots = [];
    #poisonClouds = [];
    #shibaImpacts = [];
    #pendingTurnAdvance = false;
-
    #turnController;
    #turnCounter;
    #controlPanel;
@@ -43,34 +35,24 @@ class Match {
    constructor(resolution, gameMode, loadout0, loadout1, shakeCallback) {
       Match.#GRAVITY = createVector(0, 400);
       Match.#ZERO_VECTOR = createVector(0, 0);
-
       this.#width = resolution.x;
       this.#height = resolution.y;
-
       this.#wind = new WindSystem();
       this.#rain = new RainSystem();
       this.#earthquake = new EarthquakeSystem(shakeCallback);
-
       this.#bgTopColour = color(0);
       this.#bgBottomColour = color(0, 80, 100);
-
       this.#scoreBoard = new ScoreBoard();
       this.#scoreBoard.setup();
-
       this.#controlPanel = new ControlPanel(color(20));
       this.#scoreCalculator = new ScoreCalculator();
       this.#turnCounter = new TurnCounter(createVector(this.#width / 2, this.#height / 20));
-
       this.#terrain = new Terrain(this.#controlPanel, color(255, 0, 0));
-      const terrainSeed = floor(random(99999));
-      this.#terrain.generateInitialTerrain(terrainSeed);
-
-      this.#spawnPlayers();
-      this.#applyLoadout(loadout0, 0);
-      this.#applyLoadout(loadout1, 1);
-
+      this.#terrain.generateInitialTerrain(floor(random(99999)));
+      // Player initialisation
+      this.#spawnPlayers(loadout0, loadout1);
+      // Turn logic
       this.#turnController = new TurnController(this.#wind);
-
       this.#isEasyDifficulty = (gameMode === "easy");
       this.#trajectoryPreviewer = new TrajectoryPreview(resolution);
       this.#setModeBasedWeather();
@@ -85,20 +67,9 @@ class Match {
       this.#updatePoisonClouds(dt);
       this.#updateShibaImpacts();
       this.#updatePlayers();
-
       if (this.#currentExplosions.length > 0) this.#updateExplosions(dt);
-
       this.#updateFloatingScores();
-
-      if (
-         this.#pendingTurnAdvance &&
-         this.#currentExplosions.length === 0 &&
-         this.#secondaryShots.length === 0 &&
-         this.#poisonClouds.length === 0
-      ) {
-         this.#turnController.advancePhase();
-         this.#pendingTurnAdvance = false;
-      }
+      this.#processTurnTransition();
    }
 
    drawMatch(applyShake = null) {
@@ -112,22 +83,17 @@ class Match {
       this.#drawHUD();
    }
 
-   onMousePressed(x, y, button) {
-      this.#lastMouseButton = (button === LEFT) || (button?.left === true);
+   onMousePressed(button) {
+      this.#lastMouseButton = (button === LEFT || button?.left === true);
    }
 
-   onMouseReleased(x, y, button) {
-      const wasLeftMousePress = this.#lastMouseButton === true;
-      this.#lastMouseButton = false;
-      if (!this.#physicsDone() || !wasLeftMousePress) return;
-
+   onMouseReleased() {
+      if (!this.#physicsDone() || this.#lastMouseButton !== true) return;
       const currentPlayer = this.#players[this.#turnController.activePlayerId];
       const inventoryResult = this.#controlPanel.handleWeaponInventoryClick();
-
       if (inventoryResult.selectedIndex !== null)
          currentPlayer.currentWeaponIndex = inventoryResult.selectedIndex;
       if (inventoryResult.handled) return;
-
       this.#handleAngleDialToggle();
       this.#handlePowerAdjustToggle();
       this.#triggerMouseCannonShot();
@@ -152,50 +118,42 @@ class Match {
       }
    }
 
-   #spawnPlayers() {
-      const wheelRadius = 12;
-      const barrelSizeVector = createVector(wheelRadius * 6, 8);
-
-      this.#addPlayer(
-         wheelRadius,
-         this.#width / 4,
-         wheelRadius,
-         barrelSizeVector,
-         -45,
-         3,
-         color('silver'),
-         color('lightslategray')
-      );
-
-      this.#addPlayer(
-         this.#width - this.#width / 5,
-         this.#width - wheelRadius,
-         wheelRadius,
-         barrelSizeVector,
-         220,
-         3,
-         color('moccasin'),
-         color('navajowhite')
-      );
+   #spawnPlayers(loadout0, loadout1) {
+      const wheelRadius = 12, barrelSizeVector = createVector(wheelRadius * 6, 8);
+      // left cannon
+      this.#addPlayer({
+         position: createVector(random(wheelRadius, this.#width / 4), 0),
+         wheelRadius: wheelRadius,
+         barrelSize: barrelSizeVector,
+         barrelAngle: -45,
+         moveSteps: 3,
+         fillColor: color('silver'),
+         strokeColor: color('lightslategray'),
+         weaponLoadout: this.#resolveLoadout(loadout0)
+      });
+      // right cannon
+      this.#addPlayer({
+         position: createVector(random(this.#width - this.#width / 5, this.#width - wheelRadius), 0),
+         wheelRadius: wheelRadius,
+         barrelSize: barrelSizeVector,
+         barrelAngle: 220,
+         moveSteps: 3,
+         fillColor: color('moccasin'),
+         strokeColor: color('navajowhite'),
+         weaponLoadout: this.#resolveLoadout(loadout1)
+      });
    }
 
-   #addPlayer(randMin, randMax, radius, barrSz, barrAngle, steps, fillCol, outCol) {
-      const posX = random(randMin, randMax);
-      const posVec = createVector(
-         posX,
-         this.#terrain.getHeightAt(posX) - radius
-      );
-      this.#players.push(
-         new PlayerCannon(posVec, radius, barrSz, barrAngle, steps, fillCol, outCol)
-      );
+   #addPlayer(playerConfig) {
+      const { position, wheelRadius } = playerConfig;
+      position.y = this.#terrain.getHeightAt(position.x) - wheelRadius;
+      this.#players.push(new PlayerCannon(playerConfig));
    }
 
-   #applyLoadout(loadout, id) {
-      const fallbackLoadout = WEAPON_REGISTRY.map((weapon) => new weapon.constructor());
-      const resolvedLoadout = (loadout && loadout.length > 0) ? loadout : fallbackLoadout;
-      this.#players[id].weaponLoadout = resolvedLoadout;
-      this.#players[id].currentWeaponIndex = 0;
-      resolvedLoadout.forEach(w => w.resetUsage?.());
+   #resolveLoadout(loadout) {
+      if (loadout && loadout.length > 0) return loadout;
+      // If no loadout provided, assign one of everything from the registry
+      return WEAPON_REGISTRY.map((weapon) => new weapon.constructor());
    }
 
    #handleRoundTransition() {
@@ -250,201 +208,126 @@ class Match {
 
    #updateShot(dt) {
       if (!this.#currentShot?.isActive) return;
+      const impactEvent = this.#currentShot.updatePhysics({
+         dt: dt / 1000,
+         gravity: Match.#GRAVITY,
+         wind: this.#wind,
+         rain: this.#rain,
+         earthquake: this.#earthquake,
+         terrain: this.#terrain,
+         players: this.#players,
+         resolution: createVector(this.#width, this.#height)
+      });
+      if (impactEvent?.type === "STAR_SPLIT") this.#handleStarSplit(impactEvent);
+      else if (impactEvent) this.#handleShotImpact(impactEvent); // replaces #spawnExplosion() call
+   }
 
-      const impactEvent = this.#currentShot.updatePhysics(
-         dt / 1000,
-         Match.#GRAVITY,
-         this.#wind,
-         this.#rain,
-         this.#earthquake,
-         this.#terrain,
-         this.#controlPanel,
-         this.#width
+   #handleStarSplit(impactEvent) {
+      this.#shakeCallback?.(10, 10);
+      this.spawnWeaponExplosion(
+         this.#currentShot.position.copy(),
+         "star",
+         this.#currentShot,
+         this.#currentShot.weapon
       );
-
-      if (impactEvent?.type === "STAR_SPLIT") {
-         const shooter = this.#players[this.#lastShooterId];
-         const weapon = shooter?.weaponLoadout?.find(w => w.id === "star") ?? null;
-
-         this.#shakeCallback?.(10, 10);
-         this.spawnWeaponExplosion(
-            this.#currentShot.position.copy(),
-            "star",
-            this.#currentShot,
-            weapon
-         );
-         this.#secondaryShots.push(...impactEvent.fragments);
-         this.#currentShot = null;
-         return;
-      }
-
-      if (impactEvent) this.#handleShotImpact(impactEvent);
+      this.#secondaryShots.push(...impactEvent.fragments);
+      this.#currentShot = null;
    }
 
    #handleShotImpact(impactEvent) {
       const shot = this.#currentShot;
       this.#currentShot = null;
-
       if (impactEvent.type === 'OUT_OF_BOUNDS') {
-         this.#turnController.advancePhase();
+         this.#pendingTurnAdvance = true;
          return;
       }
+      if (impactEvent.type !== 'TERRAIN_IMPACT' && impactEvent.type !== 'PLAYER_HIT') return;
 
-      if (impactEvent.type !== 'TERRAIN_IMPACT') return;
-
-      if (shot?.weaponId === "starFragment") {
-         const starWeapon = this.#players[this.#lastShooterId]
-            ?.weaponLoadout?.find(w => w.id === "star") ?? null;
-
-         this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, starWeapon);
-         return;
-      }
-
-      // Always trust the weapon stored on the projectile itself.
       const weapon = shot?.weapon ?? null;
-
+      const kind = shot?.weaponId ?? "ball";
       if (weapon?.onImpact) {
          weapon.onImpact(this, impactEvent, shot);
          return;
       }
-
-      const kind = shot?.weaponId ?? "ball";
       this.#handleWeaponEffectFallback(kind, impactEvent, shot, weapon);
    }
 
    #handleWeaponEffectFallback(kind, impactEvent, shot, weapon = null) {
-      if (kind === "pineapple") {
-         this.spawnWeaponExplosion(impactEvent.pos, "pineapple", shot, weapon);
-         this.spawnPoisonCloud(impactEvent.pos);
-         return;
+      switch (kind) {
+         case "pineapple":
+            this.spawnWeaponExplosion(impactEvent.pos, "pineapple", shot, weapon);
+            this.spawnPoisonCloud(impactEvent.pos);
+            break;
+         case "shiba":
+            this.spawnWeaponExplosion(impactEvent.pos, "shiba", shot, weapon);
+            this.spawnShibaImpact(impactEvent.pos);
+            break;
+         case "star":
+            this.spawnWeaponExplosion(impactEvent.pos, "star", shot, weapon);
+            break;
+         case "starFragment":
+            this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, weapon);
+            break;
+         default:
+            this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, weapon);
       }
-
-      if (kind === "shiba") {
-         this.spawnWeaponExplosion(impactEvent.pos, "shiba", shot, weapon);
-         this.spawnShibaImpact(impactEvent.pos);
-         return;
-      }
-
-      if (kind === "star") {
-         this.spawnWeaponExplosion(impactEvent.pos, "star", shot, weapon);
-         return;
-      }
-
-      this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, weapon);
    }
 
    spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null, options = {}) {
-      this.#currentExplosions.push(
-         new Explosion(
-            pos.copy(),
-            this.#terrain,
-            weapon,
-            {
-               kind,
-               maxRadius: options.maxRadius,
-               duration: options.duration,
-               affectsTerrain: options.affectsTerrain
-            }
-         )
+      this.#currentExplosions.push(new Explosion(
+         pos.copy(),
+         this.#terrain,
+         weapon,
+         {
+            kind,
+            maxRadius: options.maxRadius,
+            duration: options.duration,
+            affectsTerrain: options.affectsTerrain ?? true
+         })
       );
    }
 
    spawnPoisonCloud(pos) {
-      this.#poisonClouds.push(
-         new PoisonCloud(pos.x, pos.y, this.#lastShooterId)
-      );
+      this.#poisonClouds.push(new PoisonCloud(pos.x, pos.y, this.#lastShooterId));
    }
 
    spawnShibaImpact(pos) {
-      const impactX = pos.x;
-      const impactY = pos.y;
-
-      const targetId = 1 - this.#lastShooterId;
-      const target = this.#players[targetId];
-
+      const target = this.#players[1 - this.#lastShooterId];
+      if (!target) return;
       let strengthFactor = 0.35;
-
-      if (target) {
-         const d = dist(
-            impactX,
-            impactY,
-            target.positionVector.x,
-            target.positionVector.y
-         );
-
-         const effectRadius = 140;
-
-         if (d <= effectRadius) {
-            const factor = constrain(1 - d / effectRadius, 0, 1);
-            strengthFactor = factor;
-
-            const launchStrength = lerp(10, 22, factor);
-            const craterRadius = lerp(18, 46, factor);
-
-            target.startShibaLaunch(launchStrength, craterRadius);
-
-            const score = Math.round(10 + factor * 160);
-            this.#updateScore(score, color(255, 160, 80));
-
-            target.triggerHitFlash(8);
-         }
+      const distance = dist(pos.x, pos.y, target.position.x, target.position.y);
+      const effectRadius = 140;
+      if (distance <= effectRadius) {
+         const factor = constrain(1 - distance / effectRadius, 0, 1);
+         strengthFactor = factor;
+         const launchStrength = lerp(10, 22, factor);
+         const craterRadius = lerp(18, 46, factor);
+         target.startShibaLaunch(launchStrength, craterRadius);
+         target.triggerHitFlash(8);
+         const score = Math.round(10 + factor * 160);
+         this.#updateScore(score, color(255, 160, 80));
       }
-
-      this.#shibaImpacts.push(new ShibaImpactEffect(impactX, impactY, strengthFactor));
+      this.#shibaImpacts.push(new ShibaImpactEffect(pos.x, pos.y, strengthFactor));
       this.#shakeCallback?.(8, 7);
-   }
-
-   spawnStarFragments(pos, sourceShot) {
-      const shooterId = this.#lastShooterId;
-
-      for (let i = 0; i < 8; i++) {
-         let a;
-
-         if (shooterId === 0) {
-            a = random(-55, 55);
-         } else {
-            a = random(125, 235);
-         }
-
-         const vel = p5.Vector.fromAngle(radians(a)).mult(random(260, 340));
-         const frag = new Projectile(
-            createVector(pos.x, pos.y - 8),
-            vel,
-            3,
-            "starFragment"
-         );
-
-         this.#secondaryShots.push(frag);
-      }
    }
 
    #updateSecondaryShots(dt) {
       for (let i = this.#secondaryShots.length - 1; i >= 0; i--) {
          const shot = this.#secondaryShots[i];
-
-         const impactEvent = shot.updatePhysics(
-            dt / 1000,
-            Match.#GRAVITY,
-            this.#wind,
-            this.#rain,
-            this.#earthquake,
-            this.#terrain,
-            this.#controlPanel,
-            this.#width
-         );
-
-         if (impactEvent?.type === 'TERRAIN_IMPACT') {
-            const starWeapon = this.#players[this.#lastShooterId]
-               ?.weaponLoadout?.find(w => w.id === "star") ?? null;
-
-            this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, starWeapon);
-            this.#secondaryShots.splice(i, 1);
-            continue;
-         }
-
-         if (impactEvent?.type === 'OUT_OF_BOUNDS' || !shot.isActive) {
+         const impactEvent = shot.updatePhysics({
+            dt: dt / 1000,
+            gravity: Match.#GRAVITY,
+            wind: this.#wind,
+            rain: this.#rain,
+            terrain: this.#terrain,
+            players: this.#players,
+            resolution: createVector(this.#width, this.#height)
+         });
+         if (impactEvent) {
+            this.#handleShotImpact(impactEvent);
             this.#secondaryShots.splice(i, 1);
          }
+         else if (!shot.isActive) this.#secondaryShots.splice(i, 1);
       }
    }
 
@@ -452,14 +335,8 @@ class Match {
       for (let i = this.#poisonClouds.length - 1; i >= 0; i--) {
          const cloud = this.#poisonClouds[i];
          cloud.update(dt / 1000);
-
-         if (cloud.applyEffect) {
-            cloud.applyEffect(this.#players, this.#scoreBoard, this.#floatingScores);
-         }
-
-         if (cloud.finished) {
-            this.#poisonClouds.splice(i, 1);
-         }
+         if (cloud.applyEffect) cloud.applyEffect(this.#players, this.#scoreBoard, this.#floatingScores);
+         if (cloud.finished) this.#poisonClouds.splice(i, 1);
       }
    }
 
@@ -473,44 +350,34 @@ class Match {
 
    #updatePlayers() {
       const currentPlayer = this.#players[this.#turnController.activePlayerId];
-
       if (this.#controlPanel.angleDial.isFollowing)
          currentPlayer.barrelAngle = this.#controlPanel.angleDial.needleRotation - 90;
-
       if (this.#controlPanel.powerAdjust.isFollowing)
          currentPlayer.barrelPower = this.#controlPanel.powerAdjust.power * 7;
-
       currentPlayer.updateMove(0.18);
+      for (let player of this.#players) this.#handlePlayerPhysics(player);
+   }
 
-      for (let player of this.#players) {
-         const groundY = min(
-            this.#controlPanel.getAltitudeAt(player.positionVector.x) - player.wheelRadius,
-            this.#terrain.getHeightAt(player.positionVector.x) - player.wheelRadius
-         );
+   #handlePlayerPhysics(player) {
+      const groundY = this.#terrain.getHeightAt(player.position.x) - player.wheelRadius;
+      if (!player.isAirborne) {
+         player.position.y = groundY;
+         return;
+      }
+      player.verticalVelocity += 0.9;
+      player.position.y += player.verticalVelocity;
+      if (player.position.y >= groundY) this.#resolvePlayerLanding(player, groundY);
+   }
 
-         if (player.isAirborne) {
-            player.verticalVelocity += 0.9;
-            player.positionVector.y += player.verticalVelocity;
-
-            if (player.positionVector.y >= groundY) {
-               player.positionVector.y = groundY;
-               player.isAirborne = false;
-
-               if (player.pendingCraterRadius > 0) {
-                  this.#terrain.applyExplosion(
-                     createVector(
-                        player.positionVector.x,
-                        player.positionVector.y + player.wheelRadius
-                     ),
-                     player.pendingCraterRadius
-                  );
-                  this.#shakeCallback?.(10, 8);
-                  player.pendingCraterRadius = 0;
-               }
-            }
-         } else {
-            player.positionVector.y = groundY;
-         }
+   #resolvePlayerLanding(player, groundY) {
+      player.position.y = groundY;
+      player.isAirborne = false;
+      player.verticalVelocity = 0;
+      if (player.pendingCraterRadius > 0) {
+         const impactPos = createVector(player.position.x, player.position.y + player.wheelRadius);
+         this.#terrain.applyExplosion(impactPos, player.pendingCraterRadius);
+         this.#shakeCallback?.(10, 8);
+         player.pendingCraterRadius = 0;
       }
    }
 
@@ -522,71 +389,40 @@ class Match {
    }
 
    #updateExplosions(dt) {
-      let removedAnyExplosion = false;
-
       for (let i = this.#currentExplosions.length - 1; i >= 0; i--) {
          const explosion = this.#currentExplosions[i];
          explosion.update(dt);
-
-         if (!explosion.finished) {
-            this.#handleExplosionFeedback(explosion);
-         } else {
+         if (!explosion.finished) this.#handleExplosionFeedback(explosion);
+         else {
             this.#handleExplosionScoring(explosion);
-            const finishedKind = explosion.kind;
             this.#currentExplosions.splice(i, 1);
-            removedAnyExplosion = true;
-
-            if (
-               finishedKind === "pineapple" ||
-               finishedKind === "star" ||
-               finishedKind === "starFragment"
-            ) {
-               this.#pendingTurnAdvance = true;
-            }
+            this.#pendingTurnAdvance = true;
          }
-      }
-
-      if (
-         removedAnyExplosion &&
-         this.#currentExplosions.length === 0 &&
-         this.#secondaryShots.length === 0 &&
-         this.#poisonClouds.length === 0
-      ) {
-         this.#turnController.advancePhase();
-         this.#pendingTurnAdvance = false;
       }
    }
 
    #handleExplosionFeedback(explosion) {
-      let distance = this.#calculateExplosionDistance(explosion, 1 - this.#lastShooterId);
-      this.#applyExplosionFeedback(explosion, 'enemyFeedbackTriggered', distance, 1 - this.#lastShooterId, 12, 6, 8);
-
-      distance = this.#calculateExplosionDistance(explosion, this.#lastShooterId);
-      this.#applyExplosionFeedback(explosion, 'selfFeedbackTriggered', distance, this.#lastShooterId, 10, 5, 6);
+      const enemyId = 1 - this.#lastShooterId;
+      const distToEnemy = this.#players[enemyId].getDistanceTo(explosion.position);
+      // last 3 arguments to applyExplosionFeedback() relate to visual effects
+      this.#applyExplosionFeedback(explosion, 'enemyFeedbackTriggered', distToEnemy, enemyId, 12, 6, 8);
+      const selfId = this.#lastShooterId;
+      const distToSelf = this.#players[selfId].getDistanceTo(explosion.position);
+      this.#applyExplosionFeedback(explosion, 'selfFeedbackTriggered', distToSelf, selfId, 10, 5, 6);
    }
 
-   #calculateExplosionDistance(explosion, playerId) {
-      return this.#players[playerId].positionVector.dist(explosion.position);
-   }
-
-   #applyExplosionFeedback(explosion, id, distance, playerId, flashFrames, shakeFrames, shakeMag) {
-      if (!explosion[id] && distance <= explosion.radius) {
+   #applyExplosionFeedback(explosion, blastId, distance, playerId, flashFrames, shakeFrames, shakeMag) {
+      if (!explosion[blastId] && distance <= explosion.radius) {
          this.#players[playerId].triggerHitFlash(flashFrames);
-         this.#shakeCallback?.(shakeFrames, shakeMag);
-         explosion[id] = true;
+         this.#shakeCallback(shakeFrames, shakeMag);
+         explosion[blastId] = true;
       }
    }
 
    #handleExplosionScoring(explosion) {
-      const { enemy, self } = this.#scoreCalculator.calculateExplosionScore(
-         explosion,
-         this.#players,
-         this.#lastShooterId
-      );
-
+      const { enemy, self } = this.#scoreCalculator.calculateExplosionScore(explosion, this.#players, this.#lastShooterId);
       if (enemy > 0) this.#updateScore(enemy, color(255, 220, 0));
       if (self > 0) this.#updateScore(-self, color(255, 80, 80));
-
       this.#scoreBoard.score1 = Math.max(0, this.#scoreBoard.score1);
       this.#scoreBoard.score2 = Math.max(0, this.#scoreBoard.score2);
    }
@@ -600,11 +436,18 @@ class Match {
       }
 
       this.#floatingScores.push(new FloatingScore(
-         this.#players[this.#lastShooterId].positionVector.x,
-         this.#players[this.#lastShooterId].positionVector.y - 60,
+         this.#players[this.#lastShooterId].position.x,
+         this.#players[this.#lastShooterId].position.y - 60,
          extraPoints,
          scoreColor
       ));
+   }
+
+   #processTurnTransition() {
+      if (this.#pendingTurnAdvance && this.#physicsDone()) {
+         this.#turnController.advancePhase();
+         this.#pendingTurnAdvance = false;
+      }
    }
 
    #drawEnvironment() {
@@ -678,7 +521,8 @@ class Match {
 
    #handlePowerAdjustToggle() {
       const powerWidget = this.#controlPanel.powerAdjust;
-      powerWidget.isFollowing = (!this.#controlPanel.angleDial.isFollowing && powerWidget.isHovered && !powerWidget.isFollowing);
+      powerWidget.isFollowing =
+         (!this.#controlPanel.angleDial.isFollowing && powerWidget.isHovered && !powerWidget.isFollowing);
    }
 
    #triggerMouseCannonShot() {
@@ -687,38 +531,19 @@ class Match {
    }
 
    #executeCannonShot() {
-      if (this.#physicsDone()) {
-         this.#pendingTurnAdvance = false;
-         this.#lastShooterId = this.#turnController.activePlayerId;
-         const shooter = this.#players[this.#lastShooterId];
-         const selectedIndex = shooter.currentWeaponIndex ?? 0;
-         const selectedWeapon = shooter.weaponLoadout?.[selectedIndex] ?? null;
-         if (selectedWeapon && !selectedWeapon.consume()) return;
-         const target = this.#players[1 - this.#lastShooterId];
-         this.#currentShot = shooter.fireShot(selectedWeapon, target);
-         if (selectedWeapon && Array.isArray(shooter.weaponLoadout)) {
-            shooter.weaponLoadout.splice(selectedIndex, 1);
-            shooter.currentWeaponIndex = constrain(
-               selectedIndex,
-               0,
-               Math.max(shooter.weaponLoadout.length - 1, 0)
-            );
-         }
-         this.#controlPanel.setWeaponLoadouts(
-            shooter.weaponLoadout ?? [],
-            shooter.currentWeaponIndex ?? 0
-         );
-      }
+      if (!this.#physicsDone()) return;
+      this.#lastShooterId = this.#turnController.activePlayerId;
+      const shooter = this.#players[this.#lastShooterId];
+      this.#currentShot = shooter.fireCurrentWeapon();
+      if (!this.#currentShot) return;
+      this.#controlPanel.setWeaponLoadouts(shooter.weaponLoadout, shooter.currentWeaponIndex);
    }
 
    #switchCurrentWeapon(step) {
       if (!this.#physicsDone()) return;
       const player = this.#players[this.#turnController.activePlayerId];
       player.cycleWeapon(step);
-      this.#controlPanel.setWeaponLoadouts(
-         player.weaponLoadout ?? [],
-         player.currentWeaponIndex ?? 0
-      );
+      this.#controlPanel.setWeaponLoadouts(player.weaponLoadout, player.currentWeaponIndex);
    }
 
    #triggerMouseCannonMovement() {

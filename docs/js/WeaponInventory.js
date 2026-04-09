@@ -1,13 +1,13 @@
 class WeaponInventory {
     #positionVector;
     #isExpanded = false;
-    weapons = [];
     #currentWeapon = 0;
     #weaponsCount = 5;
     #weaponBoxHeight = 64;
     #weaponBoxWidth = 64;
     #gap = 10;
     #plateOutlineColor;
+    weapons = [];
     
     constructor(posV = createVector(width / 3, height - height / 5), plateOutColor = color('teal')) {
         this.#positionVector = posV;
