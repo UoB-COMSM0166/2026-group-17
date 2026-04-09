@@ -13,7 +13,6 @@ class PlayerCannon {
    #weaponLoadout = [];
    #currentWeaponIndex = 0;
 
-
    constructor(config) {
       this.#position = config.position;
       this.#wheelRadius = config.wheelRadius;
@@ -25,6 +24,10 @@ class PlayerCannon {
       this.#targetX = config.position.x; // for smooth movement
       this.#moveSteps = config.moveSteps
       this.#setLoadout(config.weaponLoadout);
+      // special-weapon / physics-related state
+      this.isAirborne = false;
+      this.verticalVelocity = 0;
+      this.pendingCraterRadius = 0;
    }
 
    updateMove(follow = 0.30) {
@@ -35,11 +38,22 @@ class PlayerCannon {
       const weapon = this.#weaponLoadout[this.#currentWeaponIndex];
       if (!weapon || !weapon.consume()) return null;
       const projectile = this.#fireShot(weapon);
-      this.#weaponLoadout.splice(this.#currentWeaponIndex, 1);
-      if (this.#currentWeaponIndex >= this.#weaponLoadout.length) {
-         this.#currentWeaponIndex = Math.max(0, this.#weaponLoadout.length - 1);
+      if (weapon.id !== "ball") {
+         this.#weaponLoadout.splice(this.#currentWeaponIndex, 1);
+         this.#currentWeaponIndex = constrain(this.#currentWeaponIndex, 0, Math.max(0, this.#weaponLoadout.length - 1));
       }
       return projectile;
+   }
+
+   startShibaLaunch(strength, craterRadius) {
+      this.isAirborne = true;
+      this.verticalVelocity = -strength;
+      this.pendingCraterRadius = craterRadius;
+   }
+
+   cycleWeapon(step = 1) {
+      if (this.#weaponLoadout.length === 0) return;
+      this.#currentWeaponIndex = (this.#currentWeaponIndex + step + this.#weaponLoadout.length) % this.#weaponLoadout.length;
    }
 
    drawPlayer() {
@@ -61,7 +75,6 @@ class PlayerCannon {
       push();
       noFill();
       strokeWeight(4);
-      // Red for player 1, blue for player 2
       const indicatorColor = (playerId === 0) ? color(255, 80, 80) : color(80, 180, 255);
       stroke(indicatorColor);
       circle(this.#position.x, this.#position.y, this.#wheelRadius + 15);
@@ -81,7 +94,7 @@ class PlayerCannon {
    }
 
    triggerHitFlash(frames = 10) {
-      this.#hitFlashFrames = Math.max(this.#hitFlashFrames, frames);
+      this.#hitFlashFrames = max(this.#hitFlashFrames, frames);
    }
 
    tickEffects() {
@@ -91,12 +104,12 @@ class PlayerCannon {
    #fireShot(weapon = null) {
       // offset of muzzle tip from position
       this.#savedBarrelPower = this.#barrelPower;
-      let offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
-      let velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(this.#barrelPower);
+      const offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
       offset.rotate(this.#barrelAngle);
-      const projectile = new Projectile(p5.Vector.add(this.#position, offset), velocity, this, weapon);
-      projectile.maxExplosionRadius = weapon?.explosionRadius ?? 50;
-      return projectile;
+      // Keep the same base trajectory for all projectile weapons
+      const velocity = createVector(cos(this.#barrelAngle), sin(this.#barrelAngle)).mult(this.#barrelPower);
+      const muzzlePosition = p5.Vector.add(this.#position, offset);
+      return new Projectile(muzzlePosition, velocity, this, weapon);
    }
 
    #setLoadout(loadout) {
@@ -131,11 +144,22 @@ class PlayerCannon {
    set moveSteps(s) { this.#moveSteps = s; }
    get barrelSize() { return this.#barrelSize; }
    get weaponLoadout() { return this.#weaponLoadout; }
+   set weaponLoadout(loadout) { this.#weaponLoadout = loadout ?? []; }
    get currentWeaponIndex() { return this.#currentWeaponIndex; }
    set currentWeaponIndex(index) {
       // Ensure the index stays within the bounds of the current loadout
-      this.#currentWeaponIndex = constrain(index, 0, Math.max(0, this.#weaponLoadout.length - 1));
+      this.#currentWeaponIndex = constrain(index, 0, max(0, this.#weaponLoadout.length - 1));
    }
+
+   get currentWeapon() {
+      if (this.#weaponLoadout.length === 0) return null;
+      return this.#weaponLoadout[this.#currentWeaponIndex] ?? this.#weaponLoadout[0];
+   }
+
+   setTargetX(x, canvasWidth) {
+      this.#targetX = constrain(x, this.#wheelRadius, canvasWidth - this.#wheelRadius);
+   }
+
 
    getDistanceTo(targetPosition) {
       const distanceToWheelCenter = p5.Vector.dist(this.#position, targetPosition);
@@ -157,9 +181,5 @@ class PlayerCannon {
       );
       const distanceToBarrelSurface = dist(rotatedTargetPos.x, rotatedTargetPos.y, closestBarrelPoint.x, closestBarrelPoint.y);
       return Math.min(distanceToWheelSurface, distanceToBarrelSurface);
-   }
-
-   setTargetX(x, canvasWidth) {
-      this.#targetX = constrain(x, this.#wheelRadius, canvasWidth - this.wheelRadius);
    }
 }
