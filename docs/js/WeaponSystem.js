@@ -1,7 +1,7 @@
 class WeaponSystem {
   constructor() {
-    this.weaponOrder = ["ball", "pineapple", "star", "shiba"];
-    this.currentWeapon = "ball";
+    this.weaponOrder = ["cannon_ball", "pineapple", "star", "shiba", "bubblegumshot", "earthworm", "impact", "grapeshot", "lazer", "Submarin"];
+    this.currentWeapon = "cannon_ball";
     this.weaponData = {};
   }
 

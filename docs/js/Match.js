@@ -71,6 +71,8 @@ class Match {
 
       this.#turnController = new TurnController(this.#wind);
 
+      this.#turnController.onSkipCallback = (playerId) => {this.#handlePlayerSkip(playerId);};
+
       this.#isEasyDifficulty = (gameMode === "easy");
       this.#trajectoryPreviewer = new TrajectoryPreview(resolution);
       this.#setModeBasedWeather();
@@ -96,7 +98,7 @@ class Match {
          this.#secondaryShots.length === 0 &&
          this.#poisonClouds.length === 0
       ) {
-         this.#turnController.advancePhase();
+         this.#turnController.advancePhase(this.#players);
          this.#pendingTurnAdvance = false;
       }
    }
@@ -277,16 +279,16 @@ class Match {
          this.#currentShot = null;
          return;
       }
-
       if (impactEvent) this.#handleShotImpact(impactEvent);
    }
 
    #handleShotImpact(impactEvent) {
       const shot = this.#currentShot;
+
       this.#currentShot = null;
 
       if (impactEvent.type === 'OUT_OF_BOUNDS') {
-         this.#turnController.advancePhase();
+         this.#turnController.advancePhase(this.#players);
          return;
       }
 
@@ -302,6 +304,10 @@ class Match {
 
       // Always trust the weapon stored on the projectile itself.
       const weapon = shot?.weapon ?? null;
+
+      console.log("weapon:", weapon);
+      console.log("onImpact:", weapon?.onImpact);
+      console.log("instanc of Bubblegumshot:", weapon instanceof Bubblegumshot);
 
       if (weapon?.onImpact) {
          weapon.onImpact(this, impactEvent, shot);
@@ -381,7 +387,7 @@ class Match {
             const launchStrength = lerp(10, 22, factor);
             const craterRadius = lerp(18, 46, factor);
 
-            target.startShibaLaunch(launchStrength, craterRadius);
+            target.stuckUntilTurn = Math.max(target.stuckUntilTurn, 1);
 
             const score = Math.round(10 + factor * 160);
             this.#updateScore(score, color(255, 160, 80));
@@ -552,7 +558,7 @@ class Match {
          this.#secondaryShots.length === 0 &&
          this.#poisonClouds.length === 0
       ) {
-         this.#turnController.advancePhase();
+         this.#turnController.advancePhase(this.#players);
          this.#pendingTurnAdvance = false;
       }
    }
@@ -649,7 +655,8 @@ class Match {
 
    #drawWeaponHUD(activePlayerId) {
       const player = this.#players[activePlayerId];
-      const weapon = player.currentWeapon;
+      const weapon = player.weaponLoadout?.[player.currentWeaponIndex];
+
       if (!weapon) return;
 
       // Move the panel down so it does not overlap the score UI.
@@ -687,15 +694,19 @@ class Match {
    }
 
    #executeCannonShot() {
+
       if (this.#physicsDone()) {
          this.#pendingTurnAdvance = false;
          this.#lastShooterId = this.#turnController.activePlayerId;
          const shooter = this.#players[this.#lastShooterId];
          const selectedIndex = shooter.currentWeaponIndex ?? 0;
          const selectedWeapon = shooter.weaponLoadout?.[selectedIndex] ?? null;
-         if (selectedWeapon && !selectedWeapon.consume()) return;
+
+         if(!selectedWeapon) return;
+         selectedWeapon.consume();
+
          const target = this.#players[1 - this.#lastShooterId];
-         this.#currentShot = shooter.fireShot(selectedWeapon, target);
+         this.#currentShot = shooter.fireShot(selectedWeapon, 5);
          if (selectedWeapon && Array.isArray(shooter.weaponLoadout)) {
             shooter.weaponLoadout.splice(selectedIndex, 1);
             shooter.currentWeaponIndex = constrain(
@@ -756,5 +767,22 @@ class Match {
          score2: this.#scoreBoard.score2,
          winnerData: this.#scoreBoard.getHighestScorePlayerId()
       };
+   }
+   //Expose internal state for weapon effects
+   //All player cannons in the match 
+   getPlayers(){
+      return this.#players;
+   }
+   //Controls turn order and turn number
+   getTurnController(){
+      return this.#turnController;
+   }
+   //ID of the player who fired the last shot
+   getLastShooterId(){
+      return this.#lastShooterId;
+   }
+
+   #handlePlayerSkip(playerId){
+      this.#turnCounter.showSkip(playerId);
    }
 }

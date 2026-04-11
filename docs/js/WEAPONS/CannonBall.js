@@ -15,6 +15,13 @@ class CannonBall extends AbstractWeapon {
   }
 
   drawProjectile(cx, cy, r) {
+    if (typeof cannonballImg !== "undefined" && cannonballImg) {
+      push();
+      imageMode(CENTER);
+      image(cannonballImg, cx, cy, 68, 68);
+      pop();
+      return;
+    }
     push();
 
     const g = drawingContext.createRadialGradient(

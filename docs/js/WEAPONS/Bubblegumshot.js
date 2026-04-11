@@ -14,6 +14,13 @@ class Bubblegumshot extends AbstractWeapon {
     this.used = false;
   }
   drawProjectile(cx, cy, r) {
+        if (typeof bubblegumImg !== "undefined" && bubblegumImg) {
+      push();
+      imageMode(CENTER);
+      image(bubblegumImg, cx, cy, 68, 68);
+      pop();
+      return;
+    }
     push();
     translate(cx, cy);
     noStroke();
@@ -25,5 +32,35 @@ class Bubblegumshot extends AbstractWeapon {
     triangle(r*1.1, 0, r*1.9, -r*0.9, r*1.5, 0);
     triangle(r*1.1, 0, r*1.9,  r*0.9, r*1.5, 0);
     pop();
+  }
+
+  onImpact(match, impactEvent, shot){
+
+    //Spawn the normal explosion effect
+    match.spawnWeaponExplosion(impactEvent.pos, "bubblegumshot", shot, this);
+    //Get match state
+    const players = match.getPlayers();
+    const turnController = match.getTurnController();
+    const shooterId = match.getLastShooterId();
+    //Target the opponent
+    const targetId = 1 - shooterId;
+    const target = players[targetId];
+    //Calculate distance from explosion center to target
+    const d = dist(
+      impactEvent.pos.x,
+      impactEvent.pos.y,
+      target.positionVector.x,
+      target.positionVector.y
+    );
+
+    //If it is within explosion ratius, apply sticky effect
+    if(d <= this.explosionRadius){
+
+        target.stuckUntilTurn = Math.max(
+        target.stuckUntilTurn, 
+        turnController.turnNumber + 2
+        );
+      target.triggerHitFlash(10);
+    }
   }
 }

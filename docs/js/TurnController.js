@@ -4,15 +4,28 @@ class TurnController {
    #activePlayerId = 0;
    #windEvent;
 
-   constructor(wind) { this.windEvent = wind; }
+   constructor(wind, onSkipCallback) { 
+      this.windEvent = wind; 
+      this.onSkipCallback = onSkipCallback;
+   }
 
    get activePlayerId() { return this.#activePlayerId; }
    get turnNumber() { return this.#turnNumber; }
    get maxTurns() { return this.#maxTurns; }
 
-   advancePhase() {
-      this.#updateActivePlayerId();
-      if (this.#activePlayerId === 0) this.#turnNumber++;
+   advancePhase(players) {
+      do{
+         this.#updateActivePlayerId();
+         if (this.#activePlayerId === 0) this.#turnNumber++;
+           
+         const currentPlayer = players[this.#activePlayerId];
+      
+         if(!currentPlayer.canAct(this)){
+            const playerId = this.#activePlayerId;
+            this.onSkipCallback?.(playerId);
+         }
+      }
+      while(!players[this.#activePlayerId].canAct(this));         
    }
 
    #updateActivePlayerId() {
