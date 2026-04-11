@@ -35,9 +35,11 @@ class Bubblegumshot extends AbstractWeapon {
   }
 
   onImpact(match, impactEvent, shot){
-
+    
+    const impactPos = impactEvent.pos ?? impactEvent.position;
+    if(!impactPos) return;
     //Spawn the normal explosion effect
-    match.spawnWeaponExplosion(impactEvent.pos, "bubblegumshot", shot, this);
+    match.spawnWeaponExplosion(impactPos, "bubblegumshot", shot, this);
     //Get match state
     const players = match.getPlayers();
     const turnController = match.getTurnController();
@@ -47,10 +49,10 @@ class Bubblegumshot extends AbstractWeapon {
     const target = players[targetId];
     //Calculate distance from explosion center to target
     const d = dist(
-      impactEvent.pos.x,
-      impactEvent.pos.y,
-      target.positionVector.x,
-      target.positionVector.y
+      impactPos.x,
+      impactPos.y,
+      target.position.x,
+      target.position.y
     );
 
     //If it is within explosion ratius, apply sticky effect
@@ -58,7 +60,7 @@ class Bubblegumshot extends AbstractWeapon {
 
         target.stuckUntilTurn = Math.max(
         target.stuckUntilTurn, 
-        turnController.turnNumber + 2
+        turnController.turnNumber + 1
         );
       target.triggerHitFlash(10);
     }

@@ -19,7 +19,7 @@ class MatchState extends State {
    }
 
    onMousePressed(cursorX, cursorY, button) {
-      this.#match.onMousePressed(cursorX, cursorY, button);
+      this.#match.onMousePressed(button);
    }
 
    onMouseReleased(cursorX, cursorY, button) {

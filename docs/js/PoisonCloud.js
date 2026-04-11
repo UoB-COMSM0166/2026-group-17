@@ -33,7 +33,7 @@ class PoisonCloud {
     }
 
     affectsPlayer(player) {
-        const d = dist(this.x, this.y, player.positionVector.x, player.positionVector.y);
+        const d = dist(this.x, this.y, player.position.x, player.position.y);
         return d <= this.radius;
     }
 
@@ -51,8 +51,8 @@ class PoisonCloud {
             const d = dist(
                 this.x,
                 this.y,
-                target.positionVector.x,
-                target.positionVector.y
+                target.position.x,
+                target.position.y
             );
 
             const factor = constrain(1 - d / this.radius, 0, 1);
@@ -61,8 +61,8 @@ class PoisonCloud {
             else scoreBoard.score2 += poisonScore;
             floatingScores.push(
                 new FloatingScore(
-                    players[shooterId].positionVector.x,
-                    players[shooterId].positionVector.y - 60,
+                    shooter.position.x,
+                    shooter.position.y - 60,
                     +poisonScore,
                     color(160, 80, 220)
                 )

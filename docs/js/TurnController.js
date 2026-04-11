@@ -14,20 +14,25 @@ class TurnController {
    get maxTurns() { return this.#maxTurns; }
 
    advancePhase(players) {
-      do{
-         this.#updateActivePlayerId();
+
+      if(!Array.isArray(players) || players.length === 0) return;
+      let attempts = 0;   
+      while(attempts < 2){
+      this.#updateActivePlayerId();
          if (this.#activePlayerId === 0) this.#turnNumber++;
            
-         const currentPlayer = players[this.#activePlayerId];
-      
-         if(!currentPlayer.canAct(this)){
-            const playerId = this.#activePlayerId;
-            this.onSkipCallback?.(playerId);
-         }
-      }
-      while(!players[this.#activePlayerId].canAct(this));         
-   }
+         const currentPlayer = players?.[this.#activePlayerId];
+         if(!currentPlayer) return;
 
+         const canAct = currentPlayer.canAct?.(this) ?? true;
+    
+         if(canAct) return;
+
+         this.onSkipCallback?.(this.#activePlayerId);
+         attempts++;
+         }
+   }         
+   
    #updateActivePlayerId() {
       this.#activePlayerId = 1 - this.#activePlayerId;
    }

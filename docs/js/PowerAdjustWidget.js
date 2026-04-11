@@ -102,13 +102,7 @@ class PowerAdjustWidget {
       const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
       const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
 
-    if (this.#isFollowing) {
-      if (this.#isHovered()) {
-        this.#sliderX = constrain(mouseX, xMin, xMax);
-      } else {
-        this.#isFollowing = false;
-      }
-    }
+      if (this.#isFollowing) this.#sliderX = constrain(mouseX, xMin, xMax);
 
       this.#power = map(this.#sliderX, xMin, xMax, 0, 100);
       const px = this.#sliderX;
@@ -116,9 +110,7 @@ class PowerAdjustWidget {
       if (isEnabled && (this.#isHovered() || this.#isFollowing)) {
          stroke(this.#plateOutlineColor);
          strokeWeight(2);
-      } else {
-         noStroke();
-      }
+      } else noStroke();
 
       triangle(px, this.#p1.y, px - 6, this.#p1.y + 12, px + 6, this.#p1.y + 12);
       pop();
@@ -147,38 +139,38 @@ class PowerAdjustWidget {
       const x1 = pA.x, y1 = pA.y;
       const x2 = pB.x, y2 = pB.y;
 
-  const t = (x - x1) / (x2 - x1);
-  return y1 + (y2 - y1) * t;
-  }
-  
-  #drawPowerText() {
-  push();
-  noStroke();
-  fill(255);
-  textSize(16);
-  textAlign(CENTER, CENTER);
+      const t = (x - x1) / (x2 - x1);
+      return y1 + (y2 - y1) * t;
+   }
+
+   #drawPowerText() {
+      push();
+      noStroke();
+      fill(255);
+      textSize(16);
+      textAlign(CENTER, CENTER);
 
       const label = `Power: ${Math.round(this.#power)}`;
 
-  text(label, (this.#p1.x + this.#p2.x) / 2, height - (this.#p3.y - this.#p2.y) * 1.75);
+      text(label, (this.#p1.x + this.#p2.x) / 2, height - (this.#p3.y - this.#p2.y) * 1.75);
 
-  pop();
-  }
+      pop();
+   }
 
-  keyPressed(key, isEnabled) {
-      if(key === 'w' || key === 'W') {
-         if(isEnabled) this.increasePower(5);
+   keyPressed(key, isEnabled) {
+      if (key === 'w' || key === 'W') {
+         if (isEnabled) this.increasePower(5);
       }
-      else if(key === 's' || key === 'S') {
-         if(isEnabled) this.decreasePower(5);
+      else if (key === 's' || key === 'S') {
+         if (isEnabled) this.decreasePower(5);
       }
-  }
+   }
 
-  increasePower(step = 1) {
-    this.power = constrain(this.#power + step, 0, 100);
-  }
+   increasePower(step = 1) {
+      this.power = constrain(this.#power + step, 0, 100);
+   }
 
-  decreasePower(step = 1) {
-    this.power = constrain(this.#power - step, 0, 100);
-  }
+   decreasePower(step = 1) {
+      this.power = constrain(this.#power - step, 0, 100);
+   }
 }
