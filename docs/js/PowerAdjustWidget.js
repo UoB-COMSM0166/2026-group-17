@@ -102,9 +102,10 @@ class PowerAdjustWidget {
       const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
       const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
 
-      if (this.#isFollowing) this.#sliderX = constrain(mouseX, xMin, xMax);
-
-      this.#power = map(this.#sliderX, xMin, xMax, 0, 100);
+      if (this.#isFollowing) {
+         this.#sliderX = constrain(mouseX, xMin, xMax);
+         this.#power = map(this.#sliderX, xMin, xMax, 0, 100);
+      }
       const px = this.#sliderX;
 
       if (isEnabled && (this.#isHovered() || this.#isFollowing)) {

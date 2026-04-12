@@ -2,6 +2,7 @@ class Terrain {
    #controlPanel;
    #baseColor;
    #columns;
+   #bumps = [];
 
    constructor(ctrlPanel, baseColor) {
       this.#controlPanel = ctrlPanel;
@@ -41,12 +42,33 @@ class Terrain {
    drawTerrain() {
       stroke(this.#baseColor);
       strokeWeight(1);
+      //Update bump timer
+      for (let bump of this.#bumps){
+         bump.timer += 1 / 60;
+      }
+
+      this.#bumps = this.#bumps.filter(b => b.timer < b.duration);
+
       for (let col of this.#columns) {
          col.updateAnimation();
+
+         let offsetY = 0;
+         
+         for(let bump of this.#bumps){
+            const distance = abs(col.xPosition - bump.x);
+            const influence = max(0, 1 - distance / bump.radius);
+            const wave = sin(influence * PI) * bump.strength * 2.5;
+            offsetY -= wave;
+         } 
+
          for (let span of col.spans) {
-            line(col.xPosition, span.topY, col.xPosition, span.bottomY);
+            line(col.xPosition, span.topY + offsetY, col.xPosition, span.bottomY + offsetY);
          }
       }
+   }
+
+   addBump(x, radius, strength = 10, duration = 0.5){
+      this.#bumps.push({x, radius, strength, timer: 0, duration});
    }
 
    get isSettled() { return this.#columns.every((col) => !col.isFalling); }

@@ -21,6 +21,8 @@ class Match {
    #secondaryShots = [];
    #poisonClouds = [];
    #shibaImpacts = [];
+   #earthWormImpacts = [];
+   #earthWormBump = [];
    #pendingTurnAdvance = false;
    #turnController;
    #turnCounter;
@@ -72,12 +74,12 @@ class Match {
       this.#updatePoisonClouds(dt);
       this.#updateShibaImpacts();
       this.#updateComputerController(dt);
+      this.#updateEarthWormImpacts(dt);
+      this.#updateEarthWormBump(dt)
       this.#updatePlayers();
       if (this.#currentExplosions.length > 0) this.#updateExplosions(dt);
       this.#updateFloatingScores();
-
       this.#processTurnTransition();
-
    }
 
    drawMatch(applyShake = null) {
@@ -285,6 +287,7 @@ class Match {
    }
 
    spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null, options = {}) {
+
       if(!pos) return;
       this.#currentExplosions.push(new Explosion(
          pos.copy(),
@@ -323,6 +326,27 @@ class Match {
       }
       this.#shibaImpacts.push(new ShibaImpactEffect(pos.x, pos.y, strengthFactor));
       this.#shakeCallback?.(8, 7);
+   }
+
+   spawnEarthWorm(impactPos, weapon){
+      this.#earthWormImpacts.push({
+         position: impactPos.copy(),
+         weapon: weapon,
+         timer: 0,
+         duration: random(2.0, 3.5),
+         targetX: impactPos.x + random(-150, 150),
+         finished: false
+      });
+   }
+
+   spawnEarthWormBump(x, strength = 10){
+      this.#earthWormBump.push({
+         x: x,
+         strength,
+         radius: 35,
+         life: 1.0,
+         seed: random(1000)
+      });
    }
 
    #updateSecondaryShots(dt) {
@@ -374,12 +398,67 @@ class Match {
       });
    }
 
+   #updateEarthWormImpacts(dt){
+      for(let i = this.#earthWormImpacts.length - 1; i >= 0; i--){
+         
+         const worm = this.#earthWormImpacts[i];
+         //Timer
+         worm.timer += dt /1000;
+         //Follow enemy
+         const target = this.#players[1 - this.#lastShooterId];
+         //predicted position
+         const prediction = target.position.x + random(-60, 60);
+         worm.targetX = prediction;
+         //Wave motion
+         const wave = sin(frameCount * 0.2 + i) * 3;
+         //Move underground with speed change
+         const speed = lerp(0.02, 0.08, worm.timer / worm.duration);
+         worm.position.x = lerp(worm.position.x, worm.targetX, speed) + wave;
+         //Follow Terrain shape
+         const ground = this.#terrain.getHeightAt(worm.position.x);
+         const depth = lerp(30, 80, worm.timer /worm.duration);
+         worm.position.y = ground + depth;
+         //Explosion
+         if(worm.timer >= worm.duration){
+
+            this.spawnEarthWormBump(worm.position.x, 22);
+            //Jump at last time
+            worm.position.y -= 20;
+            const explosionPos = createVector(
+               worm.position.x + random(-50, 50), 
+               this.#terrain.getHeightAt(worm.position.x) + 40
+            );
+            this.spawnWeaponExplosion(explosionPos, "earthworm", null, worm.weapon, {duration: 300});
+         
+         this.#earthWormImpacts.splice(i, 1);
+         }
+      }
+   }
+
+   #updateEarthWormBump(dt){
+      for(let i = this.#earthWormBump.length - 1; i >= 0; i--){
+         const bump = this.#earthWormBump[i];
+
+         bump.life -= dt / 1000;
+
+         if(bump.life <= 0){
+            this.#earthWormBump.splice(i, 1);
+         }
+      }
+   }
+
    #updatePlayers() {
       const currentPlayer = this.#players[this.#turnController.activePlayerId];
-      if (this.#controlPanel.angleDial.isFollowing)
-         currentPlayer.barrelAngle = this.#controlPanel.angleDial.needleRotation - 90;
-      if (this.#controlPanel.powerAdjust.isFollowing)
-         currentPlayer.barrelPower = this.#controlPanel.powerAdjust.power * 7;
+      if (this.#controlPanel.angleDial.isFollowing){
+         const newAngle = this.#controlPanel.angleDial.needleRotation - 90;
+         currentPlayer.barrelAngle = newAngle;
+      }
+      if (this.#controlPanel.powerAdjust.isFollowing){
+         const newPower = this.#controlPanel.powerAdjust.power * 7;
+         if(newPower > 0){
+            currentPlayer.barrelPower = newPower;
+         }
+      }
       currentPlayer.updateMove(0.18);
       for (let player of this.#players) this.#handlePlayerPhysics(player);
    }
@@ -508,6 +587,17 @@ class Match {
       for (const explosion of this.#currentExplosions) explosion.draw();
       for (const cloud of this.#poisonClouds) cloud.draw();
       for (const fx of this.#shibaImpacts) fx.draw();
+      
+      for (const worm of this.#earthWormImpacts) {
+         push();
+         noStroke();
+
+         const wobble = sin(frameCount * 0.2) * 3;
+
+         fill(120, 80, 40, 200);
+         ellipse(worm.position.x, worm.position.y, 18 + wobble, 10);
+         pop();
+      }
    }
 
    #drawHUD() {

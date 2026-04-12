@@ -25,7 +25,7 @@ class Explosion {
 
       this.#duration =
          options.duration ??
-         constrain(500 + this.#maxRadius * 4, 500, 1400);
+         (500 + this.#maxRadius * 4);
 
       this.enemyFeedbackTriggered = false;
       this.selfFeedbackTriggered = false;
@@ -71,6 +71,11 @@ class Explosion {
          const elastic = sin(progress * PI);
 
          this.#currentRadius = lerp(0, this.#maxRadius, progress)*(1 + elastic * 0.25);
+      }
+
+      if(this.kind === "impactShock"){
+         this.#weapon?.drawImpactShock?.(this);
+         return;
       }
    }
 
@@ -168,37 +173,6 @@ class Explosion {
             circle(x, y, this.waveRadius);
          }
 
-         pop();
-         return;
-      }
-
-      if(this.kind === "bubblegumshot"){
-         push();
-         noStroke();
-         //Outer soft bubble
-         fill(255, 120, 180, 60);
-         circle(x, y, r * 2.2);
-         //Main sticky bubble body
-         fill(255, 80, 160, 140);
-         circle(x, y, r * 1.6);
-         //Dense core for impact center
-         stroke(255, 40, 120, 200);
-         circle(x, y, r * 0.8);
-         //Sticky
-         stroke(255, 120, 180, 120);
-         strokeWeight(3);
-
-         for(let i = 0; i < 4; i++){
-            let a = (frameCount * 0.05 + i) * PI / 2;
-            let len = r * 0.8;
-            //Stretching gum threads
-            line(
-               x + cos(a) * r * 0.3,
-               y + sin(a) * r * 0.3,
-               x + cos(a) * len,
-               y + sin(a) * len
-            );
-         }
          pop();
          return;
       }
