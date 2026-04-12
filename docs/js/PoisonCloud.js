@@ -56,7 +56,7 @@ class PoisonCloud {
             );
 
             const factor = constrain(1 - d / this.radius, 0, 1);
-            const poisonScore = Math.round(8 + factor * 20);
+            const poisonScore = round(8 + factor * 20);
             if (shooterId === 0) scoreBoard.score1 += poisonScore;
             else scoreBoard.score2 += poisonScore;
             floatingScores.push(

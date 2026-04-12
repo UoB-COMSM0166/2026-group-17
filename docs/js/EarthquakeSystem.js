@@ -10,7 +10,7 @@ class EarthquakeSystem {
     }
     applyTo(projectile, dt) {
         if (!this.isActive) return;
-        projectile.vel.x += random(-0.6, 0.6) * this.intensity;
+        projectile.velocity.x += random(-0.6, 0.6) * this.intensity;
     }
 
     draw() {

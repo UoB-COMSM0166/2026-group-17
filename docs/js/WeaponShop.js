@@ -36,6 +36,12 @@ class WeaponShop {
       this._panelH = gridH;
    }
 
+   update(dt, computerController) {
+      if (this._currentPlayer() && !this.isDone()) {
+         computerController.startThinking();
+      }
+      computerController.updateAI(dt, { pickWeapon: () => this.pickRandomWeapon() });
+   }
 
    isDone() {
       return this._selections.length === this.picksEach * 2;
@@ -44,22 +50,38 @@ class WeaponShop {
    getLoadout(pid) {
       return this._selections.filter(s => s.player === pid).map(s => s.weapon);
    }
-   //interaction
-   handleClick(mx, my) {
+
+   // split from handleClick(), so AI can also use it
+   selectWeaponByIndex(idx) {
       //to check if players have finished picking weapons
       // if so, no more selection allowed and store the loadout for each player
       if (this.isDone()) return;
-      const idx = this._cardAt(mx, my);
-      if (idx < 0) return;
+      if (idx < 0 || idx >= WEAPON_REGISTRY.length) return;
       const weapon = WEAPON_REGISTRY[idx];
-      if (this._selections.some(s => s.weapon.id === weapon.id)) return;
+      // Avoid taking already picked weapons
+      if (this.#isWeaponSelected(weapon.id)) return;
       const p = this._currentPlayer();
       if (p === null) return;
       this._selections.push({ weapon, player: p });
    }
 
+   //interaction
+   handleClick(mx, my) {
+      if (this._currentPlayer()) return;
+      const idx = this._cardAt(mx, my);
+      this.selectWeaponByIndex(idx);
+   }
+
    handleMouseMove(mx, my) {
+      if (this._currentPlayer()) return;
       this._hoveredIdx = this._cardAt(mx, my);
+   }
+
+   pickRandomWeapon() {
+      // '_' passed as 1st arument in map, to indicate it is only used as a filler
+      const availableIndices = WEAPON_REGISTRY.map((_, i) => i)
+         .filter(i => !this.#isWeaponSelected(WEAPON_REGISTRY[i].id));
+      if (availableIndices.length > 0) this.selectWeaponByIndex(random(availableIndices));
    }
 
    // Main draw 
@@ -142,13 +164,13 @@ class WeaponShop {
       noStroke();
       // frosted fill
       fill(r, g, b, isActive ? 28 : 12);
-      _glassRect(px, py, pw, ph, 14);
+      DrawUtils.glassRect(px, py, pw, ph, 14);
 
       // border
       noFill();
       stroke(r, g, b, isActive ? 210 : 70);
       strokeWeight(isActive ? 2 : 1.2);
-      _glassRect(px, py, pw, ph, 14);
+      DrawUtils.glassRect(px, py, pw, ph, 14);
 
       // Active glow border
       if (isActive) {
@@ -156,7 +178,7 @@ class WeaponShop {
          drawingContext.shadowColor = `rgba(${r},${g},${b},0.6)`;
          stroke(r, g, b, 140);
          strokeWeight(2);
-         _glassRect(px, py, pw, ph, 14);
+         DrawUtils.glassRect(px, py, pw, ph, 14);
          drawingContext.shadowBlur = 0;
       }
 
@@ -203,7 +225,7 @@ class WeaponShop {
             ellipseMode(CENTER);
             drawingContext.save();
             drawingContext.beginPath();
-            drawingContext.arc(slotX + 17, sy + slotH / 2, 12, 0, Math.PI * 2);
+            drawingContext.arc(slotX + 17, sy + slotH / 2, 12, 0, PI * 2);
             drawingContext.clip();
             w.drawIcon(slotX + 17, sy + slotH / 2, 11);
             drawingContext.restore();
@@ -221,10 +243,9 @@ class WeaponShop {
    // Weapon card grid to show 10 weapons, 5 per row
 
    _drawGrid() {
-      //console.log("weapons:", WEAPON_REGISTRY);
       for (let i = 0; i < Object.keys(WEAPON_REGISTRY).length; i++) {
          const col = i % this._cols;
-         const row = Math.floor(i / this._cols);
+         const row = floor(i / this._cols);
          const x = this._gridX + col * (this._cardW + this._gapX);
          const y = this._gridY + row * (this._cardH + this._gapY);
          this._drawCard(i, x, y);
@@ -263,7 +284,7 @@ class WeaponShop {
       } else {
          fill(22, 34, 62, 210);
       }
-      _glassRect(0, 0, this._cardW, this._cardH, 12);
+      DrawUtils.glassRect(0, 0, this._cardW, this._cardH, 12);
 
       // Border glow
       if (sel || isHov) {
@@ -273,7 +294,7 @@ class WeaponShop {
       noFill();
       stroke(...bdr, sel ? 230 : (isHov ? 190 : 90));
       strokeWeight(sel ? 2.2 : 1.5);
-      _glassRect(0, 0, this._cardW, this._cardH, 12);
+      DrawUtils.glassRect(0, 0, this._cardW, this._cardH, 12);
       drawingContext.shadowBlur = 0;
 
       // Inner top edge highlight (glass effect)
@@ -312,7 +333,7 @@ class WeaponShop {
       // Clip icon
       drawingContext.save();
       drawingContext.beginPath();
-      drawingContext.arc(iconCX, iconCY, iconR + 8, 0, Math.PI * 2);
+      drawingContext.arc(iconCX, iconCY, iconR + 8, 0, PI * 2);
       drawingContext.clip();
       push(); ellipseMode(CENTER);
       weapon.drawIcon(iconCX, iconCY, iconR);
@@ -400,7 +421,7 @@ class WeaponShop {
    _cardAt(mx, my) {
       for (let i = 0; i < WEAPON_REGISTRY.length; i++) {
          const col = i % this._cols;
-         const row = Math.floor(i / this._cols);
+         const row = floor(i / this._cols);
          const x = this._gridX + col * (this._cardW + this._gapX);
          const y = this._gridY + row * (this._cardH + this._gapY);
          if (mx >= x && mx <= x + this._cardW && my >= y && my <= y + this._cardH)
@@ -416,26 +437,5 @@ class WeaponShop {
       return mx >= bx && mx <= bx + 360 && my >= by && my <= by + 36;
    }
 
-}
-
-// draw a rounded rectangle with current fill and stroke styles, used for glass panels and cards
-//glass effect
-function _glassRect(x, y, w, h, r) {
-   drawingContext.beginPath();
-   drawingContext.moveTo(x + r, y);
-   drawingContext.lineTo(x + w - r, y);
-   drawingContext.quadraticCurveTo(x + w, y, x + w, y + r);
-   drawingContext.lineTo(x + w, y + h - r);
-   drawingContext.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-   drawingContext.lineTo(x + r, y + h);
-   drawingContext.quadraticCurveTo(x, y + h, x, y + h - r);
-   drawingContext.lineTo(x, y + r);
-   drawingContext.quadraticCurveTo(x, y, x + r, y);
-   drawingContext.closePath();
-   if (drawingContext.fillStyle && drawingContext.fillStyle !== 'rgba(0, 0, 0, 0)') {
-      drawingContext.fill();
-   }
-   if (drawingContext.strokeStyle && drawingContext.strokeStyle !== 'rgba(0, 0, 0, 0)') {
-      drawingContext.stroke();
-   }
+   #isWeaponSelected(id) { return this._selections.some(s => s.weapon.id === id) }
 }

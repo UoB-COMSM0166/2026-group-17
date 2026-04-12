@@ -19,10 +19,10 @@ class RainSystem {
         if (!this.isActive) return;
 
         // rain drag
-        projectile.vel.y += this.intensity * 15 * dt;
+        projectile.velocity.y += this.intensity * 15 * dt;
 
         // slight air resistance
-        projectile.vel.mult(0.995);
+        projectile.velocity.mult(0.995);
     }
 
     draw(terrain) {

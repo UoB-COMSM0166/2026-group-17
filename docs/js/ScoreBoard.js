@@ -70,11 +70,11 @@ class ScoreBoard {
    }
 
    addPointToPlayer1(points) {
-      this.score1 = Math.max(this.score1 + points, 0);
+      this.score1 = max(this.score1 + points, 0);
    }
 
    addPointToPlayer2(points) {
-      this.score2 = Math.max(this.score2 + points, 0);
+      this.score2 = max(this.score2 + points, 0);
    }
 
    getHighestScorePlayerId() {

@@ -17,15 +17,15 @@ class WindSystem {
       if (!this.isActive) return;
       let windEffect = this.windForce * 20;
 
-      projectile.vel.x += windEffect * dt;
+      projectile.velocity.x += windEffect * dt;
 
-      let speed = projectile.vel.mag();
+      let speed = projectile.velocity.mag();
       if (speed > 0) {
          let dragMag = this.dragCoefficient * speed * speed;
-         let dragVec = projectile.vel.copy();
+         let dragVec = projectile.velocity.copy();
          dragVec.normalize();
          dragVec.mult(-dragMag * dt);
-         projectile.vel.add(dragVec);
+         projectile.velocity.add(dragVec);
       }
    }
    draw(ctrlPanelBaseAltitude) {
