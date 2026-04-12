@@ -1,119 +1,116 @@
 class TrajectoryPreview {
-   #resolution;
-   #maxSteps = 600;
-   #simTimeStep = 0.016;
-   #hitTolerance = 20;
+   static simTimeStep = 0.016;
+   static maxSteps = 600;
+   static #hitTolerance = 20;
+   static #resolution;
 
-   constructor(resolution) { this.#resolution = resolution; }
+   constructor(resolution) { TrajectoryPreview.#resolution = resolution; }
 
-   drawPreview(player, enemy, terrain, gravityVec, windVec) {
-      const weapon = player.currentWeapon;
-      // Calculate projectile starting point
-      const { launchPos, launchVel } = this.#getLaunchState(player);
-      // Environment forces
-      const wind = createVector(windVec?.x ?? 0, windVec?.y ?? 0);
-      const targetHitRadius = enemy.wheelRadius + this.#hitTolerance;
-      // identify if this shot would hit the enemy by simulating the trajectory in advance
-      const simResult = this.#runSimulation(
-         launchPos, launchVel, gravityVec, wind, terrain, enemy, targetHitRadius, weapon
-      );
-      this.#renderPath(simResult.path, simResult.willHit);
-      if (simResult.willHit) this.#renderHitMarker(enemy.position, targetHitRadius);
+   static simulationStep(mockShot, stepForce, terrain, enemy, weapon) {
+      const hitRadius = enemy.wheelRadius + this.#hitTolerance;
+      mockShot.age += this.simTimeStep;
+      mockShot.velocity.add(stepForce);
+      weapon?.beforeProjectileStep?.(mockShot, { dt: this.simTimeStep, terrain });
+      mockShot.position.add(p5.Vector.mult(mockShot.velocity, this.simTimeStep));
+      if (this.#isOutOfBounds(mockShot.position)) return { collision: true, willHit: false };
+      if (this.#hitsEnemy(mockShot.position, enemy, hitRadius)) return { collision: true, willHit: true };
+      if (this.#hitsTerrain(mockShot.position, terrain)) return { collision: true, willHit: false };
+      return { collision: false };
    }
 
-   #getLaunchState(player) {
-      const angle = player.barrelAngle;
-      const speed = player.barrelPower;
+   static getLaunchState(player, barrelAngle, barrelPower) {
+      const angle = barrelAngle ?? player.barrelAngle;
+      const speed = barrelPower ?? player.barrelPower;
       const offset = createVector(player.wheelRadius + player.barrelSize.x / 2, 0);
       offset.rotate(angle);
       return {
-         launchPos: player.position.copy().add(offset),
+         launchPos: p5.Vector.add(player.position, offset),
          launchVel: createVector(cos(angle) * speed, sin(angle) * speed)
       }
    }
 
-   #runSimulation(pos, vel, gravity, wind, terrain, enemy, hitRadius, weapon) {
+   drawPreview(player, enemy, terrain, gravityVec, windVec) {
+      const weapon = player.currentWeapon;
+      // Calculate projectile starting point
+      const { launchPos, launchVel } = TrajectoryPreview.getLaunchState(player);
+      // Environment forces
+      const wind = createVector(windVec?.x ?? 0, windVec?.y ?? 0);
+      // identify if this shot would hit the enemy by simulating the trajectory in advance
+      const simResult = this.#runSimulation(launchPos, launchVel, gravityVec, wind, terrain, enemy, weapon);
+      this.#renderPath(simResult.path, simResult.willHit);
+      const targetHitRadius = player.wheelRadius + TrajectoryPreview.#hitTolerance;
+      if (simResult.willHit) this.#renderHitMarker(enemy.position, targetHitRadius);
+   }
+
+   #runSimulation(pos, vel, gravity, wind, terrain, enemy, weapon) {
       const path = [];
-      const stepForce = p5.Vector.add(gravity, wind).mult(this.#simTimeStep);
-      let willHit = false;
-      const mockShot = { position: pos, vel: vel, age: 0, state: {}, radius: weapon?.shotRadius ?? 4 };
-      for (let i = 0; i < this.#maxSteps; i++) {
-         const result = this.#simulationStep(mockShot, stepForce, terrain, enemy, hitRadius, weapon)
+      const stepForce = p5.Vector.add(gravity, wind).mult(TrajectoryPreview.simTimeStep);
+      const mockShot = { position: pos, velocity: vel, age: 0, state: {} };
+      for (let i = 0; i < TrajectoryPreview.maxSteps; i++) {
+         const result = TrajectoryPreview.simulationStep(mockShot, stepForce, terrain, enemy, weapon);
          this.#addToPath(mockShot.position, i, path);
          if (result.collision) return { path, willHit: result.willHit };
       }
       return { path, willHit: false };
    }
 
-   #simulationStep(mockShot, stepForce, terrain, enemy, hitRadius, weapon) {
-      mockShot.age += this.#simTimeStep;
-      mockShot.vel.add(stepForce);
-      weapon?.beforeProjectileStep?.(mockShot, { dt: this.#simTimeStep, terrain });
-      mockShot.position.add(p5.Vector.mult(mockShot.vel, this.#simTimeStep));
-      if (this.#isOutOfBounds(mockShot.position)) return { collision: true, willHit: false };
-      if (this.#hitsTerrain(mockShot.position, terrain))
-         return { collision: true, willHit: this.#hitsEnemy(mockShot.position, enemy, hitRadius) };
-      if (this.#hitsEnemy(mockShot.position, enemy, hitRadius)) return { collision: true, willHit: true };
-      return { collision: false };
+   static #isOutOfBounds(pos) {
+      return (pos.x < 0 || pos.x > this.#resolution.x || pos.y > this.#resolution.y);
    }
 
-#isOutOfBounds(pos) {
-   return (pos.x < 0 || pos.x > this.#resolution.x || pos.y > this.#resolution.y);
-}
-
-#hitsTerrain(pos, terrain) {
-   return pos.y >= terrain.getHeightAt(pos.x);
-}
-
-#hitsEnemy(pos, enemy, hitRadius) {
-   return p5.Vector.dist(pos, enemy.position) < hitRadius;
-}
-
-#addToPath(pos, i, path) {
-   if (i % 2 === 0) path.push({ pos: pos.copy(), index: i })
-}
-
-#renderPath(path, willHit) {
-   // colors for hit and miss
-   const baseColor = willHit ? [80, 255, 120] : [0, 245, 212];
-   const glowColor = willHit ? `rgba(80,255,120,` : `rgba(0,245,212,`;
-   push();
-   noStroke();
-   for (const point of path) {
-      const progress = point.index / this.#maxSteps;
-      const alpha = lerp(255, 0, progress);
-      const size = lerp(3, 0.8, progress);
-      // Glow layer
-      drawingContext.shadowBlur = lerp(18, 0, progress);
-      drawingContext.shadowColor = `${glowColor}${alpha / 255})`;
-      fill(...baseColor, alpha * 0.4);
-      circle(point.pos.x, point.pos.y, size * 1.5);
-      // Core layer
-      drawingContext.shadowBlur = lerp(8, 0, progress);
-      fill(200, 255, 250, alpha);
-      circle(point.pos.x, point.pos.y, size);
+   static #hitsTerrain(pos, terrain) {
+      return pos.y >= terrain.getHeightAt(pos.x);
    }
-   pop();
-}
 
-#renderHitMarker(targetPos, hitRadius) {
-   push();
-   drawingContext.shadowBlur = 20;
-   drawingContext.shadowColor = 'rgba(80, 255, 120, 0.9)';
-   // Pulsing circle
-   noFill();
-   stroke(80, 255, 120, 200);
-   strokeWeight(2);
-   // frameCount for pulsing effect
-   const pulse = sin(frameCount * 5) * 4;
-   circle(targetPos.x, targetPos.y, hitRadius + pulse);
-   // "HIT" text
-   noStroke();
-   drawingContext.shadowBlur = 10;
-   fill(80, 255, 120);
-   textAlign(CENTER, BOTTOM);
-   textSize(14);
-   text('HIT', targetPos.x, targetPos.y - hitRadius - 8);
-   pop();
-}
+   static #hitsEnemy(pos, enemy, hitRadius) {
+      return p5.Vector.dist(pos, enemy.position) < hitRadius;
+   }
+
+   #addToPath(pos, i, path) {
+      if (i % 2 === 0) path.push({ pos: pos.copy(), index: i })
+   }
+
+   #renderPath(path, willHit) {
+      // colors for hit and miss
+      const baseColor = willHit ? [80, 255, 120] : [0, 245, 212];
+      const glowColor = willHit ? `rgba(80,255,120,` : `rgba(0,245,212,`;
+      push();
+      noStroke();
+      for (const point of path) {
+         const progress = point.index / TrajectoryPreview.maxSteps;
+         const alpha = lerp(255, 0, progress);
+         const size = lerp(3, 0.8, progress);
+         // Glow layer
+         drawingContext.shadowBlur = lerp(18, 0, progress);
+         drawingContext.shadowColor = `${glowColor}${alpha / 255})`;
+         fill(...baseColor, alpha * 0.4);
+         circle(point.pos.x, point.pos.y, size * 1.5);
+         // Core layer
+         drawingContext.shadowBlur = lerp(8, 0, progress);
+         fill(200, 255, 250, alpha);
+         circle(point.pos.x, point.pos.y, size);
+      }
+      pop();
+   }
+
+   #renderHitMarker(targetPos, hitRadius) {
+      push();
+      drawingContext.shadowBlur = 20;
+      drawingContext.shadowColor = 'rgba(80, 255, 120, 0.9)';
+      // Pulsing circle
+      noFill();
+      stroke(80, 255, 120, 200);
+      strokeWeight(2);
+      // frameCount for pulsing effect
+      const pulse = sin(frameCount * 5) * 4;
+      circle(targetPos.x, targetPos.y, hitRadius + pulse);
+      // "HIT" text
+      noStroke();
+      drawingContext.shadowBlur = 10;
+      fill(80, 255, 120);
+      textAlign(CENTER, BOTTOM);
+      textSize(14);
+      text('HIT', targetPos.x, targetPos.y - hitRadius - 8);
+      pop();
+   }
 }

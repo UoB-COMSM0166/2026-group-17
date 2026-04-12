@@ -26,13 +26,13 @@ class ScoreCalculator {
       //If the cannon is outside the effective explosion radius, no score is given
       if (distance > explosion.maxRadius || isNaN(distance)) return 0;
       //Base score decreases as distance increases
-      const base = Math.max(0, map(distance, 0, explosion.maxRadius, 200, 0));
+      const base = max(0, map(distance, 0, explosion.maxRadius, 200, 0));
 
       let bonus = 0;
       //Bonus score depending on how close the hit is
       if (distance < explosion.maxRadius * 0.2) bonus = 80;
       else if (distance < explosion.maxRadius * 0.5) bonus = 40;
       //Final score
-      return Math.floor(base + bonus);
+      return floor(base + bonus);
    }
 }

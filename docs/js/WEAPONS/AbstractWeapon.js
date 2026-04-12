@@ -27,7 +27,7 @@ class AbstractWeapon {
     // one-use style compatibility
     if (this.used) return false;
     this.used = true;
-    this.ammoLeft = Math.max(0, this.ammoLeft - 1);
+    this.ammoLeft = max(0, this.ammoLeft - 1);
     return true;
   }
 

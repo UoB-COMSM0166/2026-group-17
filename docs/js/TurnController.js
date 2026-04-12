@@ -2,9 +2,7 @@ class TurnController {
    #turnNumber = 1;
    #maxTurns = 5;
    #activePlayerId = 0;
-   #windEvent;
 
-   constructor(wind) { this.windEvent = wind; }
 
    get activePlayerId() { return this.#activePlayerId; }
    get turnNumber() { return this.#turnNumber; }

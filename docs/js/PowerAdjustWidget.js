@@ -18,8 +18,8 @@ class PowerAdjustWidget {
       this.#p1 = { x: this.#positionVector.x - 100, y: this.#positionVector.y + 100 };
       this.#p2 = { x: this.#positionVector.x + 60, y: this.#positionVector.y };
       this.#p3 = { x: this.#positionVector.x + 60, y: this.#positionVector.y + 100 };
-      const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
-      const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
+      const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
+      const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
       this.#sliderX = (xMin + xMax) / 2;
    }
 
@@ -28,8 +28,8 @@ class PowerAdjustWidget {
    set isFollowing(track) { this.#isFollowing = track; }
    get power() { return this.#power; }
    set power(p) {
-      const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
-      const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
+      const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
+      const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
       this.#sliderX = map(p, 0, 100, xMin, xMax);
       this.#power = p;
    }
@@ -99,8 +99,8 @@ class PowerAdjustWidget {
       push();
       fill(250);
 
-      const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
-      const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
+      const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
+      const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
 
       if (this.#isFollowing) this.#sliderX = constrain(mouseX, xMin, xMax);
 
@@ -150,7 +150,7 @@ class PowerAdjustWidget {
       textSize(16);
       textAlign(CENTER, CENTER);
 
-      const label = `Power: ${Math.round(this.#power)}`;
+      const label = `Power: ${round(this.#power)}`;
 
       text(label, (this.#p1.x + this.#p2.x) / 2, height - (this.#p3.y - this.#p2.y) * 1.75);
 

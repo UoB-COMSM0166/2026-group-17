@@ -24,7 +24,7 @@ drawProjectileInstance(projectile) {
   noFill();
   stroke(220, 150, 255, 120);
   strokeWeight(2);
-  const dir = projectile.vel.copy();
+  const dir = projectile.velocity.copy();
   if (dir.mag() > 0) dir.normalize();
   const normal = createVector(-dir.y, dir.x).mult(6);
   line(

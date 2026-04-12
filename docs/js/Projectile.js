@@ -158,7 +158,7 @@ class Projectile {
    }
 
    get position() { return this.#position; }
-   get vel() { return this.#velocity; }
+   get velocity() { return this.#velocity; }
    get isActive() { return this.#isActive; }
    set isActive(truthVal) { this.#isActive = truthVal; }
    get weapon() { return this.#weapon; }
