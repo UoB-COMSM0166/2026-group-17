@@ -42,7 +42,7 @@ class PlayerCannon {
       const projectile = this.#fireShot(weapon);
       if (weapon.id !== "ball") {
          this.#weaponLoadout.splice(this.#currentWeaponIndex, 1);
-         this.#currentWeaponIndex = constrain(this.#currentWeaponIndex, 0, Math.max(0, this.#weaponLoadout.length - 1));
+         this.#currentWeaponIndex = constrain(this.#currentWeaponIndex, 0, max(0, this.#weaponLoadout.length - 1));
       }
       return projectile;
    }
@@ -176,10 +176,9 @@ class PlayerCannon {
       this.#targetX = constrain(x, this.#wheelRadius, canvasWidth - this.#wheelRadius);
    }
 
-
    getDistanceTo(targetPosition) {
       const distanceToWheelCenter = p5.Vector.dist(this.#position, targetPosition);
-      const distanceToWheelSurface = Math.max(0, distanceToWheelCenter - this.#wheelRadius);
+      const distanceToWheelSurface = max(0, distanceToWheelCenter - this.#wheelRadius);
       const relativeTargetPos = p5.Vector.sub(targetPosition, this.#position);
       const restoringAngle = -this.#barrelAngle;
       // rotate target point to barrel's local coordinate system
@@ -196,7 +195,7 @@ class PlayerCannon {
          constrain(rotatedTargetPos.y, -halfBarrelSz.y, halfBarrelSz.y)
       );
       const distanceToBarrelSurface = dist(rotatedTargetPos.x, rotatedTargetPos.y, closestBarrelPoint.x, closestBarrelPoint.y);
-      return Math.min(distanceToWheelSurface, distanceToBarrelSurface);
+      return min(distanceToWheelSurface, distanceToBarrelSurface);
    }
 
    canAct(turnController){

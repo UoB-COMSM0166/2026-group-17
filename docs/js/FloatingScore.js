@@ -16,12 +16,12 @@ class FloatingScore {
    }
 
    _clamp(v, a, b) {
-      return Math.max(a, Math.min(b, v));
+      return max(a, min(b, v));
    }
    update() {
       this.t += 0.14;
       const tt = this._clamp(this.t, 0, 1);
-      const eased = 1 - Math.pow(1 - tt, 3);
+      const eased = 1 - pow(1 - tt, 3);
       this.x = lerp(this.x0, this.x1, eased);
       this.y = lerp(this.y0, this.y1, eased);
       if (tt >= 1) {
@@ -36,7 +36,7 @@ class FloatingScore {
       let s;
       if (typeof this.value === "number") s = (this.value > 0 ? `+${this.value}` : `${this.value}`);
       else s = String(this.value);
-      const scalePop = 1 + 0.35 * Math.exp(-6 * this.t);
+      const scalePop = 1 + 0.35 * exp(-6 * this.t);
       const baseSize = 34;
       textSize(baseSize * scalePop);
       if (typeof drawingContext !== "undefined") {

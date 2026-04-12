@@ -18,9 +18,6 @@ class MenuState extends State {
       if (!mode) return;
       // Go to weapon shop
       this.game.pendingMode = mode;
-      this.game.switchState(
-         new ShopState(this.game, this.resolution)
-      );
+      this.game.switchState(new ShopState(this.game, this.resolution));
    }
 }
-

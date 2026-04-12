@@ -17,7 +17,7 @@ class Lazershot extends AbstractWeapon {
 
  drawProjectileInstance(projectile) {
   push();
-  const dir = projectile.vel.copy();
+  const dir = projectile.velocity.copy();
   if (dir.mag() > 0) dir.normalize();
   const tail = dir.mult(34);
   stroke(120, 255, 255, 180);

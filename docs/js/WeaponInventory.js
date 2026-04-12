@@ -16,7 +16,7 @@ class WeaponInventory {
 
     setWeaponLoadouts(loadouts = []) {
         this.weapons = Array.isArray(loadouts) ? loadouts : [];
-        this.#weaponsCount = Math.max(this.weapons.length, 1);
+        this.#weaponsCount = max(this.weapons.length, 1);
         if (this.weapons.length === 0) this.#currentWeapon = 0;
         else this.#currentWeapon = constrain(this.#currentWeapon, 0, this.weapons.length - 1);
     }

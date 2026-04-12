@@ -29,10 +29,11 @@ class Match {
    #floatingScores = [];
    #trajectoryPreviewer;
    #isEasyDifficulty;
+   #computerController;
    #lastMouseButton;
    #shakeCallback;
 
-   constructor(resolution, gameMode, loadout0, loadout1, shakeCallback) {
+   constructor(resolution, gameMode, loadout0, loadout1, aiController, shakeCallback) {
       Match.#GRAVITY = createVector(0, 400);
       Match.#ZERO_VECTOR = createVector(0, 0);
       this.#width = resolution.x;
@@ -52,12 +53,13 @@ class Match {
       // Player initialisation
       this.#spawnPlayers(loadout0, loadout1);
       // Turn logic
-      this.#turnController = new TurnController(this.#wind);
+      this.#turnController = new TurnController();
       //Skip turn for bubblegumshot
       this.#turnController.onSkipCallback = (playerId) => {this.#handlePlayerSkip(playerId);};
-
       this.#isEasyDifficulty = (gameMode === "easy");
       this.#trajectoryPreviewer = new TrajectoryPreview(resolution);
+      this.#computerController = aiController;
+      this.#computerController.location = 'MATCH';
       this.#setModeBasedWeather();
       this.#shakeCallback = shakeCallback;
    }
@@ -69,6 +71,7 @@ class Match {
       this.#updateSecondaryShots(dt);
       this.#updatePoisonClouds(dt);
       this.#updateShibaImpacts();
+      this.#updateComputerController(dt);
       this.#updatePlayers();
       if (this.#currentExplosions.length > 0) this.#updateExplosions(dt);
       this.#updateFloatingScores();
@@ -82,23 +85,22 @@ class Match {
       applyShake?.();
       this.#drawEnvironment();
       this.#drawPlayers();
-      if (!this.#turnController.isGameOver) this.#drawTrajectory();
+      this.#computerController.drawThinkIndicator(this.#players[1].position);
+      if (!this.#isAIPlayerTurn()) this.#drawTrajectory();
       this.#drawShotSequence();
       pop();
       this.#drawHUD();
    }
 
    onMousePressed(button) {
-      this.#lastMouseButton = (button === LEFT || button?.left === true);
+      if (!this.#inputActive()) return;
+      this.#lastMouseButton = button?.left === true;
    }
 
    onMouseReleased() {
-      if (!this.#physicsDone() || this.#lastMouseButton !== true) return;
-      const currentPlayer = this.#players[this.#turnController.activePlayerId];
-      const inventoryResult = this.#controlPanel.handleWeaponInventoryClick();
-      if (inventoryResult.selectedIndex !== null)
-         currentPlayer.currentWeaponIndex = inventoryResult.selectedIndex;
-      if (inventoryResult.handled) return;
+      if (!this.#inputActive() || !this.#lastMouseButton) return;
+      this.#lastMouseButton = false;
+      if (this.#handleInventoryClick()) return;
       this.#handleAngleDialToggle();
       this.#handlePowerAdjustToggle();
       this.#triggerMouseCannonShot();
@@ -106,6 +108,7 @@ class Match {
    }
 
    onKeyReleased(inputKey, keyId) {
+      if (!this.#inputActive()) return;
       if (inputKey === 'Space' || keyId === 32) this.#executeCannonShot();
       if (keyId === 37) this.#executeCannonMovement('left');
       if (keyId === 39) this.#executeCannonMovement('right');
@@ -224,7 +227,7 @@ class Match {
          resolution: createVector(this.#width, this.#height)
       });
       if (impactEvent?.type === "STAR_SPLIT") this.#handleStarSplit(impactEvent);
-      else if (impactEvent) this.#handleShotImpact(impactEvent); // replaces #spawnExplosion() call
+      else if (impactEvent) this.#handleShotImpact(impactEvent);
    }
 
    #handleStarSplit(impactEvent) {
@@ -314,7 +317,7 @@ class Match {
          const craterRadius = lerp(18, 46, factor);
          target.startShibaLaunch(launchStrength, craterRadius);
          target.triggerHitFlash(8);
-         const score = Math.round(10 + factor * 160);
+         const score = round(10 + factor * 160);
          this.#updateScore(score, color(255, 160, 80));
 
       }
@@ -357,6 +360,18 @@ class Match {
          fx.update();
          if (fx.finished) this.#shibaImpacts.splice(i, 1);
       }
+   }
+
+   #updateComputerController(dt) {
+      if (!this.#isAIPlayerTurn() || !this.#physicsDone()) return;
+      this.#computerController.updateAI(dt, {
+         shooter: this.#players[1],
+         target: this.#players[0],
+         terrain: this.#terrain,
+         gravity: Match.#GRAVITY,
+         wind: Match.#ZERO_VECTOR,
+         executeShot: () => this.#executeCannonShot()
+      });
    }
 
    #updatePlayers() {
@@ -434,8 +449,8 @@ class Match {
       const { enemy, self } = this.#scoreCalculator.calculateExplosionScore(explosion, this.#players, this.#lastShooterId);
       if (enemy > 0) this.#updateScore(enemy, color(255, 220, 0));
       if (self > 0) this.#updateScore(-self, color(255, 80, 80));
-      this.#scoreBoard.score1 = Math.max(0, this.#scoreBoard.score1);
-      this.#scoreBoard.score2 = Math.max(0, this.#scoreBoard.score2);
+      this.#scoreBoard.score1 = max(0, this.#scoreBoard.score1);
+      this.#scoreBoard.score2 = max(0, this.#scoreBoard.score2);
    }
 
    #updateScore(extraPoints, scoreColor) {
@@ -457,6 +472,9 @@ class Match {
    #processTurnTransition() {
       if (this.#pendingTurnAdvance && this.#physicsDone()) {
          this.#turnController.advancePhase(this.#players);
+         if (this.#isAIPlayerTurn()) {
+            this.#computerController.startThinking();
+         }
          this.#pendingTurnAdvance = false;
       }
    }
@@ -526,6 +544,14 @@ class Match {
       pop();
    }
 
+   #handleInventoryClick() {
+      const currentPlayer = this.#players[this.#turnController.activePlayerId];
+      const inventoryResult = this.#controlPanel.handleWeaponInventoryClick();
+      if (inventoryResult.selectedIndex !== null)
+         currentPlayer.currentWeaponIndex = inventoryResult.selectedIndex;
+      return inventoryResult.handled;
+   }
+
    #handleAngleDialToggle() {
       const dial = this.#controlPanel.angleDial;
       dial.isFollowing = (!this.#controlPanel.powerAdjust.isFollowing && dial.isHovered && !dial.isFollowing);
@@ -581,6 +607,12 @@ class Match {
          this.#poisonClouds.length === 0 &&
          this.#shibaImpacts.length === 0 &&
          this.#terrain.isSettled;
+   }
+
+   #isAIPlayerTurn() { return this.#turnController.activePlayerId === 1 }
+
+   #inputActive() {
+      return !this.#isAIPlayerTurn() && this.#physicsDone() && !this.#pendingTurnAdvance;
    }
 
    get isMatchOver() {
