@@ -23,7 +23,6 @@ class ImpactGun extends AbstractWeapon {
    pop();
   }
 
-
   drawProjectile(cx, cy, r) {
     push();
     noStroke();

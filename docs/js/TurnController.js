@@ -3,13 +3,10 @@ class TurnController {
    #maxTurns = 5;
    #activePlayerId = 0;
 
-<<<<<<< HEAD
    constructor(wind, onSkipCallback) { 
       this.windEvent = wind; 
       this.onSkipCallback = onSkipCallback;
    }
-=======
->>>>>>> origin/main
 
    get activePlayerId() { return this.#activePlayerId; }
    get turnNumber() { return this.#turnNumber; }
