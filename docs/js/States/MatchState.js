@@ -5,7 +5,7 @@ class MatchState extends State {
       super(game, resolution);
       const shakeLambda = (frames, mag) => this.game.effects.triggerShake(frames, mag);
       this.#match = new Match(resolution, this.game.pendingMode, loadout0, loadout1, shakeLambda);
-   };
+   }
 
    updateState(dt) {
       this.game.effects.updateShake();
@@ -15,18 +15,15 @@ class MatchState extends State {
    }
 
    drawState() {
-      push();
-      this.game.effects.applyShake();
-      this.#match.drawMatch();
-      pop();
+      this.#match.drawMatch(() => this.game.effects.applyShake());
    }
 
    onMousePressed(cursorX, cursorY, button) {
-      this.#match.onMousePressed(button);
+      this.#match.onMousePressed(cursorX, cursorY, button);
    }
 
    onMouseReleased(cursorX, cursorY, button) {
-      this.#match.onMouseReleased();
+      this.#match.onMouseReleased(cursorX, cursorY, button);
    }
 
    onKeyReleased(inputKey, keyId) {

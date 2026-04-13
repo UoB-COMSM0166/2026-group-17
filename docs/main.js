@@ -1,6 +1,17 @@
 let game;
+let pineappleImg, starImg, shibaImg;
 
-function setup() {
+async function setup() {
+   const [pineapple, star, shiba] = await Promise.all([
+      loadImage("weapons/pineapple.png"),
+      loadImage("weapons/star.png"),
+      loadImage("weapons/shiba.png"),
+   ]);
+
+   pineappleImg = pineapple;
+   starImg = star;
+   shibaImg = shiba;
+
    const resolution = createVector(1280, 700);
    game = new Game(resolution);
    Game.setupGame();
