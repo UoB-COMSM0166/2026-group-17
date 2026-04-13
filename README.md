@@ -58,19 +58,20 @@ After discussing the feasibility and development complexity of each idea, we con
 
 We then went about creating paper prototypes of our initial concept (Figure 4) in order to flesh out the specific gameplay details. This proved especially helpful considering the complexity of the concept, as it enabled us to better define the gameplay loop, player interaction flow, and core mechanics at an early stage. Paper prototyping was also valuable in improving communication within the team, particularly in helping all members visualise the turn-based combat flow, aiming controls, and overall user experience before moving into implementation.
 
+
 ### 2.2 Early Stage Design
 
 Having selected Pocket Tanks as our main reference, we then identified several key design decisions to differentiate our game from the original concept.
 
-1. Destructible terrain – allows the battlefield to change dynamically after each explosion, adding greater strategic depth.
+1. Destructible terrain allows the battlefield to change dynamically after each explosion, adding greater strategic depth.
 
-2. AI controlled opponent mode – planned to support future single-player gameplay and extend system usability.
+2. AI controlled opponent mode planned to support future single-player gameplay and extend system usability.
 
-3. Weapon shop and enhanced weapon system – enables players to select a limited loadout before each match, increasing tactical planning and gameplay variety.
+3. Weapon shop and enhanced weapon system enables players to select a limited loadout before each match, increasing tactical planning and gameplay variety.
 
-4. Easy and Hard modes – introduced to support different player skill levels, with Easy Mode providing trajectory guidance and Hard Mode increasing challenge.
+4. Easy and Hard modes introduced to support different player skill levels, with Easy Mode providing trajectory guidance and Hard Mode increasing challenge.
 
-5. Random events in Hard Mode – includes rain, wind, and earthquake effects to improve replayability and require players to adapt their shooting strategy.
+5. Random events in Hard Mode includes rain, wind, and earthquake effects to improve replayability and require players to adapt their shooting strategy.
 
 These early design decisions helped us expand the original artillery concept into a more strategic and replayable game system.
 
@@ -85,6 +86,9 @@ The wider environment includes the development team, instructors and assessors, 
 The external environment includes the deployment platform (GitHub Pages), the broader user community, and course requirements, which together reflect the wider context in which the system is developed, deployed, and evaluated.
 
 This stakeholder analysis ensured that our requirements considered not only gameplay needs, but also technical feasibility, user feedback, and academic constraints.
+![Onion Model](images/onion%20model.png)
+**Figure X. Onion Model Stakeholder Analysis**
+
 
 ### 2.4 Epics and User Stories
 
