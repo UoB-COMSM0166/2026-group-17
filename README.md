@@ -48,8 +48,86 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 
 ### Requirements 
 
-- 15% ~750 words
-- Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories. 
+## Requirements
+
+### 2.1 Ideation Process
+
+During the early stages of the ideation process, our team began with a brainstorming session, where each member used Google Docs to independently research and record several game concepts that they were interested in developing. These initial ideas covered a range of gameplay styles, including action-based, strategy-focused, and arcade-inspired games.
+
+After discussing the feasibility and development complexity of each idea, we conducted a quick team vote and decided to take Pocket Tanks as our main gameplay reference. Its turn-based artillery combat, projectile physics, and destructible environment mechanics provided a strong and achievable foundation for our project, while also offering clear opportunities for further innovation.
+
+We then went about creating paper prototypes of our initial concept (Figure 4) in order to flesh out the specific gameplay details. This proved especially helpful considering the complexity of the concept, as it enabled us to better define the gameplay loop, player interaction flow, and core mechanics at an early stage. Paper prototyping was also valuable in improving communication within the team, particularly in helping all members visualise the turn-based combat flow, aiming controls, and overall user experience before moving into implementation.
+
+
+### 2.2 Early Stage Design
+
+Having selected Pocket Tanks as our main reference, we then identified several key design decisions to differentiate our game from the original concept.
+
+1. Destructible terrain allows the battlefield to change dynamically after each explosion, adding greater strategic depth.
+
+2. AI controlled opponent mode planned to support future single-player gameplay and extend system usability.
+
+3. Weapon shop and enhanced weapon system enables players to select a limited loadout before each match, increasing tactical planning and gameplay variety.
+
+4. Easy and Hard modes introduced to support different player skill levels, with Easy Mode providing trajectory guidance and Hard Mode increasing challenge.
+
+5. Random events in Hard Mode includes rain, wind, and earthquake effects to improve replayability and require players to adapt their shooting strategy.
+
+These early design decisions helped us expand the original artillery concept into a more strategic and replayable game system.
+
+### 2.3 Stakeholder Identification: The Onion Model
+
+To support our requirements planning, we applied The Onion Model to identify the key stakeholders involved in or affected by the development of HOT CANNONS (Figure X). This helped us visualise not only the direct users of the system, but also the wider technical, academic, and deployment context surrounding the game.
+
+At the core layer, the system itself is HOT CANNONS. The containing system includes the immediate users, namely players and testers, whose feedback directly influenced usability, balance, and overall gameplay experience.
+
+The wider environment includes the development team, instructors and assessors, and the reference game Pocket Tanks. Following Alexander’s concept of surrogate roles, instructors acted as representative stakeholders by providing feedback on software engineering quality, usability, and academic expectations.
+
+The external environment includes the deployment platform (GitHub Pages), the broader user community, and course requirements, which together reflect the wider context in which the system is developed, deployed, and evaluated.
+
+This stakeholder analysis ensured that our requirements considered not only gameplay needs, but also technical feasibility, user feedback, and academic constraints.
+![Onion Model](images/onion%20model.png)
+**Figure X. Onion Model Stakeholder Analysis**
+
+
+### 2.4 Epics and User Stories
+
+Based on the stakeholders identified through the Onion Model (Figure X), we translated stakeholder needs into a set of Epics and User Stories to guide system development and prioritise core features.
+
+The main epics identified for HOT CANNONS were:
+
+- Core artillery gameplay and destructible terrain
+- Weapon shop and loadout system
+- Difficulty modes and accessibility
+- Dynamic events and replayability
+- AI controlled single player mode
+- User interface and user experience
+
+These epics were directly informed by the needs of players, testers, the wider user community, and course requirements identified in the stakeholder analysis.
+
+From these epics, we derived User Stories using the standard format:
+
+> As a [user], I want [feature], so that [value].
+
+Examples of key user stories include:
+
+- As a player, I want destructible terrain so that each shot changes the battlefield and requires strategic decision-making.
+- As a player, I want to select weapons before the match so that I can plan my gameplay strategy in advance.
+- As a new player, I want tutorial pop-ups so that I can understand how to aim and fire correctly.
+- As a new player, I want an Easy Mode with trajectory guidance so that I can quickly learn the controls and gameplay mechanics.
+- As an experienced player, I want Hard Mode random events so that each match feels more challenging and unpredictable.
+- As a colourblind player, I want distinguishable UI colours so that game information remains clear.
+- As a single player user, I want to play against an AI opponent so that I can enjoy the game without requiring a second player.
+
+These user stories helped ensure that our system requirements remained closely aligned with stakeholder needs and supported both gameplay quality and accessibility.
+
+### 2.5 Use Case Diagram
+
+To ensure the entire team maintained a shared understanding of the system–user interactions and the overall gameplay flow, we developed a Use Case Diagram as part of our requirements engineering process.
+
+The diagram was particularly useful in modelling the main gameplay flow of HOT CANNONS, including game setup, difficulty selection, weapon selection, turn-based shooting, terrain updates, and match progression.
+
+This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
 
 ### Design
 
