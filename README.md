@@ -379,6 +379,37 @@ $$\begin{cases}
 **SUS**
 
 ### Process 
+## Role Allocation and Responsibility Management
+
+At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
+
+### Team Members’ Strengths and Role Mapping
+
+| Category | Members | Strengths / Experience | Main Responsibilities |
+|----------|---------|----------------------|----------------------|
+| Development | 2 | Programming / system development experience | Core gameplay implementation, system development |
+| Testing | 1 | Testing experience | Testing, debugging, quality assurance, supporting development tasks |
+| Design (Gameplay & UI) | 1 | Game design interest | Weapon functionality design, game mechanics, UI design |
+| Creative (Visual Art) | 1 | Illustration / visual design skills | Visual design, UI assets, artistic direction |
+| Project Management | 1 | Project management experience | Progress coordination, task management, team coordination |
+
+### Practical Role Allocation
+
+Specifically, members with testing and development experience mainly handled testing and coding tasks while also contributing flexibly to other areas when needed. In addition, responsibilities were assigned according to individual interests and strengths, including weapon design, game mode design, visual design, and basic programming.
+
+In particular, members skilled in drawing took responsibility for visual design, supporting the overall artistic expression of the game. Furthermore, some members focused on core gameplay implementation, system development, and documentation, while others contributed to more technically challenging areas such as physics and destructible terrain. As a result, a wide range of skills within the team was effectively utilized.
+
+### Flexible Collaboration and Shared Development Approach
+
+In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, while each member had their own role, these roles were designed as leadership responsibilities rather than isolated tasks. Each member was expected to take initiative and lead development within their area.
+
+At the same time, challenges and development tasks were not handled individually; instead, all team members worked collaboratively to solve problems and complete development tasks as a group. When necessary, tasks were also handled by small groups to improve both efficiency and stability in development.
+
+We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
+
+### Outcomes
+
+Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
 
 - 15% ~750 words
 
