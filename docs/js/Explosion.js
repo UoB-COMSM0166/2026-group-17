@@ -25,7 +25,7 @@ class Explosion {
 
       this.#duration =
          options.duration ??
-         constrain(500 + this.#maxRadius * 4, 500, 1400);
+         (500 + this.#maxRadius * 4);
 
       this.enemyFeedbackTriggered = false;
       this.selfFeedbackTriggered = false;
@@ -65,6 +65,17 @@ class Explosion {
          }
          this.hasAppliedTerrain = true;
          this.#finished = true;
+      }
+
+      if(this.kind === "bubblegumshot"){
+         const elastic = sin(progress * PI);
+
+         this.#currentRadius = lerp(0, this.#maxRadius, progress)*(1 + elastic * 0.25);
+      }
+
+      if(this.kind === "impactShock"){
+         this.#weapon?.drawImpactShock?.(this);
+         return;
       }
    }
 

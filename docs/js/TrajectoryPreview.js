@@ -1,90 +1,69 @@
 class TrajectoryPreview {
-   #resolution;
-   #maxSteps = 600;
-   #simTimeStep = 0.016;
-   #hitTolerance = 20;
+   static simTimeStep = 0.016;
+   static maxSteps = 600;
+   static #hitTolerance = 20;
+   static #resolution;
 
-   constructor(resolution) {  this.#resolution = resolution; }
+   constructor(resolution) { TrajectoryPreview.#resolution = resolution; }
 
-   drawPreview(player, enemy, terrain, gravityVec, windVec) {
-      // Calculate projectile starting point
-      const weapon = player.currentWeapon;
-      const { launchPos, launchVel } = this.#getLaunchState(player, weapon);
-      // Environment forces
-      const wind = createVector(windVec?.x ?? 0, windVec?.y ?? 0);
-      // Keep the easy-mode hit marker small and consistent for every weapon.
-      const targetHitRadius = enemy.wheelRadius + this.#hitTolerance;
-      // identify if this shot would hit the enemy by simulating the trajectory in advance
-      const simResult = this.#runSimulation(
-         launchPos, launchVel, gravityVec, wind, terrain, enemy, targetHitRadius, weapon
-      );
-      this.#renderPath(simResult.path, simResult.willHit);
-      if (simResult.willHit) this.#renderHitMarker(enemy.positionVector, targetHitRadius);
+   static simulationStep(mockShot, stepForce, terrain, enemy, weapon) {
+      const hitRadius = enemy.wheelRadius + this.#hitTolerance;
+      mockShot.age += this.simTimeStep;
+      mockShot.velocity.add(stepForce);
+      weapon?.beforeProjectileStep?.(mockShot, { dt: this.simTimeStep, terrain });
+      mockShot.position.add(p5.Vector.mult(mockShot.velocity, this.simTimeStep));
+      if (this.#isOutOfBounds(mockShot.position)) return { collision: true, willHit: false };
+      if (this.#hitsEnemy(mockShot.position, enemy, hitRadius)) return { collision: true, willHit: true };
+      if (this.#hitsTerrain(mockShot.position, terrain)) return { collision: true, willHit: false };
+      return { collision: false };
    }
 
-   #getLaunchState(player, weapon = null) {
-      const angle = player.barrelAngle;
-      // Preview should match the shared projectile speed model.
-      const speed = player.barrelPower;
+   static getLaunchState(player, barrelAngle, barrelPower) {
+      const angle = barrelAngle ?? player.barrelAngle;
+      const speed = barrelPower ?? player.barrelPower;
       const offset = createVector(player.wheelRadius + player.barrelSize.x / 2, 0);
       offset.rotate(angle);
       return {
-         launchPos: player.positionVector.copy().add(offset),
+         launchPos: p5.Vector.add(player.position, offset),
          launchVel: createVector(cos(angle) * speed, sin(angle) * speed)
       }
    }
 
-   #runSimulation(pos, vel, gravity, wind, terrain, enemy, hitRadius, weapon = null) {
-      const stepForce = p5.Vector.add(gravity, wind).mult(this.#simTimeStep);
-      const path = [];
-      let willHit = false;
-      const previewProjectile = {
-         position: pos,
-         vel,
-         age: 0,
-         radius: weapon?.shotRadius ?? 4,
-         target: enemy,
-         state: {}
-      };
-
-      for (let i = 0; i < this.#maxSteps; i++) {
-         previewProjectile.age += this.#simTimeStep;
-         vel.add(stepForce);
-         weapon?.beforeProjectileStep?.(previewProjectile, {
-            dt: this.#simTimeStep,
-            gravity,
-            wind,
-            terrain
-         });
-         pos.add(p5.Vector.mult(vel, this.#simTimeStep));
-         this.#addToPath(pos, i, path);
-         if (this.#isOutOfBounds(pos)) break;
-         if (this.#hitsTerrain(pos, terrain)) {
-            willHit = this.#explosionHitsEnemy(pos, enemy, hitRadius);
-            break;
-         }
-         if (this.#hitsEnemy(pos, enemy, hitRadius)) {
-            willHit = true;
-            break;
-         }
-      }
-      return { path, willHit };
+   drawPreview(player, enemy, terrain, gravityVec, windVec) {
+      const weapon = player.currentWeapon;
+      // Calculate projectile starting point
+      const { launchPos, launchVel } = TrajectoryPreview.getLaunchState(player);
+      // Environment forces
+      const wind = createVector(windVec?.x ?? 0, windVec?.y ?? 0);
+      // identify if this shot would hit the enemy by simulating the trajectory in advance
+      const simResult = this.#runSimulation(launchPos, launchVel, gravityVec, wind, terrain, enemy, weapon);
+      this.#renderPath(simResult.path, simResult.willHit);
+      const targetHitRadius = player.wheelRadius + TrajectoryPreview.#hitTolerance;
+      if (simResult.willHit) this.#renderHitMarker(enemy.position, targetHitRadius);
    }
 
-   #isOutOfBounds(pos) {
+   #runSimulation(pos, vel, gravity, wind, terrain, enemy, weapon) {
+      const path = [];
+      const stepForce = p5.Vector.add(gravity, wind).mult(TrajectoryPreview.simTimeStep);
+      const mockShot = { position: pos, velocity: vel, age: 0, state: {} };
+      for (let i = 0; i < TrajectoryPreview.maxSteps; i++) {
+         const result = TrajectoryPreview.simulationStep(mockShot, stepForce, terrain, enemy, weapon);
+         this.#addToPath(mockShot.position, i, path);
+         if (result.collision) return { path, willHit: result.willHit };
+      }
+      return { path, willHit: false };
+   }
+
+   static #isOutOfBounds(pos) {
       return (pos.x < 0 || pos.x > this.#resolution.x || pos.y > this.#resolution.y);
    }
 
-   #hitsTerrain(pos, terrain) {
+   static #hitsTerrain(pos, terrain) {
       return pos.y >= terrain.getHeightAt(pos.x);
    }
 
-   #hitsEnemy(pos, enemy, hitRadius) {
-      return p5.Vector.dist(pos, enemy.positionVector) < hitRadius;
-   }
-
-   #explosionHitsEnemy(pos, enemy, hitRadius) {
-      return p5.Vector.dist(pos, enemy.positionVector) < hitRadius;
+   static #hitsEnemy(pos, enemy, hitRadius) {
+      return p5.Vector.dist(pos, enemy.position) < hitRadius;
    }
 
    #addToPath(pos, i, path) {
@@ -98,7 +77,7 @@ class TrajectoryPreview {
       push();
       noStroke();
       for (const point of path) {
-         const progress = point.index / this.#maxSteps;
+         const progress = point.index / TrajectoryPreview.maxSteps;
          const alpha = lerp(255, 0, progress);
          const size = lerp(3, 0.8, progress);
          // Glow layer

@@ -15,24 +15,24 @@ class PowerAdjustWidget {
         this.#plateFillColor = plateInColor;
         this.#plateOutlineColor = plateOutColor;
 
-        this.#p1 = { x: this.#positionVector.x - 100, y: this.#positionVector.y + 100 };
-        this.#p2 = { x: this.#positionVector.x + 60, y: this.#positionVector.y };
-        this.#p3 = { x: this.#positionVector.x + 60, y: this.#positionVector.y + 100 };
-        const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
-        const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
-        this.#sliderX = (xMin + xMax) / 2;
-    }
+      this.#p1 = { x: this.#positionVector.x - 100, y: this.#positionVector.y + 100 };
+      this.#p2 = { x: this.#positionVector.x + 60, y: this.#positionVector.y };
+      this.#p3 = { x: this.#positionVector.x + 60, y: this.#positionVector.y + 100 };
+      const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
+      const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
+      this.#sliderX = (xMin + xMax) / 2;
+   }
 
-    get isFollowing() { return this.#isFollowing; }
-    get isHovered() { return this.#isHovered(); }
-    set isFollowing(track) { this.#isFollowing = track; }
-    get power() { return this.#power; }
-    set power(p) {
-        const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
-        const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
-        this.#sliderX = map(p, 0, 100, xMin, xMax);
-        this.#power = p;
-    }
+   get isFollowing() { return this.#isFollowing; }
+   get isHovered() { return this.#isHovered(); }
+   set isFollowing(track) { this.#isFollowing = track; }
+   get power() { return this.#power; }
+   set power(p) {
+      const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
+      const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
+      this.#sliderX = map(p, 0, 100, xMin, xMax);
+      this.#power = p;
+   }
 
     drawPowerAdjust(isEnabled) {
         this.#drawBoard(isEnabled);
@@ -99,26 +99,19 @@ class PowerAdjustWidget {
         push();
         fill(250);
 
-        const xMin = Math.min(this.#p1.x + 2, this.#p3.x - 2);
-        const xMax = Math.max(this.#p1.x + 2, this.#p3.x - 2);
+      const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
+      const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
 
-        if (this.#isFollowing) {
-            if (this.#isHovered()) {
-                this.#sliderX = constrain(mouseX, xMin, xMax);
-            } else {
-                this.#isFollowing = false;
-            }
-        }
+      if (this.#isFollowing) {
+         this.#sliderX = constrain(mouseX, xMin, xMax);
+         this.#power = map(this.#sliderX, xMin, xMax, 0, 100);
+      }
+      const px = this.#sliderX;
 
-        this.#power = map(this.#sliderX, xMin, xMax, 0, 100);
-        const px = this.#sliderX;
-
-        if (isEnabled && (this.#isHovered() || this.#isFollowing)) {
-            stroke(this.#plateOutlineColor);
-            strokeWeight(2);
-        } else {
-            noStroke();
-        }
+      if (isEnabled && (this.#isHovered() || this.#isFollowing)) {
+         stroke(this.#plateOutlineColor);
+         strokeWeight(2);
+      } else noStroke();
 
         triangle(px, this.#p1.y, px - 6, this.#p1.y + 12, px + 6, this.#p1.y + 12);
         pop();
@@ -147,38 +140,38 @@ class PowerAdjustWidget {
         const x1 = pA.x, y1 = pA.y;
         const x2 = pB.x, y2 = pB.y;
 
-        const t = (x - x1) / (x2 - x1);
-        return y1 + (y2 - y1) * t;
-    }
-  
-    #drawPowerText() {
-        push();
-        noStroke();
-        fill(255);
-        textSize(16);
-        textAlign(CENTER, CENTER);
+      const t = (x - x1) / (x2 - x1);
+      return y1 + (y2 - y1) * t;
+   }
 
-        const label = `Power: ${Math.round(this.#power)}`;
+   #drawPowerText() {
+      push();
+      noStroke();
+      fill(255);
+      textSize(16);
+      textAlign(CENTER, CENTER);
 
-        text(label, (this.#p1.x + this.#p2.x) / 2, height - (this.#p3.y - this.#p2.y) * 1.75);
+      const label = `Power: ${round(this.#power)}`;
 
-        pop();
-    }
+      text(label, (this.#p1.x + this.#p2.x) / 2, height - (this.#p3.y - this.#p2.y) * 1.75);
 
-    keyPressed(key, isEnabled) {
-        if(key === 'w' || key === 'W') {
-            if(isEnabled) this.increasePower(5);
-        }
-        else if(key === 's' || key === 'S') {
-            if(isEnabled) this.decreasePower(5);
-        }
-    }
+      pop();
+   }
 
-    increasePower(step = 1) {
-        this.power = constrain(this.#power + step, 0, 100);
-    }
+   keyPressed(key, isEnabled) {
+      if (key === 'w' || key === 'W') {
+         if (isEnabled) this.increasePower(5);
+      }
+      else if (key === 's' || key === 'S') {
+         if (isEnabled) this.decreasePower(5);
+      }
+   }
 
-    decreasePower(step = 1) {
-        this.power = constrain(this.#power - step, 0, 100);
-    }
+   increasePower(step = 1) {
+      this.power = constrain(this.#power + step, 0, 100);
+   }
+
+   decreasePower(step = 1) {
+      this.power = constrain(this.#power - step, 0, 100);
+   }
 }

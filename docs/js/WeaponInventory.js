@@ -1,13 +1,13 @@
 class WeaponInventory {
     #positionVector;
     #isExpanded = false;
-    weapons = [];
     #currentWeapon = 0;
     #weaponsCount = 5;
     #weaponBoxHeight = 64;
     #weaponBoxWidth = 64;
     #gap = 10;
     #plateOutlineColor;
+    weapons = [];
     
     constructor(posV = createVector(width / 3, height - height / 5), plateOutColor = color('teal')) {
         this.#positionVector = posV;
@@ -16,7 +16,7 @@ class WeaponInventory {
 
     setWeaponLoadouts(loadouts = []) {
         this.weapons = Array.isArray(loadouts) ? loadouts : [];
-        this.#weaponsCount = Math.max(this.weapons.length, 1);
+        this.#weaponsCount = max(this.weapons.length, 1);
         if (this.weapons.length === 0) this.#currentWeapon = 0;
         else this.#currentWeapon = constrain(this.#currentWeapon, 0, this.weapons.length - 1);
     }

@@ -1,9 +1,15 @@
 class ShopState extends State {
    #weaponShop;
+   #aiController;
 
    constructor(game, resolution) {
       super(game, resolution);
       this.#weaponShop = new WeaponShop(resolution.x, resolution.y);
+      this.#aiController = new AIController(this.game.pendingMode, 'SHOP');
+   }
+
+   updateState(dt) {
+      this.#weaponShop.update(dt, this.#aiController);
    }
 
    drawState() {
@@ -16,7 +22,8 @@ class ShopState extends State {
          const loadout0 = this.#weaponShop.getLoadout(0);
          const loadout1 = this.#weaponShop.getLoadout(1);
          // Transition to match
-         this.game.switchState(new MatchState(this.game, this.resolution, loadout0, loadout1));
+         this.game.switchState(new MatchState(
+            this.game, this.resolution, loadout0, loadout1, this.#aiController));
       }
    }
 
@@ -28,7 +35,8 @@ class ShopState extends State {
       if (inputKey === ENTER && this.#weaponShop.isDone()) {
          const loadout0 = this.#weaponShop.getLoadout(0);
          const loadout1 = this.#weaponShop.getLoadout(1);
-         this.game.switchState(new MatchState(this.game, this.resolution, loadout0, loadout1));
+         this.game.switchState(new MatchState(
+            this.game, this.resolution, loadout0, loadout1, this.#aiController));
       }
    }
 }

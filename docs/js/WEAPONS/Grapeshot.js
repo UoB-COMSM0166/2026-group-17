@@ -22,7 +22,7 @@ class Grapeshot extends AbstractWeapon {
     state.spread = 0;
   }
 
-  if (!state.split && (projectile.age > 0.38 || projectile.vel.y > 40)) {
+  if (!state.split && (projectile.age > 0.38 || projectile.velocity.y > 40)) {
     state.split = true;
   }
 

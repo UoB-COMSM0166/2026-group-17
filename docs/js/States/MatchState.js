@@ -1,10 +1,11 @@
 class MatchState extends State {
    #match;
 
-   constructor(game, resolution, loadout0, loadout1) {
+   constructor(game, resolution, loadout0, loadout1, aiController) {
       super(game, resolution);
       const shakeLambda = (frames, mag) => this.game.effects.triggerShake(frames, mag);
-      this.#match = new Match(resolution, this.game.pendingMode, loadout0, loadout1, shakeLambda);
+      this.#match = new Match(
+         resolution, this.game.pendingMode, loadout0, loadout1, aiController, shakeLambda);
    }
 
    updateState(dt) {
@@ -19,7 +20,7 @@ class MatchState extends State {
    }
 
    onMousePressed(cursorX, cursorY, button) {
-      this.#match.onMousePressed(cursorX, cursorY, button);
+      this.#match.onMousePressed(button);
    }
 
    onMouseReleased(cursorX, cursorY, button) {
