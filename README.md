@@ -309,7 +309,7 @@ At this stage the game represented a minimum viable product. The core gameplay l
 
 The number of valid samples for both the NASA-TLX and SUS questionnaires was 10. This analysis aims to investigate whether there is a significant difference between the easy and hard levels in perceived workload and usability. The tables below present the total scores for the easy and the hard level in both NASA-TLX and SUS.
 
-<p align="center"><strong>Table x.<strong> Score of NASA-TLX and SUS</p>
+<p align="center"><strong>Table x.</strong> Score of NASA-TLX and SUS</p>
 
 <div align="center">
 
@@ -360,7 +360,7 @@ $$\begin{cases}
 
 </p>
 
-<p align="center"><strong>Table x.<strong> Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</p>
+<p align="center"><strong>Table x.</strong> Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</p>
 
 <div align="center">
 
@@ -379,27 +379,27 @@ $$\begin{cases}
 **SUS**
 
 ### Process 
-## Role Allocation and Responsibility Management
+### Role Allocation and Responsibility Management
 
 At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
 
-### Team Members’ Strengths and Role Mapping
+#### Team Members’ Strengths and Role Mapping
 
-| Category | Members | Strengths / Experience | Main Responsibilities |
-|----------|---------|----------------------|----------------------|
-| Development | 2 | Programming / system development experience | Core gameplay implementation, system development |
-| Testing | 1 | Testing experience | Testing, debugging, quality assurance, supporting development tasks |
-| Design (Gameplay & UI) | 1 | Game design interest | Weapon functionality design, game mechanics, UI design |
-| Creative (Visual Art) | 1 | Illustration / visual design skills | Visual design, UI assets, artistic direction |
-| Project Management | 1 | Project management experience | Progress coordination, task management, team coordination |
+| Category | Strengths / Experience | Main Responsibilities | Members |
+|----------|----------------------|----------------------|----------|
+| Development | Programming / system development experience | Core gameplay implementation, system development | 2 |
+| Testing | Testing experience | Testing, debugging, QA | 1 |
+| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design, mechanics | 1 |
+| Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | 1 |
+| Project Management | Project management experience | Progress coordination, task management | 1 |
 
-### Practical Role Allocation
+#### Practical Role Allocation
 
 Specifically, members with testing and development experience mainly handled testing and coding tasks while also contributing flexibly to other areas when needed. In addition, responsibilities were assigned according to individual interests and strengths, including weapon design, game mode design, visual design, and basic programming.
 
 In particular, members skilled in drawing took responsibility for visual design, supporting the overall artistic expression of the game. Furthermore, some members focused on core gameplay implementation, system development, and documentation, while others contributed to more technically challenging areas such as physics and destructible terrain. As a result, a wide range of skills within the team was effectively utilized.
 
-### Flexible Collaboration and Shared Development Approach
+#### Flexible Collaboration and Shared Development Approach
 
 In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, while each member had their own role, these roles were designed as leadership responsibilities rather than isolated tasks. Each member was expected to take initiative and lead development within their area.
 
@@ -407,10 +407,11 @@ At the same time, challenges and development tasks were not handled individually
 
 We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
 
-### Outcomes
+#### Outcomes
 
 Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
 
+---
 - 15% ~750 words
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
