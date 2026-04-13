@@ -160,6 +160,45 @@ With the above change the desired settling animation was achieved, however, one 
 
 #### AI-controlled player
 
+During most of the development period, the game was a 2-player hot seater as the team was busy implementing other core features and fixing immersion-breaking bugs. This changed in the last week of the spring break as the game felt stable enough to implement a computer-controlled player to replace player 2.
+
+The initial idea was for the AI behaviour to be fairly simple, considering the late stage it was being introduced in. Therefore, the initial version of the AI would pick weapons at random from the weapon shop screen, fire whatever the currently selected weapon is in its inventory and be unable to use the limited (3 moves per game) movement feature.
+
+In terms of its implementation in the code, the AI works as a finite-state machine:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> IDLE
+    IDLE --> THINKING : startThinking()
+    
+    THINKING --> SHOPPING : if #location is SHOP
+    THINKING --> AIMING : if #location is MATCH
+    
+    SHOPPING --> IDLE : pickWeapon()
+    AIMING --> FIRING : findBestShotParams()
+    FIRING --> IDLE : executeShot()
+```
+An AIController object is first instantiated in the ShopState class with its #location field set to SHOP and it is passed to the WeaponShop class's update() method which calls the AIController's startThinking() method each time the current player in the shop is player 2 and also calls the same object's updateAI() method passig it a callback to the pickRandomWeapon() method, so the AIController can call it when the time is right.
+
+After all weapons have been picked and the player either clicks or presses the correct button a reference to the same AIController object is passed from ShopState to MatchState and then from there to the Match class.
+
+In the Match class, the AI's #location field is changed to MATCH and during turn transition, if the current player is player 2, then it's startThinking() method is called. The AIController's drawThinkIndicator() method is also called to draw animated dots above the player 2's cannon, while it is in its THINKING state.
+
+When it comes to the AI's aiming logic it reuses some of the mock shot calculation logic used for determining where to draw the trajectory preview curve in easy mode but without actually drawing the curve. Instead, it uses a nested loop to check every combination of ever 2° within an assumed reasonable shooting range of -100° to -175° with every 1.25 units of power within the range of 0 to 100 (which are mapped to the range 250 to 650 internally). An early exist from the loop is allowed, if the AI discovers a combination which resulsts in a minimum distance to the enemy of less than 5 pixels.
+
+After the AI finds its ideal combination of parameters they are passed through an applyDifficultyJitter() method which remaps their value randomly within a different range depending on the current difficulty - significantly larger on easy mode for a higher likelihood of misses - and then player 2's parameters are set to those values.
+
+Unfortunately, the abovementioned nested loop caused the game to stutter for what appeared to be 0.5-1 second (possibly longer on slower computers), as can be seen in Figure X likely due to the amount of iterations required to complete the whole loop. The early exit helped but was insufficient in eliminating the issue and so a different way of achieving the same outcome had to be found.
+
+<div align="center">
+  <img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />
+  <br>
+  <em>Figure X: Visual stutter occurring during the AI aiming state transition.</em>
+</div>
+
+
 
 ### Evaluation
 #### Qualitative: Think Aloud

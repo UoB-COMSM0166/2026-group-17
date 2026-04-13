@@ -11,7 +11,6 @@ class AIController {
    constructor(mode, place) {
       this.#difficulty = mode;
       this.#location = place;
-      //this.#pickWeapon = pickWeaponCallback;
    }
 
    updateAI(dt, context) {
