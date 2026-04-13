@@ -412,6 +412,34 @@ We also maintained flexibility by adjusting roles based on project progress, ind
 Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
 
 ---
+
+### Team Workflow and Communication
+
+We adopted an Agile development approach, specifically using the Scrum framework, to manage the development process. To support this, we conducted daily stand-up meetings. These meetings were held both online and in person depending on the situation, and were continued consistently throughout the project, including during the Easter holiday period.
+
+In each meeting, we first set clear goals, then reviewed task progress, balanced workload distribution, and discussed and resolved any issues. This routine helped strengthen each member’s sense of responsibility and ensured that the entire team remained aligned with the overall direction of the project.
+
+In addition, throughout the project we used a combination of tools to support collaboration, development, planning, and schedule management.
+
+#### Tools Used
+
+To support collaboration and development, we used tools for version control, communication, planning, and schedule management.
+
+| Category | Tool | Purpose |
+|----------|------|---------|
+| Version Control & Development | GitHub | Code sharing, storage, and integration |
+| Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
+| Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
+| Project Planning | WBS (Work Breakdown Structure) | Task decomposition, role organisation, and overall progress tracking against the schedule |
+| Project Management | Kanban Board | Visualisation of task progress and workflow management |
+| Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
+
+#### Kanban board
+
+#### WBS
+
+---
+
 - 15% ~750 words
 
 - Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
