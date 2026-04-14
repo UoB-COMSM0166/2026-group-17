@@ -217,20 +217,20 @@ class Match {
    }
 
    #updateShot(dt) {
-      if (!this.#currentShot?.isActive) return;
-      const impactEvent = this.#currentShot.updatePhysics({
-         dt: dt / 1000,
-         gravity: Match.#GRAVITY,
-         wind: this.#wind,
-         rain: this.#rain,
-         earthquake: this.#earthquake,
-         terrain: this.#terrain,
-         players: this.#players,
-         resolution: createVector(this.#width, this.#height)
-      });
-      if (impactEvent?.type === "STAR_SPLIT") this.#handleStarSplit(impactEvent);
-      else if (impactEvent) this.#handleShotImpact(impactEvent);
-   }
+   if (!this.#currentShot?.isActive) return;
+   const impactEvent = this.#currentShot.updatePhysics({
+      dt: dt / 1000,
+      gravity: Match.#GRAVITY,
+      wind: this.#wind,
+      rain: this.#rain,
+      earthquake: this.#earthquake,
+      terrain: this.#terrain,
+      players: this.#players,
+      resolution: createVector(this.#width, this.#height)
+   });
+   if (impactEvent?.type === "STAR_SPLIT") this.#handleStarSplit(impactEvent);
+   else if (impactEvent) this.#handleShotImpact(impactEvent, this.#currentShot);
+}
 
    #handleStarSplit(impactEvent) {
       this.#shakeCallback?.(10, 10);
@@ -245,25 +245,26 @@ class Match {
       this.#currentShot = null;
    }
 
-   #handleShotImpact(impactEvent) {
-      const shot = this.#currentShot;
-
+   #handleShotImpact(impactEvent, shot) {
+   if (shot === this.#currentShot) {
       this.#currentShot = null;
-      if (impactEvent.type === 'OUT_OF_BOUNDS') {
-         this.#pendingTurnAdvance = true;
-         return;
-      }
-      if (impactEvent.type !== 'TERRAIN_IMPACT' && impactEvent.type !== 'PLAYER_HIT') return;
-
-      const weapon = shot?.weapon ?? null;
-      const kind = shot?.weaponId ?? "ball";
-
-      if (weapon?.onImpact) {
-         weapon.onImpact(this, impactEvent, shot);
-         return;
-      }
-      this.#handleWeaponEffectFallback(kind, impactEvent, shot, weapon);
    }
+
+   if (impactEvent.type === 'OUT_OF_BOUNDS') {
+      this.#pendingTurnAdvance = true;
+      return;
+   }
+   if (impactEvent.type !== 'TERRAIN_IMPACT' && impactEvent.type !== 'PLAYER_HIT') return;
+
+   const weapon = shot?.weapon ?? null;
+   const kind = shot?.weaponId ?? "ball";
+
+   if (weapon?.onImpact) {
+      weapon.onImpact(this, impactEvent, shot);
+      return;
+   }
+   this.#handleWeaponEffectFallback(kind, impactEvent, shot, weapon);
+}
 
    #handleWeaponEffectFallback(kind, impactEvent, shot, weapon = null) {
       switch (kind) {
@@ -349,25 +350,25 @@ class Match {
       });
    }
 
-   #updateSecondaryShots(dt) {
-      for (let i = this.#secondaryShots.length - 1; i >= 0; i--) {
-         const shot = this.#secondaryShots[i];
-         const impactEvent = shot.updatePhysics({
-            dt: dt / 1000,
-            gravity: Match.#GRAVITY,
-            wind: this.#wind,
-            rain: this.#rain,
-            terrain: this.#terrain,
-            players: this.#players,
-            resolution: createVector(this.#width, this.#height)
-         });
-         if (impactEvent) {
-            this.#handleShotImpact(impactEvent);
-            this.#secondaryShots.splice(i, 1);
-         }
-         else if (!shot.isActive) this.#secondaryShots.splice(i, 1);
+  #updateSecondaryShots(dt) {
+   for (let i = this.#secondaryShots.length - 1; i >= 0; i--) {
+      const shot = this.#secondaryShots[i];
+      const impactEvent = shot.updatePhysics({
+         dt: dt / 1000,
+         gravity: Match.#GRAVITY,
+         wind: this.#wind,
+         rain: this.#rain,
+         terrain: this.#terrain,
+         players: this.#players,
+         resolution: createVector(this.#width, this.#height)
+      });
+      if (impactEvent) {
+         this.#handleShotImpact(impactEvent, shot);
+         this.#secondaryShots.splice(i, 1);
       }
+      else if (!shot.isActive) this.#secondaryShots.splice(i, 1);
    }
+}
 
    #updatePoisonClouds(dt) {
       for (let i = this.#poisonClouds.length - 1; i >= 0; i--) {

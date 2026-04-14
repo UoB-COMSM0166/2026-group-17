@@ -40,6 +40,10 @@ class Shibashot extends AbstractWeapon {
     this.drawProjectile(cx, cy, r);
   }
 
+  drawExplosion(explosion) {
+    return; // shiba 不画 AbstractWeapon 默认黄圈
+  }
+
   onImpact(match, impactEvent, shot) {
     match.spawnWeaponExplosion(impactEvent.pos, "shiba", shot, this);
     match.spawnShibaImpact(impactEvent.pos);

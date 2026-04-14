@@ -67,123 +67,101 @@ class Explosion {
          this.#finished = true;
       }
 
-      if(this.kind === "bubblegumshot"){
+      if (this.kind === "bubblegumshot") {
          const elastic = sin(progress * PI);
 
-         this.#currentRadius = lerp(0, this.#maxRadius, progress)*(1 + elastic * 0.25);
+         this.#currentRadius = lerp(0, this.#maxRadius, progress) * (1 + elastic * 0.25);
       }
 
-      if(this.kind === "impactShock"){
+      if (this.kind === "impactShock") {
          this.#weapon?.drawImpactShock?.(this);
          return;
       }
    }
 
    draw() {
-      if (this.#finished) return;
+   if (this.#finished) return;
 
-      if (this.#weapon?.drawExplosion) {
-         this.#weapon.drawExplosion(this);
-         return;
-      }
+   const x = this.#position.x;
+   const y = this.#position.y;
+   const r = this.#currentRadius;
 
-      const x = this.#position.x;
-      const y = this.#position.y;
-      const r = this.#currentRadius;
+   if (this.kind === "shiba") {
+      return;
+   }
 
-      if (this.kind === "ball" || this.kind === "cannon_ball") {
-         push();
-         noFill();
-         stroke(255, 150, 0);
-         strokeWeight(3);
-         circle(x, y, r);
-         pop();
-         return;
-      }
+   if (this.kind === "starFragment") {
+   push();
+   drawingContext.shadowBlur = 25;
+   drawingContext.shadowColor = 'orange';
 
-      if (this.kind === "pineapple") {
-         push();
-         noStroke();
+   noStroke();
+   fill(255, 220, 90, 120);
+   circle(x, y, r * 1.3);
 
-         fill(150, 80, 220, 80);
-         circle(x, y, r * 1.6);
+   fill(255, 255, 255, 160);
+   circle(x, y, r * 0.4);
 
-         fill(80, 220, 120, 110);
-         circle(x, y, r * 1.2);
+   StarSpark.draw(x, y, r * 0.9);
 
-         fill(255, 240, 120, 180);
-         circle(x, y, r * 0.5);
+   stroke(255, 240, 120, 180);
+   strokeWeight(2);
+   line(x, y - r, x, y + r);
+   line(x - r, y, x + r, y);
 
-         stroke(120, 255, 160, 160);
-         strokeWeight(2);
-         noFill();
-         circle(x, y, r * 1.1);
-         pop();
+   pop();
+   return;
+}
 
-         push();
-         noStroke();
-         fill(120, 220, 120, 60);
-         circle(x, y, this.gasRadius);
-         pop();
-         return;
-      }
+   if (this.#weapon?.drawExplosion) {
+      this.#weapon.drawExplosion(this);
+      return;
+   }
 
-      if (this.kind === "star" || this.kind === "starFragment") {
-         push();
-         drawingContext.shadowBlur = 25;
-         drawingContext.shadowColor = 'orange';
-
-         noStroke();
-         fill(255, 220, 90, 120);
-         circle(x, y, r * 1.3);
-
-         fill(255, 255, 255, 160);
-         circle(x, y, r * 0.4);
-
-         StarSpark.draw(x, y, r * 0.9);
-
-         stroke(255, 240, 120, 180);
-         strokeWeight(2);
-         line(x, y - r, x, y + r);
-         line(x - r, y, x + r, y);
-
-         pop();
-         return;
-      }
-
-      if (this.kind === "shiba") {
-         push();
-         noStroke();
-
-         fill(170, 120, 90, 100);
-         circle(x, y, r * 1.5);
-
-         fill(255, 130, 80, 160);
-         circle(x, y, r * 0.9);
-
-         stroke(255, 80, 80);
-         strokeWeight(3);
-         line(x - r * 0.6, y, x + r * 0.6, y);
-         line(x, y - r * 0.5, x, y + r * 0.5);
-
-         if (this.waveRadius > 0) {
-            noFill();
-            stroke(255, 120, 80, 120);
-            strokeWeight(2);
-            circle(x, y, this.waveRadius);
-         }
-
-         pop();
-         return;
-      }
-
+   if (this.kind === "ball" || this.kind === "cannon_ball") {
       push();
+      noFill();
+      stroke(255, 150, 0);
       strokeWeight(3);
-      stroke('orange');
-      fill('yellow');
       circle(x, y, r);
       pop();
+      return;
    }
+
+   if (this.kind === "pineapple") {
+      push();
+      noStroke();
+
+      fill(150, 80, 220, 80);
+      circle(x, y, r * 1.6);
+
+      fill(80, 220, 120, 110);
+      circle(x, y, r * 1.2);
+
+      fill(255, 240, 120, 180);
+      circle(x, y, r * 0.5);
+
+      stroke(120, 255, 160, 160);
+      strokeWeight(2);
+      noFill();
+      circle(x, y, r * 1.1);
+      pop();
+
+      push();
+      noStroke();
+      fill(120, 220, 120, 60);
+      circle(x, y, this.gasRadius);
+      pop();
+      return;
+   }
+
+   push();
+   strokeWeight(3);
+   stroke('orange');
+   fill('yellow');
+   circle(x, y, r);
+   pop();
+}
 
    get position() { return this.#position; }
    get radius() { return this.#currentRadius; }

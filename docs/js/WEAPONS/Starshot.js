@@ -46,6 +46,13 @@ class Starshot extends AbstractWeapon {
     this.drawProjectile(cx, cy, r);
   }
 
+  drawExplosion(explosion) {
+    if (explosion.kind === "star" || explosion.kind === "starFragment") {
+      return;
+    }
+    super.drawExplosion(explosion);
+  }
+
   onImpact(match, impactEvent, shot) {
     match.spawnWeaponExplosion(impactEvent.pos, "star", shot, this);
   }
