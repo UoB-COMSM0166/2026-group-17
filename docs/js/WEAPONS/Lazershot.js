@@ -3,7 +3,7 @@ class Lazershot extends AbstractWeapon {
   constructor() {
     super({
       id: 'lazer', name: 'Lazer shot',
-      description: 'ONE shot. Apocalyptic blast.',
+      description:  "Fires a vertical laser beam from the sky.\nSlices through targets in a precise straight line.",
       damage: 10,
       speed: 6, 
       blastRadius: 10, 
@@ -97,6 +97,19 @@ class Lazershot extends AbstractWeapon {
 
  pop();
 }
+
+ drawIcon(cx, cy, r) {
+  // Use the PNG only for UI icons so the in-flight projectile keeps its JS shape.
+  if (typeof lazerImg !== "undefined" && lazerImg) {
+    push();
+    imageMode(CENTER);
+    image(lazerImg, cx, cy, 56, 56);
+    pop();
+    return;
+  }
+
+  this.drawProjectile(cx, cy, r);
+ }
 
  drawExplosion(explosion) {
   const progress = explosion.progress;
