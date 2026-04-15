@@ -3,7 +3,7 @@ class Grapeshot extends AbstractWeapon {
   constructor() {
     super({
       id: 'grapeshot', name: 'Grapeshot',
-      description: 'High arc. Massive blast.',
+      description: "Breaks apart mid-air while linked by chains.\nTriggers multiple chained explosions on impact.",
       damage: 8,
       speed: 5,
       blastRadius: 10,
@@ -138,6 +138,19 @@ class Grapeshot extends AbstractWeapon {
   
  pop();
 }
+
+ drawIcon(cx, cy, r) {
+  // Use the PNG only for UI icons so the in-flight projectile keeps its JS shape.
+  if (typeof grapeImg !== "undefined" && grapeImg) {
+    push();
+    imageMode(CENTER);
+    image(grapeImg, cx, cy, 52, 52);
+    pop();
+    return;
+  }
+
+  this.drawProjectile(cx, cy, r);
+ }
 
  drawExplosion(explosion) {
   this.drawStyledExplosion(explosion, {
