@@ -3,7 +3,7 @@ class Starshot extends AbstractWeapon {
     super({
       id: 'star',
       name: 'Starshot',
-      description: 'Freezes on impact.',
+      description: "Shatters mid-air into multiple fragments.\nEach piece detonates on impact, creating scattered explosive bursts.",
       damage: 5,
       speed: 6,
       blastRadius: 7,

@@ -3,7 +3,7 @@ class Shibashot extends AbstractWeapon {
     super({
       id: 'shiba',
       name: 'Shibashot',
-      description: 'Burning fuel blob.',
+      description: "Detonates on contact, launching enemies upward.\nSends targets flying with a forceful blast.",
       damage: 6,
       speed: 6,
       blastRadius: 6,
