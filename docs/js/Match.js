@@ -58,7 +58,7 @@ class Match {
       // Turn logic
       this.#turnController = new TurnController();
       //Skip turn for bubblegumshot
-      this.#turnController.onSkipCallback = (playerId) => {this.#handlePlayerSkip(playerId);};
+      this.#turnController.onSkipCallback = (playerId) => { this.#handlePlayerSkip(playerId); };
       this.#isEasyDifficulty = (gameMode === "easy");
       this.#trajectoryPreviewer = new TrajectoryPreview(resolution);
       this.#computerController = aiController;
@@ -248,7 +248,7 @@ class Match {
          resolution: createVector(this.#width, this.#height)
       });
       if (impactEvent?.type === "STAR_SPLIT") this.#handleStarSplit(impactEvent);
-      else if (impactEvent) this.#handleShotImpact(impactEvent);
+      else if (impactEvent) this.#handleShotImpact(impactEvent, this.#currentShot);
    }
 
    #handleStarSplit(impactEvent) {
@@ -264,10 +264,11 @@ class Match {
       this.#currentShot = null;
    }
 
-   #handleShotImpact(impactEvent) {
-      const shot = this.#currentShot;
+   #handleShotImpact(impactEvent, shot) {
+      if (shot === this.#currentShot) {
+         this.#currentShot = null;
+      }
 
-      this.#currentShot = null;
       if (impactEvent.type === 'OUT_OF_BOUNDS') {
          this.#pendingTurnAdvance = true;
          return;
@@ -300,6 +301,12 @@ class Match {
          case "starFragment":
             this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, weapon);
             break;
+         case "impact":
+            this.spawnWeaponExplosion(impactEvent.pos, "impact", shot, weapon);
+            break;
+         case "earthworm":
+            this.spawnWeaponExplosion(impactEvent.pos, "earthworm", shot, weapon);
+            this.spawnEarthWorm(impactEvent.pos, weapon);
          default:
             this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, weapon);
       }
@@ -307,7 +314,7 @@ class Match {
 
    spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null, options = {}) {
 
-      if(!pos) return;
+      if (!pos) return;
       this.#currentExplosions.push(new Explosion(
          pos.copy(),
          this.#terrain,
@@ -347,7 +354,7 @@ class Match {
       this.#shakeCallback?.(8, 7);
    }
 
-   spawnEarthWorm(impactPos, weapon){
+   spawnEarthWorm(impactPos, weapon) {
       this.#earthWormImpacts.push({
          position: impactPos.copy(),
          weapon: weapon,
@@ -358,7 +365,7 @@ class Match {
       });
    }
 
-   spawnEarthWormBump(x, strength = 10){
+   spawnEarthWormBump(x, strength = 10) {
       this.#earthWormBump.push({
          x: x,
          strength,
@@ -381,7 +388,7 @@ class Match {
             resolution: createVector(this.#width, this.#height)
          });
          if (impactEvent) {
-            this.#handleShotImpact(impactEvent);
+            this.#handleShotImpact(impactEvent, shot);
             this.#secondaryShots.splice(i, 1);
          }
          else if (!shot.isActive) this.#secondaryShots.splice(i, 1);
@@ -417,12 +424,12 @@ class Match {
       });
    }
 
-   #updateEarthWormImpacts(dt){
-      for(let i = this.#earthWormImpacts.length - 1; i >= 0; i--){
-         
+   #updateEarthWormImpacts(dt) {
+      for (let i = this.#earthWormImpacts.length - 1; i >= 0; i--) {
+
          const worm = this.#earthWormImpacts[i];
          //Timer
-         worm.timer += dt /1000;
+         worm.timer += dt / 1000;
          //Follow enemy
          const target = this.#players[1 - this.#lastShooterId];
          //predicted position
@@ -435,32 +442,32 @@ class Match {
          worm.position.x = lerp(worm.position.x, worm.targetX, speed) + wave;
          //Follow Terrain shape
          const ground = this.#terrain.getHeightAt(worm.position.x);
-         const depth = lerp(30, 80, worm.timer /worm.duration);
+         const depth = lerp(30, 80, worm.timer / worm.duration);
          worm.position.y = ground + depth;
          //Explosion
-         if(worm.timer >= worm.duration){
+         if (worm.timer >= worm.duration) {
 
             this.spawnEarthWormBump(worm.position.x, 22);
             //Jump at last time
             worm.position.y -= 20;
             const explosionPos = createVector(
-               worm.position.x + random(-50, 50), 
+               worm.position.x + random(-50, 50),
                this.#terrain.getHeightAt(worm.position.x) + 40
             );
-            this.spawnWeaponExplosion(explosionPos, "earthworm", null, worm.weapon, {duration: 300});
-         
-         this.#earthWormImpacts.splice(i, 1);
+            this.spawnWeaponExplosion(explosionPos, "earthworm", null, worm.weapon, { duration: 300 });
+
+            this.#earthWormImpacts.splice(i, 1);
          }
       }
    }
 
-   #updateEarthWormBump(dt){
-      for(let i = this.#earthWormBump.length - 1; i >= 0; i--){
+   #updateEarthWormBump(dt) {
+      for (let i = this.#earthWormBump.length - 1; i >= 0; i--) {
          const bump = this.#earthWormBump[i];
 
          bump.life -= dt / 1000;
 
-         if(bump.life <= 0){
+         if (bump.life <= 0) {
             this.#earthWormBump.splice(i, 1);
          }
       }
@@ -474,7 +481,7 @@ class Match {
       }
       if (this.#controlPanel.powerAdjust.isFollowing || this.#controlPanel.powerAdjust.isKeyboardControlled){
          const newPower = this.#controlPanel.powerAdjust.power * 7;
-         if(newPower > 0){
+         if (newPower > 0) {
             currentPlayer.barrelPower = newPower;
          }
       }      
@@ -612,7 +619,7 @@ class Match {
       for (const explosion of this.#currentExplosions) explosion.draw();
       for (const cloud of this.#poisonClouds) cloud.draw();
       for (const fx of this.#shibaImpacts) fx.draw();
-      
+
       for (const worm of this.#earthWormImpacts) {
          push();
          noStroke();
@@ -776,19 +783,19 @@ class Match {
    }
    //Expose internal state for weapon effects
    //All player cannons in the match 
-   getPlayers(){
+   getPlayers() {
       return this.#players;
    }
    //Controls turn order and turn number
-   getTurnController(){
+   getTurnController() {
       return this.#turnController;
    }
    //ID of the player who fired the last shot
-   getLastShooterId(){
+   getLastShooterId() {
       return this.#lastShooterId;
    }
 
-   #handlePlayerSkip(playerId){
+   #handlePlayerSkip(playerId) {
       this.#turnCounter.showSkip(playerId);
    }
 }

@@ -3,7 +3,7 @@ class Submarinshot extends AbstractWeapon {
   constructor() {
     super({
       id: 'Submarin', name: 'Submarinshot',
-      description: 'Curves toward enemy.',
+      description: "Launches a spinning purple shell through the air.\nDetonates with a wide-area destructive blast.",
       damage: 9, 
       speed: 7, 
       blastRadius: 8, 
@@ -78,6 +78,19 @@ drawProjectile(cx, cy, r) {
   ellipse(cx, cy + r * 1.8, r * 0.8, r * 0.8);
 
   pop();
+}
+
+drawIcon(cx, cy, r) {
+  // Use the PNG only for UI icons so the in-flight projectile keeps its JS shape.
+  if (typeof submarineImg !== "undefined" && submarineImg) {
+    push();
+    imageMode(CENTER);
+    image(submarineImg, cx, cy, 56, 56);
+    pop();
+    return;
+  }
+
+  this.drawProjectile(cx, cy, r);
 }
 drawExplosion(explosion) {
   const progress = explosion.progress;

@@ -3,7 +3,7 @@ class Shibashot extends AbstractWeapon {
     super({
       id: 'shiba',
       name: 'Shibashot',
-      description: 'Burning fuel blob.',
+      description: "Detonates on contact, launching enemies upward.\nSends targets flying with a forceful blast.",
       damage: 6,
       speed: 6,
       blastRadius: 6,
@@ -38,6 +38,10 @@ class Shibashot extends AbstractWeapon {
 
   drawIcon(cx, cy, r) {
     this.drawProjectile(cx, cy, r);
+  }
+
+  drawExplosion(explosion) {
+    return; // shiba 不画 AbstractWeapon 默认黄圈
   }
 
   onImpact(match, impactEvent, shot) {
