@@ -1,7 +1,7 @@
 class Match {
    static #GRAVITY;
    static #ZERO_VECTOR;
-   static #MAX_CANNON_SLOPE_ANGLE = 65;
+   static #MAX_CANNON_SLOPE_ANGLE = 55;
    #width;
    #height;
    #bgTopColour;
@@ -69,6 +69,8 @@ class Match {
 
    updateMatch(dt) {
       this.#handleRoundTransition();
+      this.#controlPanel.angleDial.updateKeyboardControl(this.#physicsDone());
+      this.#controlPanel.powerAdjust.updateKeyboardControl(this.#physicsDone());
       this.#syncControlPanel();
       this.#updateShot(dt);
       this.#updateSecondaryShots(dt);
@@ -110,7 +112,23 @@ class Match {
       this.#triggerMouseCannonMovement();
    }
 
+   onKeyPressed(inputKey, keyId) {
+      if (!this.#inputActive()) return;
+      if (inputKey === 'a' || inputKey === 'A' || inputKey === 'd' || inputKey === 'D') {
+         this.#controlPanel.angleDial.handleKeypressed(inputKey);
+      }
+      if (inputKey === 'w' || inputKey === 'W' || inputKey === 's' || inputKey === 'S') {
+         this.#controlPanel.powerAdjust.handleKeypressed(inputKey);
+      }
+   }
+
    onKeyReleased(inputKey, keyId) {
+      if (inputKey === 'a' || inputKey === 'A' || inputKey === 'd' || inputKey === 'D') {
+         this.#controlPanel.angleDial.handleKeyReleased(inputKey);
+      }
+      if (inputKey === 'w' || inputKey === 'W' || inputKey === 's' || inputKey === 'S') {
+         this.#controlPanel.powerAdjust.handleKeyReleased(inputKey);
+      }
       if (!this.#inputActive()) return;
       if (inputKey === 'Space' || keyId === 32) this.#executeCannonShot();
       if (keyId === 37) this.#executeCannonMovement('left');
@@ -450,11 +468,11 @@ class Match {
 
    #updatePlayers() {
       const currentPlayer = this.#players[this.#turnController.activePlayerId];
-      if (this.#controlPanel.angleDial.isFollowing){
+      if (this.#controlPanel.angleDial.isFollowing || this.#controlPanel.angleDial.isKeyboardControlled){
          const newAngle = this.#controlPanel.angleDial.needleRotation - 90;
          currentPlayer.barrelAngle = newAngle;
       }
-      if (this.#controlPanel.powerAdjust.isFollowing){
+      if (this.#controlPanel.powerAdjust.isFollowing || this.#controlPanel.powerAdjust.isKeyboardControlled){
          const newPower = this.#controlPanel.powerAdjust.power * 7;
          if(newPower > 0){
             currentPlayer.barrelPower = newPower;
@@ -573,7 +591,7 @@ class Match {
    #drawPlayers() {
       const playerId = this.#turnController.activePlayerId;
       for (const player of this.#players) {
-         const x = player.positionVector.x;
+         const x = player.position.x;
          player.drawPlayer();
       }
       if (!this.#turnController.isGameOver) this.#players[playerId].drawIndicator(playerId);
@@ -691,9 +709,14 @@ class Match {
       if (player.moveSteps > 0) {
          const moveDistance = 100;
          const multiplier = (direction === 'left') ? -1 : 1;
-         player.setTargetX(player.targetX + (this.#getPlayerTangent().x * moveDistance * multiplier), this.#width);
-         player.moveSteps -= 1;
-         this.#controlPanel.setMoveSteps(player.moveSteps);
+         const candidateX = player.targetX + (this.#getPlayerTangent().x * moveDistance * multiplier);
+         const slopeAngle = this.#terrain.getSlopeAngleAt(candidateX);
+
+         if (slopeAngle <= Match.#MAX_CANNON_SLOPE_ANGLE) {
+            player.setTargetX(candidateX, this.#width);
+            player.moveSteps -= 1;
+            this.#controlPanel.setMoveSteps(player.moveSteps);
+         }
       }
    }
 
@@ -713,22 +736,23 @@ class Match {
    }
 
    #stopPlayerAtSteepSlope(player, follow) {
-      if (abs(player.targetX - player.positionVector.x) < 0.5) return;
+      if (abs(player.targetX - player.position.x) < 0.5) return;
 
-      const nextX = lerp(player.positionVector.x, player.targetX, follow);
+      const nextX = lerp(player.position.x, player.targetX, follow);
       const slopeAngle = this.#terrain.getSlopeAngleAt(nextX);
 
       if (slopeAngle > Match.#MAX_CANNON_SLOPE_ANGLE) {
-         player.setTargetX(player.positionVector.x, this.#width);
+         player.setTargetX(player.position.x, this.#width);
       }
    }
 
+   //get the normalized tangent of player in order to decide moving or not
    #getPlayerTangent(){
       let player = this.#players[this.#turnController.activePlayerId]
       let sampleOffset = 5;
 
-      let leftY = this.#terrain.getHeightAt(player.positionVector.x - sampleOffset);
-      let rightY = this.#terrain.getHeightAt(player.positionVector.x + sampleOffset);
+      let leftY = this.#terrain.getHeightAt(player.position.x - sampleOffset);
+      let rightY = this.#terrain.getHeightAt(player.position.x + sampleOffset);
 
       let dx = sampleOffset * 2;
       let dy = rightY - leftY;

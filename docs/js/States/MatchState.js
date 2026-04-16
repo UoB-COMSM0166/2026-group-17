@@ -27,6 +27,10 @@ class MatchState extends State {
       this.#match.onMouseReleased(cursorX, cursorY, button);
    }
 
+   onKeyPressed(inputKey, keyId) {
+      this.#match.onKeyPressed(inputKey, keyId);
+   }
+
    onKeyReleased(inputKey, keyId) {
       this.#match.onKeyReleased(inputKey, keyId);
    }
