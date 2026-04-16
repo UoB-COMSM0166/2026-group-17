@@ -213,7 +213,146 @@ As the game grew, we refined these relationships without necessarily deleting th
 
 > For interactive SVG diagrams with **zoom & drag** functionality, please open the [interactive diagrams page](https://uob-comsm0166.github.io/2026-group-17/diagrams.html).
 
+```mermaid
+classDiagram
+direction TB
 
+class Game
+class Effects
+
+class State
+class MenuState
+class ShopState
+class MatchState
+class EndState
+
+class StartMenu
+class WeaponShop
+class AIController
+
+class Match
+class PlayerCannon
+class Projectile
+class Explosion
+class PoisonCloud
+class ShibaImpactEffect
+class FloatingScore
+
+class ControlPanel
+class WeaponInventory
+class AngleDialWidget
+class ShootButton
+class PowerAdjustWidget
+class MovePadWidget
+class TrajectoryPreview
+
+class TurnController
+class TurnCounter
+class ScoreBoard
+class ScoreCalculator
+
+class Terrain
+class TerrainColumn
+
+class WindSystem
+class RainSystem
+class EarthquakeSystem
+
+class AbstractWeapon
+class CannonBall
+class Bubblegumshot
+class Earthworm
+class Grapeshot
+class ImpactGun
+class Lazershot
+class Pineappleshot
+class Shibashot
+class Starshot
+class Submarinshot
+
+Game --> Effects : owns
+Game --> State : currentState
+State <|-- MenuState
+State <|-- ShopState
+State <|-- MatchState
+State <|-- EndState
+
+MenuState --> StartMenu : uses
+MenuState --> ShopState : switches to
+
+ShopState --> WeaponShop : owns
+ShopState --> AIController : owns
+ShopState --> MatchState : switches to
+
+MatchState --> Match : owns
+MatchState --> EndState : switches to
+MatchState --> Effects : uses shake
+
+EndState --> Game : restart
+
+WeaponShop --> AbstractWeapon : displays/selects
+WeaponShop --> AIController : AI shop pick
+
+Match --> PlayerCannon : manages 2
+Match --> Terrain : owns
+Match --> ControlPanel : owns
+Match --> TurnController : owns
+Match --> TurnCounter : owns
+Match --> ScoreBoard : owns
+Match --> ScoreCalculator : owns
+Match --> TrajectoryPreview : owns
+Match --> WindSystem : owns
+Match --> RainSystem : owns
+Match --> EarthquakeSystem : owns
+Match --> AIController : uses
+Match --> Projectile : currentShot / secondaryShots
+Match --> Explosion : currentExplosions
+Match --> PoisonCloud : spawns
+Match --> ShibaImpactEffect : spawns
+Match --> FloatingScore : spawns
+
+ControlPanel --> AngleDialWidget : owns
+ControlPanel --> ShootButton : owns
+ControlPanel --> PowerAdjustWidget : owns
+ControlPanel --> MovePadWidget : owns
+ControlPanel --> WeaponInventory : owns
+
+WeaponInventory --> AbstractWeapon : displays
+TrajectoryPreview --> AbstractWeapon : reads weapon behavior
+TrajectoryPreview --> Terrain : simulates against
+TrajectoryPreview --> PlayerCannon : reads launch state
+
+Terrain --> ControlPanel : queries altitude
+Terrain *-- TerrainColumn : contains
+
+TurnController --> PlayerCannon : checks canAct
+ScoreCalculator --> PlayerCannon : scores hits
+ScoreBoard --> PlayerCannon : displays scores
+
+PlayerCannon --> Projectile : fires
+PlayerCannon o-- AbstractWeapon : weaponLoadout
+Projectile --> AbstractWeapon : weapon behavior
+Explosion --> AbstractWeapon : custom drawExplosion
+
+WindSystem --> Projectile : applyTo
+RainSystem --> Projectile : applyTo
+EarthquakeSystem --> Projectile : applyTo
+
+AbstractWeapon <|-- CannonBall
+AbstractWeapon <|-- Bubblegumshot
+AbstractWeapon <|-- Earthworm
+AbstractWeapon <|-- Grapeshot
+AbstractWeapon <|-- ImpactGun
+AbstractWeapon <|-- Lazershot
+AbstractWeapon <|-- Pineappleshot
+AbstractWeapon <|-- Shibashot
+AbstractWeapon <|-- Starshot
+AbstractWeapon <|-- Submarinshot
+
+AbstractWeapon --> Match : onImpact()
+AbstractWeapon --> Explosion : drawExplosion()
+AbstractWeapon --> Projectile : beforeProjectileStep()
+```
 ### Implementation
 
 - 15% ~750 words
