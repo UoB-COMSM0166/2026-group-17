@@ -19,7 +19,7 @@ class ImpactGun extends AbstractWeapon {
 
    push();
    imageMode(CENTER);
-   image(impactgunImg, x, y, size * 2.5, size * 2.5);
+   image(impactgunImg, x, y, 60, 60);
    pop();
   }
 
@@ -70,8 +70,6 @@ class ImpactGun extends AbstractWeapon {
   }
 
   onImpact(match, impactEvent, shot){
-    //Will delete
-    console.log("Impactgun on impact called", impactEvent);
     
     const pos = impactEvent?.position || impactEvent?.pos;
     if(!pos) return;
@@ -80,7 +78,5 @@ class ImpactGun extends AbstractWeapon {
       maxRadius: 130, 
       duration: 350,
     });
-    //Will delete
-    console.log("First explosion sent");
   }
 }

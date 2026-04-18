@@ -121,7 +121,8 @@ class WeaponInventory {
             push();
             rectMode(CORNER);
             ellipseMode(RADIUS);
-            weapon?.drawIcon?.(boxX, boxY, 12);
+            const iconSize = 40;
+            weapon?.drawIcon?.(boxX, boxY, iconSize);
             pop();
 
             drawingContext.restore();

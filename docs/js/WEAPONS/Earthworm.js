@@ -20,7 +20,7 @@ class Earthworm extends AbstractWeapon {
 
      push();
      imageMode(CENTER);
-     image(earthwormImg, x, y, size * 2.5, size * 2.5);
+     image(earthwormImg, x, y, 60, 60);
      pop();
   }
 
