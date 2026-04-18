@@ -353,6 +353,128 @@ AbstractWeapon --> Match : onImpact()
 AbstractWeapon --> Explosion : drawExplosion()
 AbstractWeapon --> Projectile : beforeProjectileStep()
 ```
+
+```mermaid
+sequenceDiagram
+    actor P as Player
+    participant G as Game
+    participant MS as MenuState
+    participant SS as ShopState
+    participant WS as WeaponShop
+    participant AI as AIController
+    participant MTS as MatchState
+    participant M as Match
+    participant CP as ControlPanel
+    participant PC as PlayerCannon
+    participant PR as Projectile
+    participant AW as AbstractWeapon
+    participant EX as Explosion
+    participant T as Terrain
+    participant TC as TurnController
+    participant SB as ScoreBoard
+    participant ES as EndState
+
+    P->>G: Start game
+    G->>MS: load MenuState
+    P->>MS: select difficulty
+    MS->>G: switch to ShopState
+
+    G->>SS: load ShopState
+    SS->>WS: create weapon shop
+    SS->>AI: create AI controller
+
+    loop Weapon selection
+        P->>WS: hover / choose weapon
+        WS-->>P: show weapon info
+        AI->>WS: auto-pick weapon
+    end
+
+    P->>SS: click Start Battle
+    SS->>G: switch to MatchState
+
+    G->>MTS: load MatchState
+    MTS->>M: create Match
+    M->>T: generate terrain
+    M->>PC: create players
+    M->>CP: create control panel
+    M->>TC: initialize turn logic
+    M->>SB: initialize scoreboard
+
+    loop Each turn
+        P->>CP: adjust angle / power / weapon
+        P->>M: fire
+        M->>PC: fire current weapon
+        PC->>PR: create projectile
+        PR->>AW: use weapon behavior
+
+        loop Projectile flight
+            M->>PR: updatePhysics()
+            PR->>AW: beforeProjectileStep()
+            PR-->>M: position / collision result
+        end
+
+        alt Projectile hits terrain or player
+            M->>AW: onImpact()
+            AW->>EX: create explosion(s)
+            EX->>T: applyExplosion()
+            M->>SB: update score
+        else Projectile out of bounds
+            PR-->>M: OUT_OF_BOUNDS
+        end
+
+        M->>TC: advancePhase()
+        TC-->>M: next active player
+    end
+
+    alt Match finished
+        M->>MTS: matchResults
+        MTS->>G: switch to EndState
+        G->>ES: load EndState
+        ES-->>P: show winner and final scores
+    end
+
+```
+
+```mermaid
+sequenceDiagram
+    actor Player
+    participant Match
+    participant PlayerCannon
+    participant Projectile
+    participant Weapon as AbstractWeapon/Subclass
+    participant Explosion
+    participant Terrain
+    participant TurnController
+    participant ScoreBoard
+
+    Player->>Match: fire weapon
+    Match->>PlayerCannon: fireCurrentWeapon()
+    PlayerCannon->>Projectile: new Projectile(...)
+    PlayerCannon-->>Match: projectile
+
+    loop update each frame
+        Match->>Projectile: updatePhysics(...)
+        Projectile->>Weapon: beforeProjectileStep(...)
+        Projectile-->>Match: flight result
+    end
+
+    alt terrain impact / player hit
+        Match->>Weapon: onImpact(match, impactEvent, shot)
+        Weapon->>Explosion: create explosion spec(s)
+        Match->>Explosion: spawnWeaponExplosion(...)
+        loop explosion update
+            Match->>Explosion: update(dt)
+            Explosion->>Terrain: applyExplosion(...)
+        end
+        Match->>ScoreBoard: add score
+    else out of bounds
+        Projectile-->>Match: OUT_OF_BOUNDS
+    end
+
+    Match->>TurnController: advancePhase(players)
+
+```
+
 ### Implementation
 
 - 15% ~750 words
