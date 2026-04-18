@@ -289,7 +289,7 @@ class Match {
 
    spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null, options = {}) {
 
-      if (!pos) return;
+      if(!pos) return;
       this.#currentExplosions.push(new Explosion(
          pos.copy(),
          this.#terrain,
@@ -329,7 +329,7 @@ class Match {
       this.#shakeCallback?.(8, 7);
    }
 
-   spawnEarthWorm(impactPos, weapon) {
+   spawnEarthWorm(impactPos, weapon){
       this.#earthWormImpacts.push({
          position: impactPos.copy(),
          weapon: weapon,
@@ -340,7 +340,7 @@ class Match {
       });
    }
 
-   spawnEarthWormBump(x, strength = 10) {
+   spawnEarthWormBump(x, strength = 10){
       this.#earthWormBump.push({
          x: x,
          strength,
@@ -421,7 +421,6 @@ class Match {
          worm.position.y = ground + depth;
          //Explosion
          if (worm.timer >= worm.duration) {
-
             this.spawnEarthWormBump(worm.position.x, 22);
             //Jump at last time
             worm.position.y -= 20;
@@ -435,14 +434,13 @@ class Match {
          }
       }
    }
-
-   #updateEarthWormBump(dt) {
-      for (let i = this.#earthWormBump.length - 1; i >= 0; i--) {
+   #updateEarthWormBump(dt){
+      for(let i = this.#earthWormBump.length - 1; i >= 0; i--){
          const bump = this.#earthWormBump[i];
 
          bump.life -= dt / 1000;
 
-         if (bump.life <= 0) {
+         if(bump.life <= 0){
             this.#earthWormBump.splice(i, 1);
          }
       }
@@ -450,13 +448,13 @@ class Match {
 
    #updatePlayers() {
       const currentPlayer = this.#players[this.#turnController.activePlayerId];
-      if (this.#controlPanel.angleDial.isFollowing) {
+      if (this.#controlPanel.angleDial.isFollowing){
          const newAngle = this.#controlPanel.angleDial.needleRotation - 90;
          currentPlayer.barrelAngle = newAngle;
       }
-      if (this.#controlPanel.powerAdjust.isFollowing) {
+      if (this.#controlPanel.powerAdjust.isFollowing){
          const newPower = this.#controlPanel.powerAdjust.power * 7;
-         if (newPower > 0) {
+         if(newPower > 0){
             currentPlayer.barrelPower = newPower;
          }
       }
@@ -588,7 +586,6 @@ class Match {
       for (const explosion of this.#currentExplosions) explosion.draw();
       for (const cloud of this.#poisonClouds) cloud.draw();
       for (const fx of this.#shibaImpacts) fx.draw();
-
       for (const worm of this.#earthWormImpacts) {
          push();
          noStroke();

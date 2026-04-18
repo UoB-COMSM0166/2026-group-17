@@ -69,8 +69,7 @@ class ImpactGun extends AbstractWeapon {
     pop();
   }
 
-  onImpact(match, impactEvent, shot){
-    
+  onImpact(match, impactEvent, shot){    
     const pos = impactEvent?.position || impactEvent?.pos;
     if(!pos) return;
 
