@@ -1,11 +1,21 @@
 class PowerAdjustWidget {
+   //outlook part
    #positionVector;
    #p1; #p2; #p3;
    #plateOutlineColor;
    #plateFillColor;
+   //control part
    #isFollowing = false;
    #power = 0;
    #sliderX;
+   #upHeld = false;
+   #downHeld = false;
+   #holdDelay = 180;
+   #repeatInterval = 25;
+   #upHoldTimer = 0;
+   #downHoldTimer = 0;
+   #lastUpRepeat = 0;
+   #lastDownRepeat = 0;
 
    constructor(posV = createVector(width / 6 * 5, height - height / 5),
       plateInColor = color('paleturquoise'),
@@ -21,13 +31,16 @@ class PowerAdjustWidget {
       const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
       const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
       this.#sliderX = (xMin + xMax) / 2;
+
    }
 
    get isFollowing() { return this.#isFollowing; }
    get isHovered() { return this.#isHovered(); }
    set isFollowing(track) { this.#isFollowing = track; }
+   get isKeyboardControlled() { return this.#upHeld || this.#downHeld; }
    get power() { return this.#power; }
    set power(p) {
+      p = constrain(p, 0, 100);
       const xMin = min(this.#p1.x + 2, this.#p3.x - 2);
       const xMax = max(this.#p1.x + 2, this.#p3.x - 2);
       this.#sliderX = map(p, 0, 100, xMin, xMax);
@@ -53,7 +66,6 @@ class PowerAdjustWidget {
       const g = ctx.createLinearGradient(minX, minY, maxX, minY);
       g.addColorStop(0, col1);
       g.addColorStop(1, col2);
-      //the
       ctx.fillStyle = g;
 
       //move
@@ -120,6 +132,7 @@ class PowerAdjustWidget {
    }
 
    #isHovered() {
+      //Barycentric coordinate system
       const mx = mouseX, my = mouseY;
       const { x: x1, y: y1 } = this.#p1;
       const { x: x2, y: y2 } = this.#p2;
@@ -158,20 +171,54 @@ class PowerAdjustWidget {
       pop();
    }
 
-   keyPressed(key, isEnabled) {
-      if (key === 'w' || key === 'W') {
-         if (isEnabled) this.increasePower(5);
+   //----------------keyboard control for angle dial-----------------
+   handleKeypressed(keyId){
+      const now = millis();
+
+      //w for power up, s for power down
+      if ((keyId === 'w' || keyId === 'W')) {
+         this.#isFollowing = false;
+         this.#upHeld = true;
+         this.#upHoldTimer = now;
+         this.#lastUpRepeat = now;
+         this.power += 1;
       }
-      else if (key === 's' || key === 'S') {
-         if (isEnabled) this.decreasePower(5);
+      else if (keyId === 's' || keyId === 'S') {
+         this.#isFollowing = false;
+         this.#downHeld = true;
+         this.#downHoldTimer = now;
+         this.#lastDownRepeat = now;
+         this.power -= 1;
       }
    }
 
-   increasePower(step = 1) {
-      this.power = constrain(this.#power + step, 0, 100);
+   handleKeyReleased(keyId){
+      if (keyId === 'w' || keyId === 'W') this.#upHeld = false;
+      else if (keyId === 's' || keyId === 'S') this.#downHeld = false;
    }
 
-   decreasePower(step = 1) {
-      this.power = constrain(this.#power - step, 0, 100);
+   updateKeyboardControl(controlable = true){
+      if (!controlable) return;
+
+      const now = millis();
+
+      if (this.#upHeld && this.power < 100) {
+         const heldLongEnough =  now - this.#upHoldTimer > this.#holdDelay;
+         const shouldRepeat = now - this.#lastUpRepeat > this.#repeatInterval;
+
+         if(heldLongEnough && shouldRepeat) {
+            this.power += 1;
+            this.#lastUpRepeat = now;
+         }
+      }
+      else if (this.#downHeld && this.power > 0) {
+         const heldLongEnough =  now - this.#downHoldTimer > this.#holdDelay;
+         const shouldRepeat = now - this.#lastDownRepeat > this.#repeatInterval;
+
+         if(heldLongEnough && shouldRepeat) {
+            this.power -= 1;
+            this.#lastDownRepeat = now;
+         }
+      }
    }
 }
