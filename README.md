@@ -385,7 +385,7 @@ At the initial stage of the project, we identified and mapped each member’s st
 
 Specifically, members with creative strengths were responsible for visual design and video production, those with project management experience handled scheduling and task coordination, and members with a technical focus worked on gameplay implementation and AI development. Each member contributed to the foundation of the project by leveraging their own strengths and experience.
 
-#### Team Members’ Strengths and Role Mapping
+<h3 align="center">Team Members’ Strengths and Role Mapping</h3>
 
 | Category | Strengths / Experience | Main Responsibilities | Members |
 |----------|----------------------|----------------------|----------|
@@ -405,11 +405,38 @@ At the same time, challenges and development tasks were not handled individually
 
 We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
 
----
+To support collaboration and development, we used tools for version control, communication, planning, and schedule management.
+
+<h3 align="center">Collaboration Tools Used</h3>
+
+| Category | Tool | Purpose |
+|----------|------|---------|
+| Version Control & Development | GitHub | Code sharing, storage, and integration |
+| Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
+| Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
+| Project Planning | WBS (Work Breakdown Structure) | Task decomposition, role organisation, and overall progress tracking against the schedule |
+| Project Management | Kanban Board | Visualisation of task progress and workflow management |
+| Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
 
 ### Shared Development Approach and Improvements
 
 To support collaborative problem-solving and development, we adopted the agile methodology learned in class. We conducted daily stand-up meetings throughout the project period, including during the Easter break, to review task progress and identify issues. In addition, we held in-person sessions approximately every two weeks, reserving a meeting room to ensure focused, on-site collaborative development time. During these sessions, we conducted pair programming and performed code merging through direct discussion in front of monitors with relevant task owners, which helped improve development efficiency.
+
+During meetings, the Gantt chart schedule was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
+
+<h3 align="center">Gantt chart schedule</h3>
+
+<p align="center">
+  <img src="images/Gantt%20chart.png" width="600">
+</p>
+
+<h3 align="center">Kanban board</h3>
+
+<p align="center">
+  <img src="images/Kanban%20Board.png" width="600">
+</p>
+
+---
 
 ### Improvements in Project Management Process
 
@@ -424,7 +451,7 @@ Discussion of possible solutions to the identified issues
 
 In addition, since all members were continuously dedicating significant effort to game development tasks throughout the project period and signs of fatigue were observed, we implemented measures to ensure a balanced workload and reduce stress during breaks. Before holiday periods, each member’s schedule was shared in advance via Outlook calendars, allowing others to cover tasks as needed and minimizing unnecessary communication during that time.
 
-#### Daily meeting agenda slide
+<h3 align="center">Daily Meeting Agenda Slide</h3>
 
 <p align="center">
   <img src="images/DailyMeeting%20agenda.png" width="600">
@@ -436,6 +463,8 @@ In addition, during collaborative development, several issues occurred when merg
 
 To address these problems, we established the following process during daily meetings and ensured that all team members strictly followed it: 
 
+<h3 align="center">Revised Git Merge Process</h3>
+
 <p align="center">
   <img src="images/Merge%20process.png" width="600">
 </p>
@@ -444,37 +473,6 @@ To address these problems, we established the following process during daily mee
 #### Outcomes
 
 Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
-
----
-
-#### Tools Used
-
-To support collaboration and development, we used tools for version control, communication, planning, and schedule management.
-
-| Category | Tool | Purpose |
-|----------|------|---------|
-| Version Control & Development | GitHub | Code sharing, storage, and integration |
-| Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
-| Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
-| Project Planning | WBS (Work Breakdown Structure) | Task decomposition, role organisation, and overall progress tracking against the schedule |
-| Project Management | Kanban Board | Visualisation of task progress and workflow management |
-| Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
-
-#### Kanban board
-
-<p align="center">
-  <img src="images/Kanban%20Board.png" width="600">
-</p>
-
-#### Gantt chart schedule
-
-During meetings, the Gantt chart schedule was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
-
-<p align="center">
-  <img src="images/Gantt%20chart.png" width="600">
-</p>
-
-#### 
 
 ---
 
