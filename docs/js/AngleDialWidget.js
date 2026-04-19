@@ -1,11 +1,21 @@
 class AngleDialWidget {
+   //the outlook part
    static #needleColor;
    #positionVector;
    #radius;
    #plateFillColor;
    #plateOutlineColor;
+   //the control part
    #isFollowing = false;
    #needleRotation = 45;
+   #leftHeld = false;
+   #rightHeld = false;
+   #holdDelay = 180;
+   #repeatInterval = 25;
+   #leftHoldTimer = 0;
+   #rightHoldTimer = 0;
+   #lastLeftRepeat = 0;
+   #lastRightRepeat = 0;
 
    constructor(posV = createVector(width / 6, height - height / 5), rad = 60,
       plateInColor = color('paleturquoise'),
@@ -24,6 +34,7 @@ class AngleDialWidget {
    }
 
    get isFollowing() { return this.#isFollowing; }
+   get isKeyboardControlled() { return this.#leftHeld || this.#rightHeld; }
    get isHovered() { return this.#isHovered(); }
    get needleRotation() { return this.#needleRotation; }
    set needleRotation(angle) { this.#needleRotation = angle; }
@@ -92,5 +103,56 @@ class AngleDialWidget {
       const angle = ((360 - (this.#needleRotation - 90)) % 360).toFixed(0);
       text(`Angle: ${angle} °`, this.#positionVector.x, this.#positionVector.y - this.#radius * 1.5);
       pop();
+   }
+
+   //----------------keyboard control for angle dial-----------------
+   handleKeypressed(keyId){
+      const now = millis();
+
+      //a for left, d for right
+      if (keyId === 'a' || keyId === 'A') {
+         this.#isFollowing = false;
+         this.#leftHeld = true;
+         this.#leftHoldTimer = now;
+         this.#lastLeftRepeat = now;
+         this.#needleRotation -= 1;
+      }
+      else if (keyId === 'd' || keyId === 'D') {
+         this.#isFollowing = false;
+         this.#rightHeld = true;
+         this.#rightHoldTimer = now;
+         this.#lastRightRepeat = now;
+         this.#needleRotation += 1;
+      }
+   }
+
+   handleKeyReleased(keyId){
+      if (keyId === 'a' || keyId === 'A') this.#leftHeld = false;
+      else if (keyId === 'd' || keyId === 'D') this.#rightHeld = false;
+   }
+
+   updateKeyboardControl(controlable = true){
+      if (!controlable) return;
+
+      const now = millis();
+
+      if (this.#leftHeld) {
+         const heldLongEnough =  now - this.#leftHoldTimer > this.#holdDelay;
+         const shouldRepeat = now - this.#lastLeftRepeat > this.#repeatInterval;
+
+         if(heldLongEnough && shouldRepeat) {
+            this.#needleRotation -= 1;
+            this.#lastLeftRepeat = now;
+         }
+      }
+      else if (this.#rightHeld) {
+         const heldLongEnough =  now - this.#rightHoldTimer > this.#holdDelay;
+         const shouldRepeat = now - this.#lastRightRepeat > this.#repeatInterval;
+
+         if(heldLongEnough && shouldRepeat) {
+            this.#needleRotation += 1;
+            this.#lastRightRepeat = now;
+         }
+      }
    }
 }

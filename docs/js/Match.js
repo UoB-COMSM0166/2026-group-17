@@ -1,6 +1,7 @@
 class Match {
    static #GRAVITY;
    static #ZERO_VECTOR;
+   static #MAX_CANNON_SLOPE_ANGLE = 55;
    #width;
    #height;
    #bgTopColour;
@@ -57,7 +58,7 @@ class Match {
       // Turn logic
       this.#turnController = new TurnController();
       //Skip turn for bubblegumshot
-      this.#turnController.onSkipCallback = (playerId) => {this.#handlePlayerSkip(playerId);};
+      this.#turnController.onSkipCallback = (playerId) => { this.#handlePlayerSkip(playerId); };
       this.#isEasyDifficulty = (gameMode === "easy");
       this.#trajectoryPreviewer = new TrajectoryPreview(resolution);
       this.#computerController = aiController;
@@ -68,6 +69,8 @@ class Match {
 
    updateMatch(dt) {
       this.#handleRoundTransition();
+      this.#controlPanel.angleDial.updateKeyboardControl(this.#physicsDone());
+      this.#controlPanel.powerAdjust.updateKeyboardControl(this.#physicsDone());
       this.#syncControlPanel();
       this.#updateShot(dt);
       this.#updateSecondaryShots(dt);
@@ -109,7 +112,23 @@ class Match {
       this.#triggerMouseCannonMovement();
    }
 
+   onKeyPressed(inputKey, keyId) {
+      if (!this.#inputActive()) return;
+      if (inputKey === 'a' || inputKey === 'A' || inputKey === 'd' || inputKey === 'D') {
+         this.#controlPanel.angleDial.handleKeypressed(inputKey);
+      }
+      if (inputKey === 'w' || inputKey === 'W' || inputKey === 's' || inputKey === 'S') {
+         this.#controlPanel.powerAdjust.handleKeypressed(inputKey);
+      }
+   }
+
    onKeyReleased(inputKey, keyId) {
+      if (inputKey === 'a' || inputKey === 'A' || inputKey === 'd' || inputKey === 'D') {
+         this.#controlPanel.angleDial.handleKeyReleased(inputKey);
+      }
+      if (inputKey === 'w' || inputKey === 'W' || inputKey === 's' || inputKey === 'S') {
+         this.#controlPanel.powerAdjust.handleKeyReleased(inputKey);
+      }
       if (!this.#inputActive()) return;
       if (inputKey === 'Space' || keyId === 32) this.#executeCannonShot();
       if (keyId === 37) this.#executeCannonMovement('left');
@@ -229,7 +248,7 @@ class Match {
          resolution: createVector(this.#width, this.#height)
       });
       if (impactEvent?.type === "STAR_SPLIT") this.#handleStarSplit(impactEvent);
-      else if (impactEvent) this.#handleShotImpact(impactEvent);
+      else if (impactEvent) this.#handleShotImpact(impactEvent, this.#currentShot);
    }
 
    #handleStarSplit(impactEvent) {
@@ -245,10 +264,11 @@ class Match {
       this.#currentShot = null;
    }
 
-   #handleShotImpact(impactEvent) {
-      const shot = this.#currentShot;
+   #handleShotImpact(impactEvent, shot) {
+      if (shot === this.#currentShot) {
+         this.#currentShot = null;
+      }
 
-      this.#currentShot = null;
       if (impactEvent.type === 'OUT_OF_BOUNDS') {
          this.#pendingTurnAdvance = true;
          return;
@@ -281,6 +301,12 @@ class Match {
          case "starFragment":
             this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, weapon);
             break;
+         case "impact":
+            this.spawnWeaponExplosion(impactEvent.pos, "impact", shot, weapon);
+            break;
+         case "earthworm":
+            this.spawnWeaponExplosion(impactEvent.pos, "earthworm", shot, weapon);
+            this.spawnEarthWorm(impactEvent.pos, weapon);
          default:
             this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, weapon);
       }
@@ -288,7 +314,7 @@ class Match {
 
    spawnWeaponExplosion(pos, kind = "ball", shot = null, weapon = null, options = {}) {
 
-      if(!pos) return;
+      if (!pos) return;
       this.#currentExplosions.push(new Explosion(
          pos.copy(),
          this.#terrain,
@@ -328,7 +354,7 @@ class Match {
       this.#shakeCallback?.(8, 7);
    }
 
-   spawnEarthWorm(impactPos, weapon){
+   spawnEarthWorm(impactPos, weapon) {
       this.#earthWormImpacts.push({
          position: impactPos.copy(),
          weapon: weapon,
@@ -339,7 +365,7 @@ class Match {
       });
    }
 
-   spawnEarthWormBump(x, strength = 10){
+   spawnEarthWormBump(x, strength = 10) {
       this.#earthWormBump.push({
          x: x,
          strength,
@@ -362,7 +388,7 @@ class Match {
             resolution: createVector(this.#width, this.#height)
          });
          if (impactEvent) {
-            this.#handleShotImpact(impactEvent);
+            this.#handleShotImpact(impactEvent, shot);
             this.#secondaryShots.splice(i, 1);
          }
          else if (!shot.isActive) this.#secondaryShots.splice(i, 1);
@@ -398,12 +424,12 @@ class Match {
       });
    }
 
-   #updateEarthWormImpacts(dt){
-      for(let i = this.#earthWormImpacts.length - 1; i >= 0; i--){
-         
+   #updateEarthWormImpacts(dt) {
+      for (let i = this.#earthWormImpacts.length - 1; i >= 0; i--) {
+
          const worm = this.#earthWormImpacts[i];
          //Timer
-         worm.timer += dt /1000;
+         worm.timer += dt / 1000;
          //Follow enemy
          const target = this.#players[1 - this.#lastShooterId];
          //predicted position
@@ -416,32 +442,32 @@ class Match {
          worm.position.x = lerp(worm.position.x, worm.targetX, speed) + wave;
          //Follow Terrain shape
          const ground = this.#terrain.getHeightAt(worm.position.x);
-         const depth = lerp(30, 80, worm.timer /worm.duration);
+         const depth = lerp(30, 80, worm.timer / worm.duration);
          worm.position.y = ground + depth;
          //Explosion
-         if(worm.timer >= worm.duration){
+         if (worm.timer >= worm.duration) {
 
             this.spawnEarthWormBump(worm.position.x, 22);
             //Jump at last time
             worm.position.y -= 20;
             const explosionPos = createVector(
-               worm.position.x + random(-50, 50), 
+               worm.position.x + random(-50, 50),
                this.#terrain.getHeightAt(worm.position.x) + 40
             );
-            this.spawnWeaponExplosion(explosionPos, "earthworm", null, worm.weapon, {duration: 300});
-         
-         this.#earthWormImpacts.splice(i, 1);
+            this.spawnWeaponExplosion(explosionPos, "earthworm", null, worm.weapon, { duration: 300 });
+
+            this.#earthWormImpacts.splice(i, 1);
          }
       }
    }
 
-   #updateEarthWormBump(dt){
-      for(let i = this.#earthWormBump.length - 1; i >= 0; i--){
+   #updateEarthWormBump(dt) {
+      for (let i = this.#earthWormBump.length - 1; i >= 0; i--) {
          const bump = this.#earthWormBump[i];
 
          bump.life -= dt / 1000;
 
-         if(bump.life <= 0){
+         if (bump.life <= 0) {
             this.#earthWormBump.splice(i, 1);
          }
       }
@@ -449,17 +475,20 @@ class Match {
 
    #updatePlayers() {
       const currentPlayer = this.#players[this.#turnController.activePlayerId];
-      if (this.#controlPanel.angleDial.isFollowing){
+      if (this.#controlPanel.angleDial.isFollowing || this.#controlPanel.angleDial.isKeyboardControlled){
          const newAngle = this.#controlPanel.angleDial.needleRotation - 90;
          currentPlayer.barrelAngle = newAngle;
       }
-      if (this.#controlPanel.powerAdjust.isFollowing){
+      if (this.#controlPanel.powerAdjust.isFollowing || this.#controlPanel.powerAdjust.isKeyboardControlled){
          const newPower = this.#controlPanel.powerAdjust.power * 7;
-         if(newPower > 0){
+         if (newPower > 0) {
             currentPlayer.barrelPower = newPower;
          }
-      }
-      currentPlayer.updateMove(0.18);
+      }      
+      
+      this.#stopPlayerAtSteepSlope(currentPlayer, 0.10);
+
+      currentPlayer.updateMove(0.10);
       for (let player of this.#players) this.#handlePlayerPhysics(player);
    }
 
@@ -568,7 +597,10 @@ class Match {
 
    #drawPlayers() {
       const playerId = this.#turnController.activePlayerId;
-      for (const player of this.#players) player.drawPlayer();
+      for (const player of this.#players) {
+         const x = player.position.x;
+         player.drawPlayer();
+      }
       if (!this.#turnController.isGameOver) this.#players[playerId].drawIndicator(playerId);
    }
 
@@ -587,7 +619,7 @@ class Match {
       for (const explosion of this.#currentExplosions) explosion.draw();
       for (const cloud of this.#poisonClouds) cloud.draw();
       for (const fx of this.#shibaImpacts) fx.draw();
-      
+
       for (const worm of this.#earthWormImpacts) {
          push();
          noStroke();
@@ -682,16 +714,21 @@ class Match {
    #executeCannonMovement(direction) {
       const player = this.#players[this.#turnController.activePlayerId];
       if (player.moveSteps > 0) {
-         const moveDistance = 50;
+         const moveDistance = 100;
          const multiplier = (direction === 'left') ? -1 : 1;
-         player.setTargetX(player.targetX + (moveDistance * multiplier), this.#width);
-         player.moveSteps -= 1;
-         this.#controlPanel.setMoveSteps(player.moveSteps);
+         const candidateX = player.targetX + (this.#getPlayerTangent().x * moveDistance * multiplier);
+         const slopeAngle = this.#terrain.getSlopeAngleAt(candidateX);
+
+         if (slopeAngle <= Match.#MAX_CANNON_SLOPE_ANGLE) {
+            player.setTargetX(candidateX, this.#width);
+            player.moveSteps -= 1;
+            this.#controlPanel.setMoveSteps(player.moveSteps);
+         }
       }
    }
 
    #physicsDone() {
-      return !this.#currentShot &&
+         return !this.#currentShot &&
          this.#currentExplosions.length === 0 &&
          this.#secondaryShots.length === 0 &&
          this.#poisonClouds.length === 0 &&
@@ -703,6 +740,34 @@ class Match {
 
    #inputActive() {
       return !this.#isAIPlayerTurn() && this.#physicsDone() && !this.#pendingTurnAdvance;
+   }
+
+   #stopPlayerAtSteepSlope(player, follow) {
+      if (abs(player.targetX - player.position.x) < 0.5) return;
+
+      const nextX = lerp(player.position.x, player.targetX, follow);
+      const slopeAngle = this.#terrain.getSlopeAngleAt(nextX);
+
+      if (slopeAngle > Match.#MAX_CANNON_SLOPE_ANGLE) {
+         player.setTargetX(player.position.x, this.#width);
+      }
+   }
+
+   //get the normalized tangent of player in order to decide moving or not
+   #getPlayerTangent(){
+      let player = this.#players[this.#turnController.activePlayerId]
+      let sampleOffset = 5;
+
+      let leftY = this.#terrain.getHeightAt(player.position.x - sampleOffset);
+      let rightY = this.#terrain.getHeightAt(player.position.x + sampleOffset);
+
+      let dx = sampleOffset * 2;
+      let dy = rightY - leftY;
+
+      let tangent = createVector(dx, dy);
+      tangent.normalize();
+
+      return tangent;
    }
 
    get isMatchOver() {
@@ -718,19 +783,19 @@ class Match {
    }
    //Expose internal state for weapon effects
    //All player cannons in the match 
-   getPlayers(){
+   getPlayers() {
       return this.#players;
    }
    //Controls turn order and turn number
-   getTurnController(){
+   getTurnController() {
       return this.#turnController;
    }
    //ID of the player who fired the last shot
-   getLastShooterId(){
+   getLastShooterId() {
       return this.#lastShooterId;
    }
 
-   #handlePlayerSkip(playerId){
+   #handlePlayerSkip(playerId) {
       this.#turnCounter.showSkip(playerId);
    }
 }

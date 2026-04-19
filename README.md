@@ -48,8 +48,86 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 
 ### Requirements 
 
-- 15% ~750 words
-- Early stages design. Ideation process. How did you decide as a team what to develop? Use case diagrams, user stories. 
+## Requirements
+
+### 2.1 Ideation Process
+
+During the early stages of the ideation process, our team began with a brainstorming session, where each member used Google Docs to independently research and record several game concepts that they were interested in developing. These initial ideas covered a range of gameplay styles, including action-based, strategy-focused, and arcade-inspired games.
+
+After discussing the feasibility and development complexity of each idea, we conducted a quick team vote and decided to take Pocket Tanks as our main gameplay reference. Its turn-based artillery combat, projectile physics, and destructible environment mechanics provided a strong and achievable foundation for our project, while also offering clear opportunities for further innovation.
+
+We then went about creating paper prototypes of our initial concept (Figure 4) in order to flesh out the specific gameplay details. This proved especially helpful considering the complexity of the concept, as it enabled us to better define the gameplay loop, player interaction flow, and core mechanics at an early stage. Paper prototyping was also valuable in improving communication within the team, particularly in helping all members visualise the turn-based combat flow, aiming controls, and overall user experience before moving into implementation.
+
+
+### 2.2 Early Stage Design
+
+Having selected Pocket Tanks as our main reference, we then identified several key design decisions to differentiate our game from the original concept.
+
+1. Destructible terrain allows the battlefield to change dynamically after each explosion, adding greater strategic depth.
+
+2. AI controlled opponent mode planned to support future single-player gameplay and extend system usability.
+
+3. Weapon shop and enhanced weapon system enables players to select a limited loadout before each match, increasing tactical planning and gameplay variety.
+
+4. Easy and Hard modes introduced to support different player skill levels, with Easy Mode providing trajectory guidance and Hard Mode increasing challenge.
+
+5. Random events in Hard Mode includes rain, wind, and earthquake effects to improve replayability and require players to adapt their shooting strategy.
+
+These early design decisions helped us expand the original artillery concept into a more strategic and replayable game system.
+
+### 2.3 Stakeholder Identification: The Onion Model
+
+To support our requirements planning, we applied The Onion Model to identify the key stakeholders involved in or affected by the development of HOT CANNONS (Figure X). This helped us visualise not only the direct users of the system, but also the wider technical, academic, and deployment context surrounding the game.
+
+At the core layer, the system itself is HOT CANNONS. The containing system includes the immediate users, namely players and testers, whose feedback directly influenced usability, balance, and overall gameplay experience.
+
+The wider environment includes the development team, instructors and assessors, and the reference game Pocket Tanks. Following Alexander’s concept of surrogate roles, instructors acted as representative stakeholders by providing feedback on software engineering quality, usability, and academic expectations.
+
+The external environment includes the deployment platform (GitHub Pages), the broader user community, and course requirements, which together reflect the wider context in which the system is developed, deployed, and evaluated.
+
+This stakeholder analysis ensured that our requirements considered not only gameplay needs, but also technical feasibility, user feedback, and academic constraints.
+![Onion Model](images/onion%20model.png)
+**Figure X. Onion Model Stakeholder Analysis**
+
+
+### 2.4 Epics and User Stories
+
+Based on the stakeholders identified through the Onion Model (Figure X), we translated stakeholder needs into a set of Epics and User Stories to guide system development and prioritise core features.
+
+The main epics identified for HOT CANNONS were:
+
+- Core artillery gameplay and destructible terrain
+- Weapon shop and loadout system
+- Difficulty modes and accessibility
+- Dynamic events and replayability
+- AI controlled single player mode
+- User interface and user experience
+
+These epics were directly informed by the needs of players, testers, the wider user community, and course requirements identified in the stakeholder analysis.
+
+From these epics, we derived User Stories using the standard format:
+
+> As a [user], I want [feature], so that [value].
+
+Examples of key user stories include:
+
+- As a player, I want destructible terrain so that each shot changes the battlefield and requires strategic decision-making.
+- As a player, I want to select weapons before the match so that I can plan my gameplay strategy in advance.
+- As a new player, I want tutorial pop-ups so that I can understand how to aim and fire correctly.
+- As a new player, I want an Easy Mode with trajectory guidance so that I can quickly learn the controls and gameplay mechanics.
+- As an experienced player, I want Hard Mode random events so that each match feels more challenging and unpredictable.
+- As a colourblind player, I want distinguishable UI colours so that game information remains clear.
+- As a single player user, I want to play against an AI opponent so that I can enjoy the game without requiring a second player.
+
+These user stories helped ensure that our system requirements remained closely aligned with stakeholder needs and supported both gameplay quality and accessibility.
+
+### 2.5 Use Case Diagram
+
+To ensure the entire team maintained a shared understanding of the system–user interactions and the overall gameplay flow, we developed a Use Case Diagram as part of our requirements engineering process.
+
+The diagram was particularly useful in modelling the main gameplay flow of HOT CANNONS, including game setup, difficulty selection, weapon selection, turn-based shooting, terrain updates, and match progression.
+
+This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
 
 ### Design
 
@@ -160,6 +238,45 @@ With the above change the desired settling animation was achieved, however, one 
 
 #### AI-controlled player
 
+During most of the development period, the game was a 2-player hot seater as the team was busy implementing other core features and fixing immersion-breaking bugs. This changed in the last week of the spring break as the game felt stable enough to implement a computer-controlled player to replace player 2.
+
+The initial idea was for the AI behaviour to be fairly simple, considering the late stage it was being introduced in. Therefore, the initial version of the AI would pick weapons at random from the weapon shop screen, fire whatever the currently selected weapon is in its inventory and be unable to use the limited (3 moves per game) movement feature.
+
+In terms of its implementation in the code, the AI works as a finite-state machine:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> IDLE
+    IDLE --> THINKING : startThinking()
+    
+    THINKING --> SHOPPING : if #location is SHOP
+    THINKING --> AIMING : if #location is MATCH
+    
+    SHOPPING --> IDLE : pickWeapon()
+    AIMING --> FIRING : findBestShotParams()
+    FIRING --> IDLE : executeShot()
+```
+An AIController object is first instantiated in the ShopState class with its #location field set to SHOP and it is passed to the WeaponShop class's update() method which calls the AIController's startThinking() method each time the current player in the shop is player 2 and also calls the same object's updateAI() method passig it a callback to the pickRandomWeapon() method, so the AIController can call it when the time is right.
+
+After all weapons have been picked and the player either clicks or presses the correct button a reference to the same AIController object is passed from ShopState to MatchState and then from there to the Match class.
+
+In the Match class, the AI's #location field is changed to MATCH and during turn transition, if the current player is player 2, then it's startThinking() method is called. The AIController's drawThinkIndicator() method is also called to draw animated dots above the player 2's cannon, while it is in its THINKING state.
+
+When it comes to the AI's aiming logic it reuses some of the mock shot calculation logic used for determining where to draw the trajectory preview curve in easy mode but without actually drawing the curve. Instead, it uses a nested loop to check every combination of ever 2° within an assumed reasonable shooting range of -100° to -175° with every 1.25 units of power within the range of 0 to 100 (which are mapped to the range 250 to 650 internally). An early exist from the loop is allowed, if the AI discovers a combination which resulsts in a minimum distance to the enemy of less than 5 pixels.
+
+After the AI finds its ideal combination of parameters they are passed through an applyDifficultyJitter() method which remaps their value randomly within a different range depending on the current difficulty - significantly larger on easy mode for a higher likelihood of misses - and then player 2's parameters are set to those values.
+
+Unfortunately, the abovementioned nested loop caused the game to stutter for what appeared to be 0.5-1 second (possibly longer on slower computers), as can be seen in Figure X likely due to the amount of iterations required to complete the whole loop. The early exit helped but was insufficient in eliminating the issue and so a different way of achieving the same outcome had to be found.
+
+<div align="center">
+  <img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />
+  <br>
+  <em>Figure X: Visual stutter occurring during the AI aiming state transition.</em>
+</div>
+
+
 
 ### Evaluation
 #### Qualitative: Think Aloud
@@ -192,7 +309,7 @@ At this stage the game represented a minimum viable product. The core gameplay l
 
 The number of valid samples for both the NASA-TLX and SUS questionnaires was 10. This analysis aims to investigate whether there is a significant difference between the easy and hard levels in perceived workload and usability. The tables below present the total scores for the easy and the hard level in both NASA-TLX and SUS.
 
-<p align="center"><strong>Table x.<strong> Score of NASA-TLX and SUS</p>
+<p align="center"><strong>Table x.</strong> Score of NASA-TLX and SUS</p>
 
 <div align="center">
 
@@ -243,7 +360,7 @@ $$\begin{cases}
 
 </p>
 
-<p align="center"><strong>Table x.<strong> Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</p>
+<p align="center"><strong>Table x.</strong> Wilcoxon Signed-Rank Test Results for NASA-TLX Scores Between Easy and Hard Levels</p>
 
 <div align="center">
 
@@ -262,6 +379,72 @@ $$\begin{cases}
 **SUS**
 
 ### Process 
+### Role Allocation and Responsibility Management
+
+At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
+
+#### Team Members’ Strengths and Role Mapping
+
+| Category | Strengths / Experience | Main Responsibilities | Members |
+|----------|----------------------|----------------------|----------|
+| Development | Programming / system development experience | Core gameplay implementation, system development | 2 |
+| Testing | Testing experience | Testing, debugging, QA | 1 |
+| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design, mechanics | 1 |
+| Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | 1 |
+| Project Management | Project management experience | Progress coordination, task management | 1 |
+
+#### Practical Role Allocation
+
+Specifically, members with testing and development experience mainly handled testing and coding tasks while also contributing flexibly to other areas when needed. In addition, responsibilities were assigned according to individual interests and strengths, including weapon design, game mode design, visual design, and basic programming.
+
+In particular, members skilled in drawing took responsibility for visual design, supporting the overall artistic expression of the game. Furthermore, some members focused on core gameplay implementation, system development, and documentation, while others contributed to more technically challenging areas such as physics and destructible terrain. As a result, a wide range of skills within the team was effectively utilized.
+
+#### Flexible Collaboration and Shared Development Approach
+
+In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, while each member had their own role, these roles were designed as leadership responsibilities rather than isolated tasks. Each member was expected to take initiative and lead development within their area.
+
+At the same time, challenges and development tasks were not handled individually; instead, all team members worked collaboratively to solve problems and complete development tasks as a group. When necessary, tasks were also handled by small groups to improve both efficiency and stability in development.
+
+We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
+
+#### Outcomes
+
+Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
+
+---
+
+### Team Workflow and Communication
+
+We adopted an Agile development approach, specifically using the Scrum framework, to manage the development process. To support this, we conducted daily stand-up meetings. These meetings were held both online and in person depending on the situation, and were continued consistently throughout the project, including during the Easter holiday period.
+
+In each meeting, we first set clear goals, then reviewed task progress, balanced workload distribution, and discussed and resolved any issues. This routine helped strengthen each member’s sense of responsibility and ensured that the entire team remained aligned with the overall direction of the project.
+
+In addition, throughout the project we used a combination of tools to support collaboration, development, planning, and schedule management.
+
+#### Tools Used
+
+To support collaboration and development, we used tools for version control, communication, planning, and schedule management.
+
+| Category | Tool | Purpose |
+|----------|------|---------|
+| Version Control & Development | GitHub | Code sharing, storage, and integration |
+| Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
+| Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
+| Project Planning | WBS (Work Breakdown Structure) | Task decomposition, role organisation, and overall progress tracking against the schedule |
+| Project Management | Kanban Board | Visualisation of task progress and workflow management |
+| Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
+
+#### Kanban board
+
+<p align="center">
+  <img src="images/Kanban%20Board.png" width="600">
+</p>
+
+#### WBS
+
+During meetings, the Work Breakdown Structure (WBS) was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
+
+---
 
 - 15% ~750 words
 

@@ -99,6 +99,7 @@ class WeaponShop {
       // Player 2 — right
       this._drawSidePanel(1);
       this._drawGrid();
+      this._drawHoverDescription();
       if (this.isDone()) this._drawStartPrompt();
 
       pop();
@@ -405,8 +406,45 @@ class WeaponShop {
       drawingContext.shadowColor = 'rgba(255,200,0,0.9)';
       textAlign(CENTER, CENTER);
       textSize(15);
+      textFont('Arial');
       text('✓  All chosen — Click here or press ENTER to battle!', this.W / 2, by + bh / 2);
       drawingContext.shadowBlur = 0;
+   }
+
+   _drawHoverDescription() {
+      if (this._hoveredIdx < 0 || this._hoveredIdx >= WEAPON_REGISTRY.length) return;
+
+      const weapon = WEAPON_REGISTRY[this._hoveredIdx];
+      if (!weapon) return;
+
+      const boxW = 520;
+      const boxH = 64;
+      const boxX = this.W / 2 - boxW / 2;
+      const boxY = this._gridY + this._cardH * 2 + this._gapY + 18;
+
+      push();
+      rectMode(CORNER);
+      textAlign(LEFT, TOP);
+
+      noStroke();
+      fill(18, 28, 48, 220);
+      DrawUtils.glassRect(boxX, boxY, boxW, boxH, 12);
+
+      stroke(90, 140, 220, 120);
+      strokeWeight(1.4);
+      noFill();
+      DrawUtils.glassRect(boxX, boxY, boxW, boxH, 12);
+
+      noStroke();
+      fill(230, 235, 255);
+      textSize(13);
+      text(`${weapon.name}`, boxX + 16, boxY + 12);
+
+      fill(170, 184, 214);
+      textSize(11);
+      // Show the existing weapon description without changing gameplay logic.
+      text(weapon.description ?? 'No description available.', boxX + 16, boxY + 33, boxW - 32, boxH - 18);
+      pop();
    }
 
 
