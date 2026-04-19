@@ -3,7 +3,7 @@ class Earthworm extends AbstractWeapon {
   constructor() {
     super({
       id: 'earthworm', name: 'Earthworm',
-      description: 'Burrows underground, hiding beneath the terrain. \nMoves randomly while tracking the opponent\'s cannons, then explodes on contact.',
+      description: 'Burrows underground, hiding beneath the terrain. \nMoves randomly while tracking the opponent\'s cannon, then explodes on contact.',
       damage: 8,
       speed: 4,
       blastRadius: 8,
@@ -91,7 +91,7 @@ class Earthworm extends AbstractWeapon {
     if(!pos) return;
 
     const impactPos = pos.copy ? pos.copy() : createVector(pos.x, pos.y);
-    //Warm effect
+    //Worm effect
     match.spawnEarthWorm(impactPos, this);
   }
 }

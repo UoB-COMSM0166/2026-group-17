@@ -58,7 +58,7 @@ class Bubblegumshot extends AbstractWeapon {
     ellipse(0, 0, r * 2.5, r * 2.2);
     //Main sticky bubble body
     fill(255, 100, 180, 140);
-    circle(0, 0, r * 1.8, r * 1.6);
+    ellipse(0, 0, r * 1.8, r * 1.6);
     //Inner bubble
     fill(255, 60, 150, 180);
     ellipse(0, 0, r * 1.0, r * 0.9);
