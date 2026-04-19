@@ -440,9 +440,13 @@ To support collaboration and development, we used tools for version control, com
   <img src="images/Kanban%20Board.png" width="600">
 </p>
 
-#### WBS
+#### Gantt chart schedule
 
-During meetings, the Work Breakdown Structure (WBS) was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
+During meetings, the Gantt chart schedule was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
+
+<p align="center">
+  <img src="images/Gantt%20chart.png" width="600">
+</p>
 
 ---
 
