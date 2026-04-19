@@ -2,7 +2,7 @@ class ImpactGun extends AbstractWeapon {
   constructor() {
     super({
       id: 'impact', name: 'Impact Gun',
-      description: 'Instant hit. No arc.',
+      description: 'Fires a concentrated energy burst that hits instantly. \nIt releases a powerful shockwave that hits the opponent\'s cannon on impact.',
       damage: 10, 
       speed: 10, 
       blastRadius: 2,
@@ -19,7 +19,7 @@ class ImpactGun extends AbstractWeapon {
 
    push();
    imageMode(CENTER);
-   image(impactgunImg, x, y, size * 2.5, size * 2.5);
+   image(impactgunImg, x, y, 60, 60);
    pop();
   }
 
@@ -69,10 +69,7 @@ class ImpactGun extends AbstractWeapon {
     pop();
   }
 
-  onImpact(match, impactEvent, shot){
-    //Will delete
-    console.log("Impactgun on impact called", impactEvent);
-    
+  onImpact(match, impactEvent, shot){    
     const pos = impactEvent?.position || impactEvent?.pos;
     if(!pos) return;
 
@@ -80,7 +77,5 @@ class ImpactGun extends AbstractWeapon {
       maxRadius: 130, 
       duration: 350,
     });
-    //Will delete
-    console.log("First explosion sent");
   }
 }

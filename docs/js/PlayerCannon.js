@@ -207,6 +207,6 @@ class PlayerCannon {
    }
 
    canAct(turnController){
-      return turnController.turnNumber >= this.stuckUntilTurn;
+      return turnController.turnNumber > this.stuckUntilTurn;
    }
 }
