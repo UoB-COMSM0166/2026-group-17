@@ -3,7 +3,7 @@ class Earthworm extends AbstractWeapon {
   constructor() {
     super({
       id: 'earthworm', name: 'Earthworm',
-      description: 'Burrows underground before striking!',
+      description: 'Burrows underground, hiding beneath the terrain. \nMoves randomly while tracking the opponent\'s cannons, then explodes on contact.',
       damage: 8,
       speed: 4,
       blastRadius: 8,

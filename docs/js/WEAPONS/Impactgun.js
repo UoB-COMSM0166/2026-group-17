@@ -2,7 +2,7 @@ class ImpactGun extends AbstractWeapon {
   constructor() {
     super({
       id: 'impact', name: 'Impact Gun',
-      description: 'Instant hit. No arc.',
+      description: 'Fires a concentrated energy burst that hits instantly. \nIt releases a powerful shockwave that hits the opponent\'s cannon on impact.',
       damage: 10, 
       speed: 10, 
       blastRadius: 2,
