@@ -424,6 +424,12 @@ Discussion of possible solutions to the identified issues
 
 In addition, since all members were continuously dedicating significant effort to game development tasks throughout the project period and signs of fatigue were observed, we implemented measures to ensure a balanced workload and reduce stress during breaks. Before holiday periods, each member’s schedule was shared in advance via Outlook calendars, allowing others to cover tasks as needed and minimizing unnecessary communication during that time.
 
+#### Daily meeting agenda slide
+
+<p align="center">
+  <img src="images/DailyMeeting%20agenda.png" width="600">
+</p>
+
 ### Improvements in Version Control and development Process 
 
 In addition, during collaborative development, several issues occurred when merging individual members’ code into the main branch. For example, some pull requests were merged without being noticed or approved, resulting in certain functionalities not being reflected. In other cases, changes made to shared classes affected other members’ features, and code was pushed to the main branch in a non-functional state. As a result, the main branch was not consistently kept up to date, and these issues occurred multiple times. 
