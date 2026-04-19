@@ -35,6 +35,10 @@ class Game {
       this.#currentState?.onMouseMoved?.(cursorX, cursorY);
    }
 
+   handleKeyPressed(inputKey, keyId) {
+      this.#currentState?.onKeyPressed?.(inputKey, keyId);
+   }
+
    handleKeyReleased(inputKey, keyId) {
       this.#currentState?.onKeyReleased?.(inputKey, keyId);
    }

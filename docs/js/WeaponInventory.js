@@ -1,3 +1,5 @@
+//for weapon inventory management and display
+
 class WeaponInventory {
     #positionVector;
     #isExpanded = false;
@@ -14,6 +16,8 @@ class WeaponInventory {
         this.#plateOutlineColor = plateOutColor;
     }
 
+
+    // array of weapon and number of weapons in loadout
     setWeaponLoadouts(loadouts = []) {
         this.weapons = Array.isArray(loadouts) ? loadouts : [];
         this.#weaponsCount = max(this.weapons.length, 1);
@@ -21,6 +25,7 @@ class WeaponInventory {
         else this.#currentWeapon = constrain(this.#currentWeapon, 0, this.weapons.length - 1);
     }
 
+    //set the current weapon index to dispaly in the inventory, default is the first weapon
     setCurrentWeaponIndex(index = 0) {
         if (this.weapons.length === 0) {
             this.#currentWeapon = 0;
