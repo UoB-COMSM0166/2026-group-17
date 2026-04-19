@@ -1,3 +1,4 @@
+// Class that controlls the computer controller player and uses an FSM to track its current state
 class AIController {
    static States = Object.freeze(
       { IDLE: 'IDLE', SHOPPING: 'SHOPPING', THINKING: 'THINKING', AIMING: 'AIMING', FIRING: 'FIRING' });
@@ -32,6 +33,7 @@ class AIController {
       }
    }
 
+   // Think indicator used to show to the player that the AI is taking its time to shoot
    drawThinkIndicator(position) {
       if (this.#state !== AIController.States.THINKING) return;
       push();
@@ -46,7 +48,7 @@ class AIController {
 
    startThinking() {
       if (this.#state !== AIController.States.IDLE) return;
-      if (this.#location === 'SHOP') this.#thinkTimer = random(600, 1500);
+      if (this.#location === 'SHOP') this.#thinkTimer = random(50, 100);
       else this.#thinkTimer = random(1000, 5000);
       this.#dotAnimationClock = 0;
       this.#state = AIController.States.THINKING;
@@ -68,6 +70,10 @@ class AIController {
    }
 
    #handleAiming(worldState) {
+      if (this.#difficulty === "easy") {
+         worldState.wind = createVector(0, 0);
+         worldState.rain = createVector(0, 0);
+      }
       const bestShotParams = this.#findBestShotParams(worldState);
       this.#applyDifficultyJitter(worldState.shooter, bestShotParams);
       this.#state = AIController.States.FIRING;
@@ -78,31 +84,53 @@ class AIController {
       this.#state = AIController.States.IDLE;
    }
 
+   // Prepare a parameters object and run it through 2 calls of runPass() to find best shot params
    #findBestShotParams(worldState) {
+      let passParams = {
+         bestAngle: worldState.shooter.barrelAngle,
+         bestPower: worldState.shooter.barrelPower,
+         minDistance: Infinity,
+         angleStep: 8,
+         powerStep: 40,
+         angleRange: [-95, -179],
+         powerRange: [250, 650]
+      }
+      // Run a coarse and a fine pass with a varying amount of steps for both angle and power
+      passParams = this.#runPass(passParams, worldState);
+      passParams.angleStep = 2;
+      passParams.powerStep = 5;
+      const { bestAngle, bestPower } = passParams;
+      passParams.angleRange = [min(-95, bestAngle + 10), max(-179, bestAngle - 10)];
+      passParams.powerRange = [max(250, bestPower - 40), min(650, bestPower + 40)];
+      passParams = this.#runPass(passParams, worldState);
+      return { angle: passParams.bestAngle, power: passParams.bestPower };
+   }
+
+   // Loop through a limited range of possible angle and power combinations,
+   // attempting to find the combination that would result in the most direct hit possible
+   #runPass(passParams, worldState) {
       const { shooter, target } = worldState;
-      let bestAngle = shooter.barrelAngle;
-      let bestPower = shooter.barrelPower;
-      let minDistance = Infinity;
-      for (let testAngle = -100; testAngle > -175; testAngle -= 2) {
-         for (let testPower = 250; testPower < 650; testPower += 5) {
+      const { angleStep, powerStep, angleRange, powerRange } = passParams;
+      for (let testAngle = angleRange[0]; testAngle > angleRange[1]; testAngle -= angleStep) {
+         for (let testPower = powerRange[0]; testPower < powerRange[1]; testPower += powerStep) {
             const result = this.#testMockShot(testAngle, testPower, worldState);
             const distToEnemy = p5.Vector.dist(result.endPos, target.position);
-            if (distToEnemy < minDistance) {
-               minDistance = distToEnemy;
-               bestAngle = testAngle;
-               bestPower = testPower;
+            if (distToEnemy < passParams.minDistance) {
+               passParams.minDistance = distToEnemy;
+               passParams.bestAngle = testAngle;
+               passParams.bestPower = testPower;
             }
-            if (minDistance < 5) return { angle: bestAngle, power: bestPower };
+            if (passParams.minDistance < 5) return passParams;
          }
       }
-      return { angle: bestAngle, power: bestPower };
+      return passParams;
    }
 
    #testMockShot(angle, power, worldState) {
-      const { shooter, target, terrain, gravity, wind } = worldState;
+      const { shooter, target, terrain, gravity, wind, rain } = worldState;
       const weapon = shooter.currentWeapon;
       const { launchPos, launchVel } = TrajectoryPreview.getLaunchState(shooter, angle, power);
-      const stepForce = p5.Vector.add(gravity, wind).mult(TrajectoryPreview.simTimeStep);
+      const stepForce = p5.Vector.add(gravity, wind).add(rain).mult(TrajectoryPreview.simTimeStep)
       const mockShot = { position: launchPos, velocity: launchVel, age: 0, state: {} };
       for (let i = 0; i < TrajectoryPreview.maxSteps; i++) {
          const result = TrajectoryPreview.simulationStep(mockShot, stepForce, terrain, target, weapon);
@@ -119,14 +147,14 @@ class AIController {
       }
       else {
          // Offset shot by a significantly lesser amount than easy mode
-         shooter.barrelAngle = angle + random(-1.5, 1.5);
+         shooter.barrelAngle = angle + random(0, 1);
          shooter.barrelPower = power + random(-10, 10);
       }
    }
 
    #updateDots() {
       const cycleDuration = 2000;
-      let loopTime  = this.#dotAnimationClock % cycleDuration;
+      let loopTime = this.#dotAnimationClock % cycleDuration;
       this.#activeDots = floor(map(loopTime, 0, cycleDuration, 0, 4));
    }
 

@@ -78,7 +78,7 @@ class Match {
       this.#updateShibaImpacts();
       this.#updateComputerController(dt);
       this.#updateEarthWormImpacts(dt);
-      this.#updateEarthWormBump(dt)
+      this.#updateEarthWormBump(dt);
       this.#updatePlayers();
       if (this.#currentExplosions.length > 0) this.#updateExplosions(dt);
       this.#updateFloatingScores();
@@ -91,7 +91,7 @@ class Match {
       this.#drawEnvironment();
       this.#drawPlayers();
       this.#computerController.drawThinkIndicator(this.#players[1].position);
-      if (!this.#isAIPlayerTurn()) this.#drawTrajectory();
+      if (this.#inputActive()) this.#drawTrajectory();
       this.#drawShotSequence();
       pop();
       this.#drawHUD();
@@ -419,7 +419,8 @@ class Match {
          target: this.#players[0],
          terrain: this.#terrain,
          gravity: Match.#GRAVITY,
-         wind: Match.#ZERO_VECTOR,
+         wind: this.#wind ?? Match.#ZERO_VECTOR,
+         rain: this.#rain ?? Match.#ZERO_VECTOR,
          executeShot: () => this.#executeCannonShot()
       });
    }
@@ -459,6 +460,7 @@ class Match {
          }
       }
    }
+   
    #updateEarthWormBump(dt){
       for(let i = this.#earthWormBump.length - 1; i >= 0; i--){
          const bump = this.#earthWormBump[i];
@@ -607,8 +609,15 @@ class Match {
       if (!this.#isEasyDifficulty || !this.#physicsDone()) return;
       const shooter = this.#players[this.#turnController.activePlayerId];
       const target = this.#players[1 - this.#turnController.activePlayerId];
-      const noWind = Match.#ZERO_VECTOR;
-      this.#trajectoryPreviewer.drawPreview(shooter, target, this.#terrain, Match.#GRAVITY, noWind);
+      const previewParams = {
+         player: shooter,
+         enemy: target, 
+         terrain: this.#terrain, 
+         gravity: Match.#GRAVITY, 
+         wind: Match.#ZERO_VECTOR,
+         rain: Match.#ZERO_VECTOR
+      };
+      this.#trajectoryPreviewer.drawPreview(previewParams);
    }
 
    #drawShotSequence() {
@@ -632,7 +641,7 @@ class Match {
 
    #drawHUD() {
       const { turnNumber, maxTurns, activePlayerId } = this.#turnController;
-      this.#controlPanel.drawCtrlPanel(this.#players[activePlayerId], this.#physicsDone());
+      this.#controlPanel.drawCtrlPanel(this.#players[activePlayerId], this.#inputActive());
       this.#turnCounter.drawCounter(turnNumber, maxTurns, activePlayerId);
       this.#drawWeaponHUD(activePlayerId);
       for (const floatingScore of this.#floatingScores) floatingScore.draw();
@@ -731,6 +740,7 @@ class Match {
          this.#secondaryShots.length === 0 &&
          this.#poisonClouds.length === 0 &&
          this.#shibaImpacts.length === 0 &&
+         this.#earthWormImpacts.length === 0 &&
          this.#terrain.isSettled;
    }
 
@@ -797,4 +807,3 @@ class Match {
       this.#turnCounter.showSkip(playerId);
    }
 }
-
