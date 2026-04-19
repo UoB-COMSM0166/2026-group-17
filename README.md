@@ -383,6 +383,8 @@ $$\begin{cases}
 
 At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
 
+Specifically, members with creative strengths were responsible for visual design and video production, those with project management experience handled scheduling and task coordination, and members with a technical focus worked on gameplay implementation and AI development. Each member contributed to the foundation of the project by leveraging their own strengths and experience.
+
 #### Team Members’ Strengths and Role Mapping
 
 | Category | Strengths / Experience | Main Responsibilities | Members |
@@ -393,33 +395,51 @@ At the initial stage of the project, we identified and mapped each member’s st
 | Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | 1 |
 | Project Management | Project management experience | Progress coordination, task management | 1 |
 
-#### Practical Role Allocation
+---
 
-Specifically, members with testing and development experience mainly handled testing and coding tasks while also contributing flexibly to other areas when needed. In addition, responsibilities were assigned according to individual interests and strengths, including weapon design, game mode design, visual design, and basic programming.
+### Flexible Collaboration
 
-In particular, members skilled in drawing took responsibility for visual design, supporting the overall artistic expression of the game. Furthermore, some members focused on core gameplay implementation, system development, and documentation, while others contributed to more technically challenging areas such as physics and destructible terrain. As a result, a wide range of skills within the team was effectively utilized.
+In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, these roles were designed not as simple divisions of work, but as leadership responsibilities. Each member was expected to proactively conduct preliminary research, actively involve other members when necessary, and take initiative in driving development within their respective area.
 
-#### Flexible Collaboration and Shared Development Approach
-
-In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, while each member had their own role, these roles were designed as leadership responsibilities rather than isolated tasks. Each member was expected to take initiative and lead development within their area.
-
-At the same time, challenges and development tasks were not handled individually; instead, all team members worked collaboratively to solve problems and complete development tasks as a group. When necessary, tasks were also handled by small groups to improve both efficiency and stability in development.
+At the same time, challenges and development tasks were not handled individually. Instead, the entire team worked collaboratively to solve problems and progress development. For example, for large and labor-intensive tasks such as terrain initial design and weapon effect design, small groups were formed when necessary to improve development efficiency.
 
 We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
+
+---
+
+### Shared Development Approach and Improvements
+
+To support collaborative problem-solving and development, we adopted the agile methodology learned in class. We conducted daily stand-up meetings throughout the project period, including during the Easter break, to review task progress and identify issues. In addition, we held in-person sessions approximately every two weeks, reserving a meeting room to ensure focused, on-site collaborative development time. During these sessions, we conducted pair programming and performed code merging through direct discussion in front of monitors with relevant task owners, which helped improve development efficiency.
+
+### Improvements in Project Management Process
+
+We frequently held both online and in-person meetings; however, in the early stages, discussions often took around two hours. To improve efficiency, the project manager began preparing a one-slide agenda outlining the meeting objectives in advance and sharing it with all participants. This allowed everyone to align on the purpose of the meeting beforehand, enabling more efficient discussions and reducing meeting time to within one hour.
+
+The meetings followed the structured flow below:
+
+Confirmation of the agenda and meeting objectives
+Progress updates for each task (ensuring no member was without assigned work)
+Identification of issues in each task
+Discussion of possible solutions to the identified issues
+
+In addition, since all members were continuously dedicating significant effort to game development tasks throughout the project period and signs of fatigue were observed, we implemented measures to ensure a balanced workload and reduce stress during breaks. Before holiday periods, each member’s schedule was shared in advance via Outlook calendars, allowing others to cover tasks as needed and minimizing unnecessary communication during that time.
+
+### Improvements in Version Control and development Process 
+
+In addition, during collaborative development, several issues occurred when merging individual members’ code into the main branch. For example, some pull requests were merged without being noticed or approved, resulting in certain functionalities not being reflected. In other cases, changes made to shared classes affected other members’ features, and code was pushed to the main branch in a non-functional state. As a result, the main branch was not consistently kept up to date, and these issues occurred multiple times. 
+
+To address these problems, we established the following process during daily meetings and ensured that all team members strictly followed it: 
+
+<p align="center">
+  <img src="images/Merge%20process.png" width="600">
+</p>
+
 
 #### Outcomes
 
 Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
 
 ---
-
-### Team Workflow and Communication
-
-We adopted an Agile development approach, specifically using the Scrum framework, to manage the development process. To support this, we conducted daily stand-up meetings. These meetings were held both online and in person depending on the situation, and were continued consistently throughout the project, including during the Easter holiday period.
-
-In each meeting, we first set clear goals, then reviewed task progress, balanced workload distribution, and discussed and resolved any issues. This routine helped strengthen each member’s sense of responsibility and ensured that the entire team remained aligned with the overall direction of the project.
-
-In addition, throughout the project we used a combination of tools to support collaboration, development, planning, and schedule management.
 
 #### Tools Used
 
@@ -447,6 +467,8 @@ During meetings, the Gantt chart schedule was used as a visual tool to review ou
 <p align="center">
   <img src="images/Gantt%20chart.png" width="600">
 </p>
+
+#### 
 
 ---
 
