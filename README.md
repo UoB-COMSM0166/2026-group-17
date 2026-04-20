@@ -505,10 +505,21 @@ To address these problems, we established the following process during daily mee
 ### Conclusion
 
 - 10% ~500 words
-
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
-
 ### Contribution Statement
+
+
+*All members contributed equally; names are listed in alphabetical order and do not reflect level of contribution.*
+
+| Name    | Key contribution |
+|---------|----------------------------|
+| Hsinman | Control panel (power and angle adjustment, weapon selection, shooting button, cannon movement limit logic), Keyboard controler, background design |
+| Nikolay | AI player implementation, Terrain effects, Game results screen, Cannon trajectory logic, Turn controller logic, Cannon design |
+| Shiho   | Score calculation logic, Start screen (mode selection), Weapon and explosion effects (Bubblegumshot, Impactgun, Earthworm), Weapon character design |
+| Yinuo   | Weapon shop screen, Terrain effects, Weapon trajectory effects, Weapon effects (Lazershot, Grapshot, Submarineshot) |
+| Yuqi    | Random events (wind, acid rain, and earthquake effects), Tutorial screen, Test code, Weapon character design |
+| Yuxin   | Scoreboard display, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
+
 
 - Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
