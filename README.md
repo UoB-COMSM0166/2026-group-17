@@ -157,13 +157,13 @@ By comparing the initial and final designs, several critical improvements in sof
 * **Polymorphic Weaponry**: The final version utilizes **Polymorphism** to manage the weapon inventory. The player's loadout is stored in a unified `Weapon` array, allowing the system to handle diverse projectiles (like `ShibaShot` or `LazerShot`) through a single interface without modifying the core firing logic.
 
 ### 3.3 How our design following Object Oriented Design Principle
-| **OOD Feature** | **Reflected in the Code** | **Examples in our Project** | **Why It Is Important** |
-|---|---|---|---|
-| **Abstraction** | General base classes define shared responsibilities without exposing implementation details. | `State` provides the common lifecycle interface (`updateState()`, `drawState()`), while `AbstractWeapon` defines shared weapon behaviour such as `drawProjectile()`, `onImpact()`, and `drawExplosion()`. | This allows higher-level systems to interact with objects through a common interface rather than depending on concrete implementations. |
-| **Inheritance** | Subclasses extend base classes and reuse shared structure while adding their own specialized logic. | `MenuState`, `ShopState`, `MatchState`, and `EndState` inherit from `State`; weapon classes such as `Grapeshot`, `Lazershot`, and `Submarinshot` inherit from `AbstractWeapon`. | This reduces duplicated code and keeps common behaviour centralized. |
-| **Polymorphism** | Different subclasses respond differently to the same method calls. | The combat system can call `beforeProjectileStep()`, `onImpact()`, or `drawExplosion()` on any weapon, and each weapon class can provide its own implementation. | This makes the system extensible, since new weapons can be added without changing the main battle logic. |
-| **Composition** | Complex classes are built by combining multiple smaller objects with focused responsibilities. | `Match` is composed of `Terrain`, `TurnController`, `ScoreBoard`, `ControlPanel`, `TrajectoryPreview`, weather systems, and active gameplay objects such as `Projectile` and `Explosion`. | This improves modularity and keeps responsibilities clearly separated. |
-| **Encapsulation** | Internal state is hidden inside each class and accessed only through controlled methods or properties. | Classes use private fields such as `#players`, `#currentShot`, `#position`, and `#weaponLoadout`, with access managed through methods like `fireCurrentWeapon()` and `advancePhase()`. | This protects object state, reduces unintended side effects, and improves maintainability. |
+| **OOD Feature** | **Examples in our Project** |
+|---|---|
+| **Abstraction** | `State` provides the common lifecycle interface (`updateState()`, `drawState()`), while `AbstractWeapon` defines shared weapon behaviour such as `drawProjectile()`, `onImpact()`, and `drawExplosion()`. |
+| **Inheritance** | `MenuState`, `ShopState`, `MatchState`, and `EndState` inherit from `State`; weapon classes such as `Grapeshot`, `Lazershot`, and `Submarinshot` inherit from `AbstractWeapon`. |
+| **Polymorphism** |The combat system can call `beforeProjectileStep()`, `onImpact()`, or `drawExplosion()` on any weapon, and each weapon class can provide its own implementation.|
+| **Composition** | `Match` is composed of `Terrain`, `TurnController`, `ScoreBoard`, `ControlPanel`, `TrajectoryPreview`, weather systems, and active gameplay objects such as `Projectile` and `Explosion`.|
+| **Encapsulation** | Classes use private fields such as `#players`, `#currentShot`, `#position`, and `#weaponLoadout`, with access managed through methods like `fireCurrentWeapon()` and `advancePhase()`.|
 
 ### 3.3 Class Diagrams
 
