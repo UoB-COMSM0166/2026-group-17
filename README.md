@@ -389,12 +389,11 @@ Specifically, members with creative strengths were responsible for visual design
 
 <h3 align="center">Team Members’ Strengths and Role Mapping</h3>
 
-| Category | Strengths / Experience | Main Responsibilities | Members |
+| Role | Strengths / Experience | Main Responsibilities | Members |
 |----------|----------------------|----------------------|----------|
-| Development | Programming / system development experience | Core gameplay implementation, Feasibility study | Hsinman, Nikolay |
-| Testing | Testing experience | Testing, Quality Assurance | Yuqi |
-| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design | Yinuo |
-| Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | Yuxin |
+| Developer | Programming / system development experience | Core gameplay implementation, Feasibility study | Hsinman, Nikolay, Yuqi |
+| UI Designer | Game design interest | Weapon functionality, UI design | Yinuo |
+| Visual Desiner | Illustration / visual design skills | Visual design, UI assets | Yuxin |
 | Project Management | Project management experience | Progress coordination, task management | Shiho |
 
 ---
