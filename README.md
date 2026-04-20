@@ -639,71 +639,122 @@ $$\begin{cases}
 
 **SUS**
 
+---
+
 ### Process 
-### Role Allocation and Responsibility Management
+### Role allocation across the entire project
 
-At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
+At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation.
 
-#### Team Members’ Strengths and Role Mapping
+Specifically, members with creative strengths were responsible for visual design and video production, those with project management experience handled scheduling and task coordination, and members with a technical focus worked on gameplay implementation and AI development. Each member contributed to the foundation of the project by leveraging our strengths and experience.
 
-| Category | Strengths / Experience | Main Responsibilities | Members |
+<h3 align="center">Team Members’ Strengths and Role Mapping</h3>
+
+| Role | Strengths / Experience | Main Responsibilities | Members |
 |----------|----------------------|----------------------|----------|
-| Development | Programming / system development experience | Core gameplay implementation, system development | 2 |
-| Testing | Testing experience | Testing, debugging, QA | 1 |
-| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design, mechanics | 1 |
-| Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | 1 |
-| Project Management | Project management experience | Progress coordination, task management | 1 |
-
-#### Practical Role Allocation
-
-Specifically, members with testing and development experience mainly handled testing and coding tasks while also contributing flexibly to other areas when needed. In addition, responsibilities were assigned according to individual interests and strengths, including weapon design, game mode design, visual design, and basic programming.
-
-In particular, members skilled in drawing took responsibility for visual design, supporting the overall artistic expression of the game. Furthermore, some members focused on core gameplay implementation, system development, and documentation, while others contributed to more technically challenging areas such as physics and destructible terrain. As a result, a wide range of skills within the team was effectively utilized.
-
-#### Flexible Collaboration and Shared Development Approach
-
-In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, while each member had their own role, these roles were designed as leadership responsibilities rather than isolated tasks. Each member was expected to take initiative and lead development within their area.
-
-At the same time, challenges and development tasks were not handled individually; instead, all team members worked collaboratively to solve problems and complete development tasks as a group. When necessary, tasks were also handled by small groups to improve both efficiency and stability in development.
-
-We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
-
-#### Outcomes
-
-Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
+| Developer | Programming / system development experience | Core gameplay implementation, Feasibility study | Hsinman, Nikolay, Yuqi |
+| UI Designer | Game design interest | Weapon functionality, UI design | Yinuo |
+| Visual Desiner | Illustration / visual design skills | Visual design, UI assets | Yuxin |
+| Project Manager | Project management experience | Progress coordination, task management | Shiho |
 
 ---
 
-### Team Workflow and Communication
+### Responsibility Management and Flexible Collaboration
 
-We adopted an Agile development approach, specifically using the Scrum framework, to manage the development process. To support this, we conducted daily stand-up meetings. These meetings were held both online and in person depending on the situation, and were continued consistently throughout the project, including during the Easter holiday period.
+We defined clear ownership responsibilities across the entire project, ensuring that each member was accountable for a specific domain. Members were expected to take initiative in their area by conducting preliminary research, involving others when necessary, and driving development proactively.
 
-In each meeting, we first set clear goals, then reviewed task progress, balanced workload distribution, and discussed and resolved any issues. This routine helped strengthen each member’s sense of responsibility and ensured that the entire team remained aligned with the overall direction of the project.
+In addition to the overall project roles, we also defined specific responsibility areas within game development. Each member was responsible for implementing their assigned features while considering how they would be technically implemented. When difficulties arose, they were discussed during daily stand-up meetings, where members sought feedback and support from others. For example, during the mid-development stage, when integration between multiple features was required (such as the control panel and weapon pickup system), there was frequent exchange of questions about each other’s code and discussions regarding feature implementation.
 
-In addition, throughout the project we used a combination of tools to support collaboration, development, planning, and schedule management.
+At the same time, challenges and development tasks were not handled individually. Instead, the entire team worked collaboratively to solve problems and progress development. For example, for large and labor-intensive tasks such as terrain initial design and weapon effect design, we formed small groups when necessary to improve development efficiency.
 
-#### Tools Used
+To support collaboration and development, we used the following tools for version control, communication, planning, and scheduling. 
 
-To support collaboration and development, we used tools for version control, communication, planning, and schedule management.
+<h3 align="center">Collaboration Tools Used</h3>
 
 | Category | Tool | Purpose |
 |----------|------|---------|
 | Version Control & Development | GitHub | Code sharing, storage, and integration |
 | Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
 | Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
-| Project Planning | WBS (Work Breakdown Structure) | Task decomposition, role organisation, and overall progress tracking against the schedule |
-| Project Management | Kanban Board | Visualisation of task progress and workflow management |
+| Project Planning | Gantt chart (Excel) | Task decomposition, role organisation, and overall progress tracking against the schedule |
+| Project Management | Kanban Board (GitHub) | Visualization of detailed task progress and issue-handling progress |
 | Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
 
-#### Kanban board
+<p align="center">
+  <img src="images/Meeting%20records.png" width="800">
+</p>
+
+### Shared Development Approach
+
+To support collaborative problem-solving and development, we adopted the agile methodology learned in class. Throughout the entire project period, including the Easter break, we conducted daily stand-up meetings both online and in person to review task progress and identify issues.
+
+In addition, we held in-person sessions approximately every two weeks, securing a meeting room to ensure focused on-site collaborative development time. During these sessions, we carried out pair programming and performed code merging through direct discussions in front of monitors with the relevant task owners, which contributed to improved development efficiency.
+
+<p align="center">
+  <img src="video/Inperson meeting gif.gif" width="500">
+</p>
+
+
+### Project Management Tools Usage and Challenges
+
+During meetings, the Gantt chart schedule was used as a visual tool to understand the current position within the overall project timeline. This enabled us to evaluate task distribution, monitor workload balance, and assess whether tasks were progressing as planned or at risk of delay. In addition, detailed tasks within each area of responsibility, as well as newly arising tasks identified during daily stand-up meetings and day-to-day communication, were individually registered by each member on the Kanban board for progress tracking. This must help prevent tasks that emerged spontaneously from being forgotten or overlooked.
+
+<h3 align="center">Gantt chart schedule</h3>
+
+<p align="center">
+  <img src="images/Gantt%20chart.png" width="600">
+</p>
+
+<h3 align="center">Kanban board</h3>
 
 <p align="center">
   <img src="images/Kanban%20Board.png" width="600">
 </p>
 
-#### WBS
+We went through a period of trial and error in how we used project management tools. During the development phase, we prioritised implementation work, which meant that updates to the Gantt chart and Kanban board were not always maintained consistently. As a result, task progress visibility decreased at certain stages, and we occasionally relied on individual memory and informal communication to track ongoing work. 
 
-During meetings, the Work Breakdown Structure (WBS) was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
+This experience revealed that when these tools are treated as supplementary documentation, their accuracy rapidly deteriorates, reducing project visibility. As a result, it becomes difficult for all team members to maintain a shared understanding of game development progress and required tasks.
+
+---
+
+### Improvements in Project Management Process
+
+We frequently held both online and in-person meetings; however, in the early stages, discussions often took around two hours. To improve efficiency, we began preparing a one-slide agenda outlining the meeting objectives in advance and sharing it with all participants. This allowed everyone to align on the purpose of the meeting beforehand, enabling more efficient discussions and reducing meeting time to within one hour.
+
+The meetings followed the structured flow below:
+
+- Confirmation of the agenda and meeting objectives
+- Progress updates for each task (ensuring no member was without assigned work)
+- Identification of issues in each task
+- Discussion of possible solutions to the identified issues
+
+<h3 align="center">Daily Meeting Agenda Slide</h3>
+
+<p align="center">
+  <img src="images/DailyMeeting%20agenda.png" width="600">
+</p>
+
+In addition, since all members were continuously dedicating significant effort to game development tasks throughout the project period and signs of fatigue were observed, we implemented measures to ensure a balanced workload and reduce stress during breaks. Before holiday periods, each member’s schedule was shared in advance via Outlook calendars, allowing others to cover tasks as needed and minimizing unnecessary communication during that time.
+
+<p align="center">
+  <img src="images/Outlook calendar.png" width="700">
+</p>
+
+### Improvements in Version Control and development Process 
+
+In addition, during collaborative development, several issues occurred when merging individual members’ code into the main branch. For example, some pull requests were merged without being noticed or approved, resulting in certain functionalities not being reflected. In other cases, changes made to shared classes affected other members’ features, and code was pushed to the main branch in a non-functional state. As a result, the main branch was not consistently kept up to date, and these issues occurred multiple times. These problems were mainly caused by the lack of a clearly defined branching and review process during parallel development, as well as our tendency to prioritise completing our own tasks over reviewing others’ work.
+
+To address these problems, we established the following process during daily meetings and ensured that all team members strictly followed it: 
+
+<h3 align="center">Revised Git Merge Process</h3>
+
+<p align="center">
+  <img src="images/Merge%20process.png" width="500">
+</p>
+
+<p align="center">
+  <img src="images/Mergeprocess%20chat.png" width="600">
+</p>
 
 ---
 
@@ -714,10 +765,21 @@ During meetings, the Work Breakdown Structure (WBS) was used as a visual tool to
 ### Conclusion
 
 - 10% ~500 words
-
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
-
 ### Contribution Statement
+
+
+*All members contributed equally; names are listed in alphabetical order and do not reflect level of contribution.*
+
+| Name    | Key contribution |
+|---------|----------------------------|
+| Hsinman | Control panel (power and angle adjustment, weapon selection, shooting button, cannon movement limit logic), Keyboard controler, background design |
+| Nikolay | AI player implementation, Terrain effects, Game results screen, Cannon trajectory logic, Turn controller logic, Cannon design |
+| Shiho   | Score calculation logic, Start screen (mode selection), Weapon and explosion effects (Bubblegumshot, Impactgun, Earthworm), Weapon character design |
+| Yinuo   | Weapon shop screen, Terrain effects, Weapon trajectory effects, Weapon effects (Lazershot, Grapshot, Submarineshot) |
+| Yuqi    | Random events (wind, acid rain, and earthquake effects), Tutorial screen, Test code, Weapon character design |
+| Yuxin   | Scoreboard display, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
+
 
 - Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 

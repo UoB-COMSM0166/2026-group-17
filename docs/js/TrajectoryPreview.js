@@ -1,3 +1,5 @@
+// Logic used to create a dotted line showing the trajectory of a shot before it has been fired
+// Used to assist the player in Easy mode
 class TrajectoryPreview {
    static simTimeStep = 0.016;
    static maxSteps = 600;
@@ -29,23 +31,24 @@ class TrajectoryPreview {
       }
    }
 
-   drawPreview(player, enemy, terrain, gravityVec, windVec) {
-      const weapon = player.currentWeapon;
+   drawPreview(params) {
+      const { player, enemy } = params;
       // Calculate projectile starting point
       const { launchPos, launchVel } = TrajectoryPreview.getLaunchState(player);
-      // Environment forces
-      const wind = createVector(windVec?.x ?? 0, windVec?.y ?? 0);
       // identify if this shot would hit the enemy by simulating the trajectory in advance
-      const simResult = this.#runSimulation(launchPos, launchVel, gravityVec, wind, terrain, enemy, weapon);
+      const simResult = this.#runSimulation(launchPos, launchVel, params);
       this.#renderPath(simResult.path, simResult.willHit);
       const targetHitRadius = player.wheelRadius + TrajectoryPreview.#hitTolerance;
       if (simResult.willHit) this.#renderHitMarker(enemy.position, targetHitRadius);
    }
 
-   #runSimulation(pos, vel, gravity, wind, terrain, enemy, weapon) {
+   #runSimulation(launchPos, launchVel, params) {
+      const { gravity, wind, rain, terrain, enemy } = params;
+      const weapon = params.player.currentWeapon;
       const path = [];
-      const stepForce = p5.Vector.add(gravity, wind).mult(TrajectoryPreview.simTimeStep);
-      const mockShot = { position: pos, velocity: vel, age: 0, state: {} };
+      //const stepForce = p5.Vector.add(gravity, wind).add(rain).mult(TrajectoryPreview.simTimeStep);
+      const stepForce = p5.Vector.mult(gravity, TrajectoryPreview.simTimeStep);
+      const mockShot = { position: launchPos, velocity: launchVel, age: 0, state: {} };
       for (let i = 0; i < TrajectoryPreview.maxSteps; i++) {
          const result = TrajectoryPreview.simulationStep(mockShot, stepForce, terrain, enemy, weapon);
          this.#addToPath(mockShot.position, i, path);

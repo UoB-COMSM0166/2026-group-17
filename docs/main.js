@@ -49,6 +49,10 @@ function mouseMoved() {
    game?.handleMouseMoved(mouseX, mouseY);
 }
 
+function keyPressed() {
+   game?.handleKeyPressed(key, keyCode);
+}
+
 function keyReleased() {
    game?.handleKeyReleased(key, keyCode);
 }

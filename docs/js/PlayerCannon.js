@@ -10,6 +10,7 @@ class PlayerCannon {
    #targetX;
    #moveSteps = 3;
    #hitFlashFrames = 0;
+   #hitFlashMax = 10;
    #weaponLoadout = [];
    #currentWeaponIndex = 0;
 
@@ -32,7 +33,7 @@ class PlayerCannon {
       this.pendingCraterRadius = 0;
    }
 
-   updateMove(follow = 0.30) {
+   updateMove(follow = 0.10) {
       this.#position.x = lerp(this.#position.x, this.#targetX, follow);
    }
 
@@ -115,10 +116,6 @@ class PlayerCannon {
    }
 
    #fireShot(weapon = null) {
-      //Will delete
-      console.log("fire debug");
-      console.log("andle:", this.#barrelAngle);
-      console.log("power:", this.#barrelPower);
       // offset of muzzle tip from position
       this.#savedBarrelPower = this.#barrelPower;
       const offset = createVector(this.#wheelRadius + this.#barrelSize.x / 2, 0);
@@ -206,6 +203,6 @@ class PlayerCannon {
    }
 
    canAct(turnController){
-      return turnController.turnNumber >= this.stuckUntilTurn;
+      return turnController.turnNumber > this.stuckUntilTurn;
    }
 }

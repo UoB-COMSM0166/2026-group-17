@@ -3,7 +3,7 @@ class Pineappleshot extends AbstractWeapon {
     super({
       id: 'pineapple',
       name: 'Pineappleshot',
-      description: 'Explosive pineapple.',
+      description: "Releases a cloud of toxic purple gas on impact.\nEnvelops enemies in a lingering, harmful haze.",
       damage: 6,
       speed: 6,
       blastRadius: 5,
