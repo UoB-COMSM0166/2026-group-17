@@ -129,48 +129,26 @@ The diagram was particularly useful in modelling the main gameplay flow of HOT C
 
 This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
 
-### Design
+### 3. Design
 
-### Initial Design
-In the early stages of development, our primary goal was to establish a functional prototype centered on core mechanics: turn-based artillery combat and a destructible environment. We initially conceived a centralized architecture where a single manager coordinated the game's high-level flow. This initial design is illustrated in the class diagram below (Figure xx).
+### 3.1 Design Evolution
+In the early stages, our primary goal was to establish a functional prototype centered on core mechanics. However, as the project's complexity grew, we encountered significant engineering bottlenecks. The centralized `main` file became excessively long, making it difficult to coordinate and manage. Since each team member was responsible for developing different parts but all had to modify the same core file, the development process was plagued by frequent and complex merge conflicts. This initial structure not only slowed down progress but also increased the risk of accidental logic regressions，where one person's changes would inadvertently overwrite or break another’s code. To facilitate safer parallel development and better scalability, we moved from a centralized model to a Decentralized State Pattern.
 
-<figure style="text-align:center;">
-  <img src="images/stage1.png"
-       alt="Initial design class diagram"
-       style="width:900px; height:auto;">
-
-  <figcaption>
-    <b>Figure x:</b> bInitial Design diagram
-  </figcaption>
-</figure>
-
-In the early development stage, a central **GameStateManager** class was responsible for coordinating most aspects of the gameplay loop, including terrain generation, turn handling, player management, event processing, and UI control. While this structure was effective for initial prototyping, the addition of projectile behaviour, scoring logic, explosion handling, and environmental systems gradually increased the responsibilities of this controller. Any modification in one module, such as the UI logic, could inadvertently affect other systems like the physics engine. This "ripple effect" made the codebase difficult to manage, hard to read, and prone to errors, ultimately motivating a refactor toward a more modular architecture.
+| Phase | Conceptual Architecture Diagram | Architectural Logic & Evolution |
+| :--- | :--- | :--- |
+| **Initial Design** | <img src="images/stage1.png" alt="Initial Design" height="280"> | **Centralized Design:** Initially, a central `GameStateManager` coordinated all aspects (terrain, turns, players, UI). This was effective for prototyping but led to a "ripple effect" where UI changes could inadvertently break the physics engine, making the codebase hard to maintain. |
+| **&darr;** | **Refactoring Path** | To resolve these dependencies, we transitioned to a modular gameplay layer guided by the State Pattern. |
+| **Final Design** | <img src="images/stage3.png" alt="Final Design" height="280"> | **Decentralized Design:** The final architecture isolates the application lifecycle into specific States (**Menu**, **Shop**, **Match**, **End**). This ensures that heavy simulation logic is only resident in memory when necessary, keeping each phase isolated and maintainable. |
 
 ---
-### Final Design
 
-To solve those problems, we transitioned to a State Pattern to decouple the various domains of the game. The final high-level architecture is illustrated in Figure x. Based on that, we created the overview behavioural diagram (see figure x).
+### 3.2 Key Differences and Architectural Improvements
+By comparing the initial and final designs, several critical improvements in software engineering quality were achieved:
 
-
-<figure style="text-align:center;">
-  <img src="images/stage3.png"
-       alt="Final design class diagram"
-       style="width:900px; height:auto;">
-
-  <figcaption>
-    <b>Figure x:</b> Figure x: Final design class diagram
-  </figcaption>
-</figure>
-
-<div style="width:100%; overflow-x:scroll; text-align:center;">
-  <img src="images/behaviouraldiagram.svg"
-       alt="behavioural diagram"
-       style="width:900px;height:420px; display:inline-block;">
-</div>
-
-<p style="text-align:center;">
-  <b>Figure x:</b> behavioural diagram
-</p>
+* **State-Driven Lifecycle & Memory Optimization**: Unlike the initial design where all logic was resident simultaneously, the final system uses the `Game` class to delegate behavior to the current `State`. This ensures that heavy simulation logic (e.g., the terrain engine) is only instantiated during an active match and disposed of upon returning to the menu, significantly optimizing memory performance.
+* **Modular Coordination in `Match` Class**: The core gameplay logic is now concentrated in the `Match` class, acting as a dedicated coordinator. Instead of a monolithic loop, it collaborates with specialized classes (`TurnController`, `ScoreBoard`, `ControlPanel`, `Terrain`). This modularity prevents logic "leakage" between domains, improving readability and allowing features to be extended independently.
+* **Polymorphic Weaponry System**: We utilized **Polymorphism** to handle the weapon inventory. All weapons inherit from `AbstractWeapon`, providing extension points for projectile behavior and rendering. Concrete classes (e.g., `Grapeshot`, `Lazershot`, `Submarinshot`) override these methods. This means the combat engine requires no hardcoded logic for specific weapons; behavior is delegated to the classes themselves, allowing for easy addition of new weapons without modifying the core firing logic.
+* **Encapsulation of Custom Behavior**: Overall, the refactor achieved a clear separation of concerns: state management handles progression between screens, the `Match` system coordinates the battle environment, and weapon subclasses encapsulate custom combat physics.
 
 ---
 **Key Differences and Improvements:**
@@ -178,40 +156,27 @@ To solve those problems, we transitioned to a State Pattern to decouple the vari
 * **Logic Decoupling**: By isolating the "Shop" and "Match" logic into separate state classes, we ensured that UI interactions in the shop cannot interfere with the complex physics updates during combat.
 * **Polymorphic Weaponry**: The final version utilizes **Polymorphism** to manage the weapon inventory. The player's loadout is stored in a unified `Weapon` array, allowing the system to handle diverse projectiles (like `ShibaShot` or `LazerShot`) through a single interface without modifying the core firing logic.
 
-### Class Diagrams
-To illustrate the structural growth and refactoring of the system, we have documented the class diagrams across three key development stages. These diagrams reflect the transition from a monolithic prototype to a modular, state-driven architecture.
+### 3.3 How our design following Object Oriented Design Principle
+| **OOD Feature** | **Reflected in the Code** | **Examples in our Project** | **Why It Is Important** |
+|---|---|---|---|
+| **Abstraction** | General base classes define shared responsibilities without exposing implementation details. | `State` provides the common lifecycle interface (`updateState()`, `drawState()`), while `AbstractWeapon` defines shared weapon behaviour such as `drawProjectile()`, `onImpact()`, and `drawExplosion()`. | This allows higher-level systems to interact with objects through a common interface rather than depending on concrete implementations. |
+| **Inheritance** | Subclasses extend base classes and reuse shared structure while adding their own specialized logic. | `MenuState`, `ShopState`, `MatchState`, and `EndState` inherit from `State`; weapon classes such as `Grapeshot`, `Lazershot`, and `Submarinshot` inherit from `AbstractWeapon`. | This reduces duplicated code and keeps common behaviour centralized. |
+| **Polymorphism** | Different subclasses respond differently to the same method calls. | The combat system can call `beforeProjectileStep()`, `onImpact()`, or `drawExplosion()` on any weapon, and each weapon class can provide its own implementation. | This makes the system extensible, since new weapons can be added without changing the main battle logic. |
+| **Composition** | Complex classes are built by combining multiple smaller objects with focused responsibilities. | `Match` is composed of `Terrain`, `TurnController`, `ScoreBoard`, `ControlPanel`, `TrajectoryPreview`, weather systems, and active gameplay objects such as `Projectile` and `Explosion`. | This improves modularity and keeps responsibilities clearly separated. |
+| **Encapsulation** | Internal state is hidden inside each class and accessed only through controlled methods or properties. | Classes use private fields such as `#players`, `#currentShot`, `#position`, and `#weaponLoadout`, with access managed through methods like `fireCurrentWeapon()` and `advancePhase()`. | This protects object state, reduces unintended side effects, and improves maintainability. |
 
-## Stage 1 - Initial Prototype
+### 3.3 Class Diagrams
 
-In Stage 1, the GameStateManager was a "God Object" that tried to do everything—managing players, generating terrain, and controlling the UI all at once. This made the code risky to change. 
-<p style="text-align:center;">
-  <img src="images/stage1.svg" alt="Stage 1" width="600px" height="300px">
-</p>
+"To illustrate the structural growth and refactoring of the system, we have documented the class diagrams across three key development stages. This progression reflects our iterative transition and demonstrates how our understanding of software architecture and effective teamwork evolved throughout the project.
 
-**Figure x:** Stage 1 - Initial Prototype
+| Stage | Diagram | Description & Key Refinements |
+| :--- | :--- | :--- |
+| Stage 1: Initial Prototype | <img src="images/stage1.svg" alt="Stage 1" height="250"> | **The "God Object" Phase [[1]](#ref1):** In Stage 1, the `GameStateManager` was a "God Object" that tried to do everything, managing players, generating terrain, and controlling the UI all at once. This made the code risky to change. |
+| **Stage 2: Refactored Prototype** | <img src="images/stage2.svg" alt="Stage 2" height="250"> | **Decoupling Responsibilities:** We began breaking down the monolithic controller. Logic started shifting towards specialized classes to improve maintainability, though the game flow was still tightly coupled. |
+| **Stage 3: Final Implementation** | <img src="images/stage3.svg" alt="Stage 3" height="250"> | **Modular & State-Driven:** As the game grew, we refined these relationships. For example, while UI widgets like `AngleDialWidget` and `PowerAdjustWidget` existed from the start, they were moved in Stage 3 to be part of a dedicated `ControlPanel` inside the `Match` class. |
 
----
+> **Interactive View:** For more details, please open the [homework page](https://github.com/UoB-COMSM0166/2026-group-17/tree/main/homework).
 
-### Stage 2 - Refactored Prototype
-
-<p style="text-align:center;">
-  <img src="images/stage2.svg" alt="Stage 1" width="600px" height="300px" >
-</p>
-
-**Figure x:** Stage 2 - Refactored Prototype
-
----
-
-### Stage 3 - Final Implementation
-
-As the game grew, we refined these relationships without necessarily deleting the original components. For example, while UI widgets like AngleDialWidget and PowerAdjustWidget existed from the start, they were moved in Stage 3 to be part of a dedicated ControlPanel inside the Match class.
-<p style="text-align:center;">
-  <img src="images/stage3.svg" alt="Stage 1" width="600px" height="300px" >
-</p>
-
-**Figure x:** Stage 3 - Final Implementation
-
-> For interactive SVG diagrams with **zoom & drag** functionality, please open the [interactive diagrams page](https://uob-comsm0166.github.io/2026-group-17/diagrams.html).
 
 ```mermaid
 classDiagram
@@ -353,6 +318,16 @@ AbstractWeapon --> Match : onImpact()
 AbstractWeapon --> Explosion : drawExplosion()
 AbstractWeapon --> Projectile : beforeProjectileStep()
 ```
+<p style="text-align:center;">
+  <b>Figure x:</b> Class diagram
+</p>
+
+### 3.4 Behavior Diagrams
+
+While the Class Diagrams define the static structure, the following behavioral diagrams illustrate how our system interact with actors in real-time.
+
+#### 3.4.1 Overwiew Behavior Diagram
+The first diagram provides a high-level overview of the entire game lifecycle. It maps the journey from the initial **Menu selection** through the **Weapon Shop** and into the active **Match**. 
 
 ```mermaid
 sequenceDiagram
@@ -434,6 +409,14 @@ sequenceDiagram
     end
 
 ```
+<p style="text-align:center;">
+  <b>Figure x:</b> Overview Behavior diagram
+</p>
+
+
+#### 3.4.2 Detailed Behavior Diagram
+The second diagram is a detailed Behavior Diagram, that focuses on the "Heart" of our game: battle execution and match completion.
+This diagram highlights the dynamic orchestration of objects during a single turn. It traces how a player's fire command triggers a chain reaction.
 
 ```mermaid
 sequenceDiagram
@@ -474,6 +457,9 @@ sequenceDiagram
     Match->>TurnController: advancePhase(players)
 
 ```
+<p style="text-align:center;">
+  <b>Figure x:</b> Detailed Behavior diagram
+</p>
 
 ### Implementation
 
@@ -792,3 +778,6 @@ You can delete this section in your own repo, it's just here for information. in
 - **Documentation** of code (5% of report grade)
   - Organise your code so that it could easily be picked up by another team in the future and developed further.
   - Is your repo clearly organised? Is code well commented throughout?
+
+### Rreference
+<a name="ref1"></a> [1] Wikipedia contributors. (2024). *God object*. Wikipedia, The Free Encyclopedia. Available at: [https://en.wikipedia.org/wiki/God_object](https://en.wikipedia.org/wiki/God_object) (Accessed: 20 April 2026).
