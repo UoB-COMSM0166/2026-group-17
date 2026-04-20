@@ -640,7 +640,7 @@ Specifically, members with creative strengths were responsible for visual design
 |----------|----------------------|----------------------|----------|
 | Developer | Programming / system development experience | Core gameplay implementation, Feasibility study | Hsinman, Nikolay, Yuqi |
 | UI Designer | Game design interest | Weapon functionality, UI design | Yinuo |
-| Visual Desiner | Illustration / visual design skills | Visual design, UI assets | Yuxin |
+| CO-Developer & Desiner | Programming / design skills | Weapon implementation, UI assets | Yuxin |
 | Project Manager | Project management experience | Progress coordination, task management | Shiho |
 
 ---
@@ -752,6 +752,18 @@ To address these problems, we established the following process during daily mee
 
 - 10% ~500 words
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
+  
+Our game provided valuable experience in developing a complete interactive game system, from core gameplay mechanics to visual feedback and user interaction. One of the most important lessons learned was the necessity of designing modular and extensible systems early on. For example, the explosion system (explosion.js) was initially intended to handle basic visual effects, but it gradually evolved into a central framework supporting multiple weapon behaviors, terrain interaction, and feedback effects. This highlighted the importance of anticipating future extensions when structuring core systems.
+
+A key challenge throughout the game was managing the interaction between different gameplay layers, particularly projectile physics, collision detection, and weapon-specific behaviors. Implementing features such as the StarShot required coordinating multiple systems: mid-air projectile splitting, secondary projectile handling, and delayed explosion upon impact. Debugging these interactions was complex, as errors often emerged from system integration rather than isolated components. This process reinforced the importance of clear responsibility boundaries between classes (e.g., projectile vs. explosion vs. match controller) and systematic debugging strategies.
+
+Another challenge was ensuring consistent visual and gameplay feedback. Effects such as explosions, trajectory previews, and impact animations needed to feel responsive and readable while remaining performant. Balancing clarity and visual richness required iterative refinement, particularly when multiple effects occurred simultaneously (e.g., explosions, terrain deformation, and screen shake).
+
+If development were to continue, immediate next steps would include improving game balancing and polish, such as refining weapon parameters, enhancing visual consistency across all effects, and optimizing performance for more complex interactions. Additionally, improving the user interface and feedback systems—for example, clearer hit indicators, smoother animations, and better onboarding—would significantly enhance player experience.
+
+For a potential sequel, our game could expand into a more advanced system with dynamic environments, more complex weapon interactions, and multiplayer capabilities. Introducing features such as destructible terrain variations, weapon synergies, or adaptive AI would deepen gameplay strategy. Furthermore, restructuring the codebase into a more scalable architecture (e.g., component-based systems or event-driven design) would better support long-term development and feature expansion.
+
+
 ### Contribution Statement
 
 
@@ -762,9 +774,9 @@ To address these problems, we established the following process during daily mee
 | Hsinman | Control panel (power and angle adjustment, weapon selection, shooting button, cannon movement limit logic), Keyboard controler, background design |
 | Nikolay | AI player implementation, Terrain effects, Game results screen, Cannon trajectory logic, Turn controller logic, Cannon design |
 | Shiho   | Score calculation logic, Start screen (mode selection), Weapon and explosion effects (Bubblegumshot, Impactgun, Earthworm), Weapon character design |
-| Yinuo   | Weapon shop screen, Terrain effects, Weapon trajectory effects, Weapon effects (Lazershot, Grapshot, Submarineshot) |
+| Yinuo   | Weapon shop screen, Terrain effects,TrajectoryPreview logic，Weapon trajectory effects, Weapon and explosion effects (Lazershot, Grapshot, Submarineshot) |
 | Yuqi    | Random events (wind, acid rain, and earthquake effects), Tutorial screen, Test code, Weapon character design |
-| Yuxin   | Scoreboard display, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
+| Yuxin   | Scoreboard display, Aiming and shooting interaction, Explosion logic, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
 
 
 - Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
