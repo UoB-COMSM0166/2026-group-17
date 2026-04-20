@@ -378,8 +378,10 @@ $$\begin{cases}
 
 **SUS**
 
+---
+
 ### Process 
-### Role Allocation and Responsibility Management
+### Role allocation across the entire project
 
 At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
 
@@ -389,23 +391,21 @@ Specifically, members with creative strengths were responsible for visual design
 
 | Category | Strengths / Experience | Main Responsibilities | Members |
 |----------|----------------------|----------------------|----------|
-| Development | Programming / system development experience | Core gameplay implementation, system development | 2 |
-| Testing | Testing experience | Testing, debugging, QA | 1 |
-| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design, mechanics | 1 |
-| Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | 1 |
-| Project Management | Project management experience | Progress coordination, task management | 1 |
+| Development | Programming / system development experience | Core gameplay implementation, System development, Feasibility study | Hsinman, Nikolay |
+| Testing | Testing experience | Testing, debugging, Quality Assurance | Yuqi |
+| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design, mechanics | Yinuo |
+| Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | Yuxin |
+| Project Management | Project management experience | Progress coordination, task management, Facilitation | Shiho |
 
 ---
 
-### Flexible Collaboration
+### Responsibility Management and Flexible Collaboration
 
-In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, these roles were designed not as simple divisions of work, but as leadership responsibilities. Each member was expected to proactively conduct preliminary research, actively involve other members when necessary, and take initiative in driving development within their respective area.
+In addition, separate from the overall project roles, we also defined specific responsibility areas within game development. Each member took responsibility for the features they were assigned to develop, considering how they could be implemented. When they encountered difficulties, they discussed them during daily stand-up meetings, seeking input and ideas from other members. In the middle stage of the project, for example, since certain features required integration with others (such as the control panel and weapon pickup integration), questions and ideas regarding feature implementation were frequently exchanged.
 
-At the same time, challenges and development tasks were not handled individually. Instead, the entire team worked collaboratively to solve problems and progress development. For example, for large and labor-intensive tasks such as terrain initial design and weapon effect design, small groups were formed when necessary to improve development efficiency.
+At the same time, challenges and development tasks were not handled individually. Instead, the entire team worked collaboratively to solve problems and progress development. For example, for large and labor-intensive tasks such as terrain initial design and weapon effect design, we formed small groups when necessary to improve development efficiency.
 
-We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
-
-To support collaboration and development, we used tools for version control, communication, planning, and schedule management.
+In addition, to support collaboration and development, we used tools for version control, communication, planning, and schedule management. Furthermore, we closely coordinated with members working on tasks in parallel, and flexibly adjusted roles based on project progress, individual schedules, and skill levels.
 
 <h3 align="center">Collaboration Tools Used</h3>
 
@@ -414,15 +414,27 @@ To support collaboration and development, we used tools for version control, com
 | Version Control & Development | GitHub | Code sharing, storage, and integration |
 | Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
 | Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
-| Project Planning | WBS (Work Breakdown Structure) | Task decomposition, role organisation, and overall progress tracking against the schedule |
-| Project Management | Kanban Board | Visualisation of task progress and workflow management |
+| Project Planning | Gantt chart | Task decomposition, role organisation, and overall progress tracking against the schedule |
+| Project Management | Kanban Board | Visualization of detailed task progress and issue-handling progress |
 | Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
+
+<p align="center">
+  <img src="images/Meeting%20records.png" width="800">
+</p>
+
+We went through a period of trial and error in how we used project management tools. During the development phase, we prioritised implementation work, which meant that updates to the Gantt chart and Kanban board were not always maintained consistently. As a result, task progress visibility decreased at certain stages, and we occasionally relied on individual memory and informal communication to track ongoing work. This experience revealed that project management tools are only effective when they are continuously maintained as part of the workflow, even in situations where development pressure increases and feature implementation becomes the main focus, leading to a lower prioritisation of these tools.
 
 ### Shared Development Approach and Improvements
 
-To support collaborative problem-solving and development, we adopted the agile methodology learned in class. We conducted daily stand-up meetings throughout the project period, including during the Easter break, to review task progress and identify issues. In addition, we held in-person sessions approximately every two weeks, reserving a meeting room to ensure focused, on-site collaborative development time. During these sessions, we conducted pair programming and performed code merging through direct discussion in front of monitors with relevant task owners, which helped improve development efficiency.
+To support collaborative problem-solving and development, we adopted the agile methodology learned in class. Throughout the entire project period, including the Easter break, we conducted daily stand-up meetings both online and in person to review task progress and identify issues.
 
-During meetings, the Gantt chart schedule was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
+In addition, we held in-person sessions approximately every two weeks, securing a meeting room to ensure focused on-site collaborative development time. During these sessions, we carried out pair programming and performed code merging through direct discussions in front of monitors with the relevant task owners, which contributed to improved development efficiency.
+
+<p align="center">
+  <img src="video/Inperson meeting gif.gif" width="500">
+</p>
+
+During meetings, the Gantt chart schedule was used as a visual tool to understand the current position within the overall project timeline. This enabled us to evaluate task distribution, monitor workload balance, and assess whether tasks were progressing as planned or at risk of delay. In addition, detailed tasks within each area of responsibility, as well as newly arising tasks identified during daily stand-up meetings and day-to-day communication, were individually registered by each member on the Kanban board for progress tracking. This helped prevent tasks that emerged spontaneously from being forgotten or overlooked, and ensured that all work was properly managed and tracked.
 
 <h3 align="center">Gantt chart schedule</h3>
 
@@ -440,16 +452,14 @@ During meetings, the Gantt chart schedule was used as a visual tool to review ou
 
 ### Improvements in Project Management Process
 
-We frequently held both online and in-person meetings; however, in the early stages, discussions often took around two hours. To improve efficiency, the project manager began preparing a one-slide agenda outlining the meeting objectives in advance and sharing it with all participants. This allowed everyone to align on the purpose of the meeting beforehand, enabling more efficient discussions and reducing meeting time to within one hour.
+We frequently held both online and in-person meetings; however, in the early stages, discussions often took around two hours. To improve efficiency, we began preparing a one-slide agenda outlining the meeting objectives in advance and sharing it with all participants. This allowed everyone to align on the purpose of the meeting beforehand, enabling more efficient discussions and reducing meeting time to within one hour.
 
 The meetings followed the structured flow below:
 
-Confirmation of the agenda and meeting objectives
-Progress updates for each task (ensuring no member was without assigned work)
-Identification of issues in each task
-Discussion of possible solutions to the identified issues
-
-In addition, since all members were continuously dedicating significant effort to game development tasks throughout the project period and signs of fatigue were observed, we implemented measures to ensure a balanced workload and reduce stress during breaks. Before holiday periods, each member’s schedule was shared in advance via Outlook calendars, allowing others to cover tasks as needed and minimizing unnecessary communication during that time.
+- Confirmation of the agenda and meeting objectives
+- Progress updates for each task (ensuring no member was without assigned work)
+- Identification of issues in each task
+- Discussion of possible solutions to the identified issues
 
 <h3 align="center">Daily Meeting Agenda Slide</h3>
 
@@ -457,9 +467,15 @@ In addition, since all members were continuously dedicating significant effort t
   <img src="images/DailyMeeting%20agenda.png" width="600">
 </p>
 
+In addition, since all members were continuously dedicating significant effort to game development tasks throughout the project period and signs of fatigue were observed, we implemented measures to ensure a balanced workload and reduce stress during breaks. Before holiday periods, each member’s schedule was shared in advance via Outlook calendars, allowing others to cover tasks as needed and minimizing unnecessary communication during that time.
+
+<p align="center">
+  <img src="images/Outlook calendar.png" width="700">
+</p>
+
 ### Improvements in Version Control and development Process 
 
-In addition, during collaborative development, several issues occurred when merging individual members’ code into the main branch. For example, some pull requests were merged without being noticed or approved, resulting in certain functionalities not being reflected. In other cases, changes made to shared classes affected other members’ features, and code was pushed to the main branch in a non-functional state. As a result, the main branch was not consistently kept up to date, and these issues occurred multiple times. 
+In addition, during collaborative development, several issues occurred when merging individual members’ code into the main branch. For example, some pull requests were merged without being noticed or approved, resulting in certain functionalities not being reflected. In other cases, changes made to shared classes affected other members’ features, and code was pushed to the main branch in a non-functional state. As a result, the main branch was not consistently kept up to date, and these issues occurred multiple times. These problems were mainly caused by the lack of a clearly defined branching and review process during parallel development, as well as our tendency to prioritise completing our own tasks over reviewing others’ work.
 
 To address these problems, we established the following process during daily meetings and ensured that all team members strictly followed it: 
 
@@ -469,10 +485,9 @@ To address these problems, we established the following process during daily mee
   <img src="images/Merge%20process.png" width="600">
 </p>
 
-
-#### Outcomes
-
-Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
+<p align="center">
+  <img src="images/Mergeprocess%20chat.png" width="700">
+</p>
 
 ---
 
