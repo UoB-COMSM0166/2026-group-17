@@ -422,8 +422,6 @@ In addition, to support collaboration and development, we used tools for version
   <img src="images/Meeting%20records.png" width="800">
 </p>
 
-We went through a period of trial and error in how we used project management tools. During the development phase, we prioritised implementation work, which meant that updates to the Gantt chart and Kanban board were not always maintained consistently. As a result, task progress visibility decreased at certain stages, and we occasionally relied on individual memory and informal communication to track ongoing work. This experience revealed that project management tools are only effective when they are continuously maintained as part of the workflow, even in situations where development pressure increases and feature implementation becomes the main focus, leading to a lower prioritisation of these tools.
-
 ### Shared Development Approach and Improvements
 
 To support collaborative problem-solving and development, we adopted the agile methodology learned in class. Throughout the entire project period, including the Easter break, we conducted daily stand-up meetings both online and in person to review task progress and identify issues.
@@ -447,6 +445,8 @@ During meetings, the Gantt chart schedule was used as a visual tool to understan
 <p align="center">
   <img src="images/Kanban%20Board.png" width="600">
 </p>
+
+We went through a period of trial and error in how we used project management tools. During the development phase, we prioritised implementation work, which meant that updates to the Gantt chart and Kanban board were not always maintained consistently. As a result, task progress visibility decreased at certain stages, and we occasionally relied on individual memory and informal communication to track ongoing work. This experience revealed that project management tools are only effective when they are continuously maintained as part of the workflow, even in situations where development pressure increases and feature implementation becomes the main focus, leading to a lower prioritisation of these tools.
 
 ---
 
