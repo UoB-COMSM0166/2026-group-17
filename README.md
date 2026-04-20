@@ -165,7 +165,7 @@ By comparing the initial and final designs, several critical improvements in sof
 | **Composition** | `Match` is composed of `Terrain`, `TurnController`, `ScoreBoard`, `ControlPanel`, `TrajectoryPreview`, weather systems, and active gameplay objects such as `Projectile` and `Explosion`.|
 | **Encapsulation** | Classes use private fields such as `#players`, `#currentShot`, `#position`, and `#weaponLoadout`, with access managed through methods like `fireCurrentWeapon()` and `advancePhase()`.|
 
-### 3.3 Class Diagrams
+### 3.4 Class Diagrams
 
 "To illustrate the structural growth and refactoring of the system, we have documented the class diagrams across three key development stages. This progression reflects our iterative transition and demonstrates how our understanding of software architecture and effective teamwork evolved throughout the project.
 
@@ -322,11 +322,11 @@ AbstractWeapon --> Projectile : beforeProjectileStep()
   <b>Figure x:</b> Class diagram
 </p>
 
-### 3.4 Behavior Diagrams
+### 3.5 Behavior Diagrams
 
 While the Class Diagrams define the static structure, the following behavioral diagrams illustrate how our system interact with actors in real-time.
 
-#### 3.4.1 Overwiew Behavior Diagram
+#### Overwiew Behavior Diagram
 The first diagram provides a high-level overview of the entire game lifecycle. It maps the journey from the initial **Menu selection** through the **Weapon Shop** and into the active **Match**. 
 
 ```mermaid
@@ -414,7 +414,7 @@ sequenceDiagram
 </p>
 
 
-#### 3.4.2 Detailed Behavior Diagram
+#### Detailed Behavior Diagram
 The second diagram is a detailed Behavior Diagram, that focuses on the "Heart" of our game: battle execution and match completion.
 This diagram highlights the dynamic orchestration of objects during a single turn. It traces how a player's fire command triggers a chain reaction.
 
