@@ -394,7 +394,7 @@ Specifically, members with creative strengths were responsible for visual design
 | Developer | Programming / system development experience | Core gameplay implementation, Feasibility study | Hsinman, Nikolay, Yuqi |
 | UI Designer | Game design interest | Weapon functionality, UI design | Yinuo |
 | Visual Desiner | Illustration / visual design skills | Visual design, UI assets | Yuxin |
-| Project Management | Project management experience | Progress coordination, task management | Shiho |
+| Project Manager | Project management experience | Progress coordination, task management | Shiho |
 
 ---
 
