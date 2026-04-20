@@ -383,31 +383,31 @@ $$\begin{cases}
 ### Process 
 ### Role allocation across the entire project
 
-At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
+At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation.
 
-Specifically, members with creative strengths were responsible for visual design and video production, those with project management experience handled scheduling and task coordination, and members with a technical focus worked on gameplay implementation and AI development. Each member contributed to the foundation of the project by leveraging their own strengths and experience.
+Specifically, members with creative strengths were responsible for visual design and video production, those with project management experience handled scheduling and task coordination, and members with a technical focus worked on gameplay implementation and AI development. Each member contributed to the foundation of the project by leveraging our strengths and experience.
 
 <h3 align="center">Team Members’ Strengths and Role Mapping</h3>
 
 | Category | Strengths / Experience | Main Responsibilities | Members |
 |----------|----------------------|----------------------|----------|
-| Development | Programming / system development experience | Core gameplay implementation, System development, Feasibility study | Hsinman, Nikolay |
-| Testing | Testing experience | Testing, debugging, Quality Assurance | Yuqi |
-| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design, mechanics | Yinuo |
+| Development | Programming / system development experience | Core gameplay implementation, Feasibility study | Hsinman, Nikolay |
+| Testing | Testing experience | Testing, Quality Assurance | Yuqi |
+| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design | Yinuo |
 | Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | Yuxin |
-| Project Management | Project management experience | Progress coordination, task management, Facilitation | Shiho |
+| Project Management | Project management experience | Progress coordination, task management | Shiho |
 
 ---
 
 ### Responsibility Management and Flexible Collaboration
 
-We defined clear responsibilities across the entire project and ensured that each member was accountable for their assigned area. However, these roles were designed not as simple divisions of work, but as leadership responsibilities. Each member was expected to proactively conduct preliminary research in their respective area, actively involve other members when necessary, and take initiative in driving development within their assigned domain.
+We defined clear ownership responsibilities across the entire project, ensuring that each member was accountable for a specific domain. Members were expected to take initiative in their area by conducting preliminary research, involving others when necessary, and driving development proactively.
 
-In addition, separate from the overall project roles, we also defined specific responsibility areas within game development. Each member took responsibility for the features they were assigned to develop, considering how they could be implemented. When they encountered difficulties, they discussed them during daily stand-up meetings, seeking input and ideas from other members. In the middle stage of the project, for example, since certain features required integration with others (such as the control panel and weapon pickup integration), questions and ideas regarding feature implementation were frequently exchanged.
+In addition to the overall project roles, we also defined specific responsibility areas within game development. Each member was responsible for implementing their assigned features while considering how they would be technically implemented. When difficulties arose, they were discussed during daily stand-up meetings, where members sought feedback and support from others. For example, during the mid-development stage, when integration between multiple features was required (such as the control panel and weapon pickup system), there was frequent exchange of questions about each other’s code and discussions regarding feature implementation.
 
 At the same time, challenges and development tasks were not handled individually. Instead, the entire team worked collaboratively to solve problems and progress development. For example, for large and labor-intensive tasks such as terrain initial design and weapon effect design, we formed small groups when necessary to improve development efficiency.
 
-In addition, to support collaboration and development, we used tools for version control, communication, planning, and schedule management. Furthermore, we closely coordinated with members working on tasks in parallel, and flexibly adjusted roles based on project progress, individual schedules, and skill levels.
+To support collaboration and development, we used the following tools for version control, communication, planning, and scheduling. 
 
 <h3 align="center">Collaboration Tools Used</h3>
 
@@ -416,15 +416,15 @@ In addition, to support collaboration and development, we used tools for version
 | Version Control & Development | GitHub | Code sharing, storage, and integration |
 | Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
 | Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
-| Project Planning | Gantt chart | Task decomposition, role organisation, and overall progress tracking against the schedule |
-| Project Management | Kanban Board | Visualization of detailed task progress and issue-handling progress |
+| Project Planning | Gantt chart (Excel) | Task decomposition, role organisation, and overall progress tracking against the schedule |
+| Project Management | Kanban Board (GitHub) | Visualization of detailed task progress and issue-handling progress |
 | Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
 
 <p align="center">
   <img src="images/Meeting%20records.png" width="800">
 </p>
 
-### Shared Development Approach and Improvements
+### Shared Development Approach
 
 To support collaborative problem-solving and development, we adopted the agile methodology learned in class. Throughout the entire project period, including the Easter break, we conducted daily stand-up meetings both online and in person to review task progress and identify issues.
 
@@ -434,7 +434,10 @@ In addition, we held in-person sessions approximately every two weeks, securing 
   <img src="video/Inperson meeting gif.gif" width="500">
 </p>
 
-During meetings, the Gantt chart schedule was used as a visual tool to understand the current position within the overall project timeline. This enabled us to evaluate task distribution, monitor workload balance, and assess whether tasks were progressing as planned or at risk of delay. In addition, detailed tasks within each area of responsibility, as well as newly arising tasks identified during daily stand-up meetings and day-to-day communication, were individually registered by each member on the Kanban board for progress tracking. This helped prevent tasks that emerged spontaneously from being forgotten or overlooked, and ensured that all work was properly managed and tracked.
+
+### Project Management Tools Usage and Challenges
+
+During meetings, the Gantt chart schedule was used as a visual tool to understand the current position within the overall project timeline. This enabled us to evaluate task distribution, monitor workload balance, and assess whether tasks were progressing as planned or at risk of delay. In addition, detailed tasks within each area of responsibility, as well as newly arising tasks identified during daily stand-up meetings and day-to-day communication, were individually registered by each member on the Kanban board for progress tracking. This must help prevent tasks that emerged spontaneously from being forgotten or overlooked.
 
 <h3 align="center">Gantt chart schedule</h3>
 
@@ -448,7 +451,9 @@ During meetings, the Gantt chart schedule was used as a visual tool to understan
   <img src="images/Kanban%20Board.png" width="600">
 </p>
 
-We went through a period of trial and error in how we used project management tools. During the development phase, we prioritised implementation work, which meant that updates to the Gantt chart and Kanban board were not always maintained consistently. As a result, task progress visibility decreased at certain stages, and we occasionally relied on individual memory and informal communication to track ongoing work. This experience revealed that project management tools are only effective when they are continuously maintained as part of the workflow, even in situations where development pressure increases and feature implementation becomes the main focus, leading to a lower prioritisation of these tools.
+We went through a period of trial and error in how we used project management tools. During the development phase, we prioritised implementation work, which meant that updates to the Gantt chart and Kanban board were not always maintained consistently. As a result, task progress visibility decreased at certain stages, and we occasionally relied on individual memory and informal communication to track ongoing work. 
+
+This experience revealed that when these tools are treated as supplementary documentation, their accuracy rapidly deteriorates, reducing project visibility. As a result, it becomes difficult for all team members to maintain a shared understanding of game development progress and required tasks.
 
 ---
 
@@ -484,11 +489,11 @@ To address these problems, we established the following process during daily mee
 <h3 align="center">Revised Git Merge Process</h3>
 
 <p align="center">
-  <img src="images/Merge%20process.png" width="600">
+  <img src="images/Merge%20process.png" width="500">
 </p>
 
 <p align="center">
-  <img src="images/Mergeprocess%20chat.png" width="700">
+  <img src="images/Mergeprocess%20chat.png" width="600">
 </p>
 
 ---
