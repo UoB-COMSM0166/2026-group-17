@@ -401,6 +401,8 @@ Specifically, members with creative strengths were responsible for visual design
 
 ### Responsibility Management and Flexible Collaboration
 
+We defined clear responsibilities across the entire project and ensured that each member was accountable for their assigned area. However, these roles were designed not as simple divisions of work, but as leadership responsibilities. Each member was expected to proactively conduct preliminary research in their respective area, actively involve other members when necessary, and take initiative in driving development within their assigned domain.
+
 In addition, separate from the overall project roles, we also defined specific responsibility areas within game development. Each member took responsibility for the features they were assigned to develop, considering how they could be implemented. When they encountered difficulties, they discussed them during daily stand-up meetings, seeking input and ideas from other members. In the middle stage of the project, for example, since certain features required integration with others (such as the control panel and weapon pickup integration), questions and ideas regarding feature implementation were frequently exchanged.
 
 At the same time, challenges and development tasks were not handled individually. Instead, the entire team worked collaboratively to solve problems and progress development. For example, for large and labor-intensive tasks such as terrain initial design and weapon effect design, we formed small groups when necessary to improve development efficiency.
