@@ -19,7 +19,7 @@ class Pineappleshot extends AbstractWeapon {
       push();
       imageMode(CENTER);
       const scale = Math.min((r * 6) / pineappleImg.width, (r * 6) / pineappleImg.height);
-image(pineappleImg, cx, cy, pineappleImg.width * scale, pineappleImg.height * scale);
+      image(pineappleImg, cx, cy, pineappleImg.width * scale, pineappleImg.height * scale);
       pop();
       return;
     }

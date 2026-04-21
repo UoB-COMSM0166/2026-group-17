@@ -19,7 +19,7 @@ class Shibashot extends AbstractWeapon {
       push();
       imageMode(CENTER);
       const scale = Math.min((r * 6) / shibaImg.width, (r * 6) / shibaImg.height);
-image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
+      image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
       pop();
       return;
     }
@@ -52,7 +52,7 @@ image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
   }
 
   drawExplosion(explosion) {
-    return; // shiba 不画 AbstractWeapon 默认黄圈
+    return;
   }
 
   onImpact(match, impactEvent, shot) {
