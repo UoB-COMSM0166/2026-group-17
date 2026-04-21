@@ -130,6 +130,7 @@ The diagram was particularly useful in modelling the main gameplay flow of HOT C
 This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
 ![Use Case Diagram](images/use-case-diagram.png)
 *Figure X. Use case diagram for HOT CANNONS*
+
 ### 2.5 Use Case Specifications
 
 <p><b>Easy Mode:</b><br>
