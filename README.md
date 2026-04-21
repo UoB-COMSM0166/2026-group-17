@@ -129,6 +129,96 @@ The diagram was particularly useful in modelling the main gameplay flow of HOT C
 
 This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
 
+### 2.5 Use Case Specifications
+
+<p><b>Easy Mode:</b><br>
+Players are given a visible trajectory preview to support aiming and power adjustment.
+</p>
+
+<p><b>Hard Mode:</b><br>
+Players do not receive trajectory guidance. During the five-round match, random environmental effects such as wind, rain, and earthquakes may occur and interfere with shooting. The AI opponent also performs with stronger and more accurate shots.
+</p>
+
+<table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+  <tr style="background-color:#2c3e50; color:white;">
+    <th style="padding:10px; border:1px solid #ddd;">Use-Case Section</th>
+    <th style="padding:10px; border:1px solid #ddd;">Easy Mode</th>
+    <th style="padding:10px; border:1px solid #ddd;">Hard Mode</th>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td><b>Description</b></td>
+    <td>A match flow in which players can learn and play the game with visual aiming support.</td>
+    <td>A more challenging match flow in which aiming support is removed and environmental effects increase uncertainty.</td>
+  </tr>
+
+  <tr>
+    <td><b>Basic Flow</b></td>
+    <td>Start the game, select a game mode, choose Easy Mode, select weapons in the shop, and play turn by turn until a winner is determined.</td>
+    <td>Start the game, select a game mode, choose Hard Mode, select weapons in the shop, and play turn by turn while dealing with random environmental interference until a winner is determined.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>1</td>
+    <td>Player starts the game and may view the tutorial before entering the match.</td>
+    <td>Player starts the game and may view the tutorial before entering the match.</td>
+  </tr>
+
+  <tr>
+    <td>2</td>
+    <td>Player selects the game mode and proceeds to the weapon shop to choose a loadout.</td>
+    <td>Player selects the game mode and proceeds to the weapon shop to choose a loadout.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>3</td>
+    <td>During a turn, the player may move the cannon, select a weapon, and adjust angle and power with the help of a trajectory preview.</td>
+    <td>During a turn, the player may move the cannon, select a weapon, and adjust angle and power without trajectory preview.</td>
+  </tr>
+
+  <tr>
+    <td>4</td>
+    <td>Player fires a projectile, the shot is resolved, terrain is updated, and the turn ends.</td>
+    <td>Player fires a projectile, but environmental effects may alter projectile behaviour before the turn ends.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>5</td>
+    <td>The next player or AI takes a turn. This continues until the win condition is met.</td>
+    <td>The next player or AI takes a turn with higher accuracy and difficulty.</td>
+  </tr>
+
+  <tr>
+    <td><b>Alternative Flow</b></td>
+    <td>A player may miss due to incorrect angle or power selection, but trajectory preview helps adjustment.</td>
+    <td>A player may miss due to lack of guidance or environmental interference.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>1</td>
+    <td>An explosion modifies the terrain and affects later shots.</td>
+    <td>Terrain changes plus environmental effects increase difficulty.</td>
+  </tr>
+
+  <tr>
+    <td>2</td>
+    <td>AI takes turns using the same logic as the player.</td>
+    <td>AI uses more accurate firing behaviour.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>3</td>
+    <td>Game continues until a player’s health reaches zero.</td>
+    <td>Game continues with ongoing random disruptions.</td>
+  </tr>
+
+  <tr>
+    <td><b>End Condition</b></td>
+    <td>Game ends and results are displayed.</td>
+    <td>Game ends after a more difficult match and results are displayed.</td>
+  </tr>
+</table>
+
 ### 3. Design
 
 ### 3.1 Design Evolution
