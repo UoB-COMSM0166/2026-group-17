@@ -128,6 +128,13 @@ To ensure the entire team maintained a shared understanding of the system–user
 The diagram was particularly useful in modelling the main gameplay flow of HOT CANNONS, including game setup, difficulty selection, weapon selection, turn-based shooting, terrain updates, and match progression.
 
 This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
+<p align="center">
+  <img src="./Use Case Diagram.png" width="700"/>
+</p>
+
+<p align="center">
+  <em>Figure X. Use case diagram for HOT CANNONS</em>
+</p>
 
 ### 2.5 Use Case Specifications
 
