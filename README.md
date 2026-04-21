@@ -750,7 +750,7 @@ Specifically, members with creative strengths were responsible for visual design
 | co-Developer + UI Designer | Programming / UI design experience | Yinuo |
 | co-Developer + Visual Desiner | Artistic creativity skills | Yuxin |
 | co-Developer + Product Owner | Programming / system development experience | Nikolay |
-| Pco-Developer + Project Manager | Project management experience | Progress coordination, task management | Shiho |
+| Pco-Developer + Project Manager | Project management experience | Shiho |
 
 ---
 
