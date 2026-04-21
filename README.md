@@ -597,18 +597,19 @@ After all weapons have been picked and the player either clicks or presses the c
 
 In the Match class, the AI's #location field is changed to MATCH and during turn transition, if the current player is player 2, then it's startThinking() method is called. The AIController's drawThinkIndicator() method is also called to draw animated dots above the player 2's cannon, while it is in its THINKING state.
 
-When it comes to the AI's aiming logic it reuses some of the mock shot calculation logic used for determining where to draw the trajectory preview curve in easy mode but without actually drawing the curve. Instead, it uses a nested loop to check every combination of ever 2° within an assumed reasonable shooting range of -100° to -175° with every 1.25 units of power within the range of 0 to 100 (which are mapped to the range 250 to 650 internally). An early exist from the loop is allowed, if the AI discovers a combination which resulsts in a minimum distance to the enemy of less than 5 pixels.
+To determine firing parameters, the AI tests trajectories across a range of angles (-95° to -179°) and power levels (0 - 100). Originally, it  did this via a brute-force approach that caused a significant frame-rate stutter of up to 1 second.
 
-After the AI finds its ideal combination of parameters they are passed through an applyDifficultyJitter() method which remaps their value randomly within a different range depending on the current difficulty - significantly larger on easy mode for a higher likelihood of misses - and then player 2's parameters are set to those values.
+The  solution involved refactoring the search into a two-pass coarse-to-fine algortithm. By first identifying a candidate region with large steps and then refining the search in that specif area, we acheived a 91% reduction in iterations while maintaining aiming accuracy. The resulting performance imact is virtually imperceptible.
 
-Unfortunately, the abovementioned nested loop caused the game to stutter for what appeared to be 0.5-1 second (possibly longer on slower computers), as can be seen in Figure X likely due to the amount of iterations required to complete the whole loop. The early exit helped but was insufficient in eliminating the issue and so a different way of achieving the same outcome had to be found.
+|Metric|Brute-Force (Original)|Coarse-to-Fine (Optimized)|
+|------|----------------------|--------------------------|
+|Search Strategy|Single high-res pass|Two-pass (Coarse → Fine)|
+|Angle Step|2°|8° (Coarse) / 2° (Fine)|
+|Power Step|1.25 units|40 (Coarse) / 5 (Fine)|
+Total Iterations|≈3000|≈270|
+Performance|<img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />|<img src="images/Smoother_AI_aiming.gif" alt="Game stutter" width="200" />|
 
-<div align="center">
-  <img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />
-  <br>
-  <em>Figure X: Visual stutter occurring during the AI aiming state transition.</em>
-</div>
-
+Another issue with AI behaviour was that it sometimes fired at terrain directly ahead of it, rather than over it as is visible in Figure X. This turned out to be a much simpler issue to deal with as it only required adjusting the applyDifficultyJitter() method to not decrease the angle, so any randomness applied to the angle can only turn the barrel closer to vertical or keep it the same. This change was only applied to Hard mode as the original behaviour was considered appropriate in Easy mode.
 
 
 ### Evaluation
