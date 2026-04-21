@@ -3,8 +3,8 @@ class PlayerCannon {
    #wheelRadius;
    #barrelSize;
    #barrelAngle = 0;
-   #barrelPower = 350;
-   #savedBarrelPower = 350;
+   #barrelPower = 450;
+   #savedBarrelPower = 450;
    #fillColor;
    #outlineColor;
    #targetX;
@@ -19,7 +19,7 @@ class PlayerCannon {
       this.#wheelRadius = config.wheelRadius;
       this.#barrelSize = config.barrelSize;
       this.#barrelAngle = config.barrelAngle;
-      this.#savedBarrelPower = 350;
+      this.#savedBarrelPower = 450;
 
       this.#fillColor = config.fillColor;
       this.#outlineColor = config.strokeColor;

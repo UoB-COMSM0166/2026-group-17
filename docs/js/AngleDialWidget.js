@@ -88,6 +88,7 @@ class AngleDialWidget {
       return this.#positionVector.dist(mouseVector) <= this.#radius;
    }
 
+   //Set the needle angle
    #updateAngle(player) {
       if (this.#isFollowing)
          this.#needleRotation = 90 + atan2(mouseY - this.#positionVector.y, mouseX - this.#positionVector.x);
