@@ -745,7 +745,7 @@ Specifically, members with creative strengths were responsible for visual design
 
 <div align="center">
 
-| Role | Strengths / Experience | Members |
+| Role | Experience (Strengths) | Members |
 |----------|----------------------|----------|
 | co-Developer + Game designer | Programming / System development experience | Hsinman |
 | co-Developer + System Tester | Programming / Quality Assurance (QA) experience | Yuqi |
