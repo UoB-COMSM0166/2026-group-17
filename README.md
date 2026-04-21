@@ -743,15 +743,18 @@ Specifically, members with creative strengths were responsible for visual design
 
 <h3 align="center">Team Members’ Strengths and Role Mapping</h3>
 
+<div align="center">
+
 | Role | Strengths / Experience | Members |
 |----------|----------------------|----------|
 | co-Developer + Game designer | Programming / system development experience | Hsinman |
-| co-Developer + System Teser | Quality Assurance (QA) experience | Yuqi |
+| co-Developer + System Tester | Quality Assurance (QA) experience | Yuqi |
 | co-Developer + UI Designer | Programming / UI design experience | Yinuo |
-| co-Developer + Visual Desiner | Artistic creativity skills | Yuxin |
+| co-Developer + Visual Designer | Drawing / artistic creativity skills | Yuxin |
 | co-Developer + Product Owner | Programming / system development experience | Nikolay |
-| Pco-Developer + Project Manager | Project management experience | Shiho |
+| co-Developer + Project Manager | Project management experience | Shiho |
 
+</div>
 ---
 
 ### Responsibility Management and Flexible Collaboration
