@@ -747,12 +747,12 @@ Specifically, members with creative strengths were responsible for visual design
 
 | Role | Strengths / Experience | Members |
 |----------|----------------------|----------|
-| co-Developer + Game designer | Programming / system development experience | Hsinman |
-| co-Developer + System Tester | Quality Assurance (QA) experience | Yuqi |
+| co-Developer + Game designer | Programming / System development experience | Hsinman |
+| co-Developer + System Tester | Programming / Quality Assurance (QA) experience | Yuqi |
 | co-Developer + UI Designer | Programming / UI design experience | Yinuo |
-| co-Developer + Visual Designer | Drawing / artistic creativity skills | Yuxin |
-| co-Developer + Product Owner | Programming / system development experience | Nikolay |
-| co-Developer + Project Manager | Project management experience | Shiho |
+| co-Developer + Visual Designer | Programming / Artistic creativity experience | Yuxin |
+| co-Developer + Product Owner | Programming / Aystem development experience | Nikolay |
+| co-Developer + Project Manager | Programming / Project management experience | Shiho |
 
 </div>
 ---
