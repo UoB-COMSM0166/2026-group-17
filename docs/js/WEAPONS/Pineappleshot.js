@@ -18,8 +18,8 @@ class Pineappleshot extends AbstractWeapon {
     if (typeof pineappleImg !== "undefined" && pineappleImg) {
       push();
       imageMode(CENTER);
-      const scale = Math.min((r * 2.8) / pineappleImg.width, (r * 2.8) / pineappleImg.height);
-      image(pineappleImg, cx, cy, pineappleImg.width * scale, pineappleImg.height * scale);
+      const scale = Math.min((r * 6) / pineappleImg.width, (r * 6) / pineappleImg.height);
+image(pineappleImg, cx, cy, pineappleImg.width * scale, pineappleImg.height * scale);
       pop();
       return;
     }
@@ -42,6 +42,16 @@ class Pineappleshot extends AbstractWeapon {
   }
 
   drawIcon(cx, cy, r) {
+    if (typeof pineappleImg !== "undefined" && pineappleImg) {
+      push();
+      imageMode(CENTER);
+      const maxW = r * 2.6;
+      const maxH = r * 2.6;
+      const scale = Math.min(maxW / pineappleImg.width, maxH / pineappleImg.height);
+      image(pineappleImg, cx, cy, pineappleImg.width * scale, pineappleImg.height * scale);
+      pop();
+      return;
+    }
     this.drawProjectile(cx, cy, r);
   }
 

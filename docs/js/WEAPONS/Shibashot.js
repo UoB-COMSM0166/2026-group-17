@@ -18,8 +18,8 @@ class Shibashot extends AbstractWeapon {
     if (typeof shibaImg !== "undefined" && shibaImg) {
       push();
       imageMode(CENTER);
-      const scale = Math.min((r * 2.6) / shibaImg.width, (r * 2.6) / shibaImg.height);
-      image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
+      const scale = Math.min((r * 6) / shibaImg.width, (r * 6) / shibaImg.height);
+image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
       pop();
       return;
     }
@@ -38,6 +38,16 @@ class Shibashot extends AbstractWeapon {
   }
 
   drawIcon(cx, cy, r) {
+    if (typeof shibaImg !== "undefined" && shibaImg) {
+      push();
+      imageMode(CENTER);
+      const maxW = r * 2.5;
+      const maxH = r * 2.5;
+      const scale = Math.min(maxW / shibaImg.width, maxH / shibaImg.height);
+      image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
+      pop();
+      return;
+    }
     this.drawProjectile(cx, cy, r);
   }
 

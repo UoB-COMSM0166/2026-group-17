@@ -18,7 +18,7 @@ class Starshot extends AbstractWeapon {
     if (typeof starImg !== "undefined" && starImg) {
       push();
       imageMode(CENTER);
-      const scale = Math.min((r * 2.4) / starImg.width, (r * 2.4) / starImg.height);
+      const scale = Math.min((r * 6) / starImg.width, (r * 6) / starImg.height);
       image(starImg, cx, cy, starImg.width * scale, starImg.height * scale);
       pop();
       return;
@@ -44,6 +44,16 @@ class Starshot extends AbstractWeapon {
   }
 
   drawIcon(cx, cy, r) {
+    if (typeof starImg !== "undefined" && starImg) {
+      push();
+      imageMode(CENTER);
+      const maxW = r * 2.4;
+      const maxH = r * 2.4;
+      const scale = Math.min(maxW / starImg.width, maxH / starImg.height);
+      image(starImg, cx, cy, starImg.width * scale, starImg.height * scale);
+      pop();
+      return;
+    }
     this.drawProjectile(cx, cy, r);
   }
 
