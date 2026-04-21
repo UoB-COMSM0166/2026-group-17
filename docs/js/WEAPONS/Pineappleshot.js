@@ -18,7 +18,8 @@ class Pineappleshot extends AbstractWeapon {
     if (typeof pineappleImg !== "undefined" && pineappleImg) {
       push();
       imageMode(CENTER);
-      image(pineappleImg, cx, cy, 58, 72);
+      const scale = Math.min((r * 2.8) / pineappleImg.width, (r * 2.8) / pineappleImg.height);
+      image(pineappleImg, cx, cy, pineappleImg.width * scale, pineappleImg.height * scale);
       pop();
       return;
     }
@@ -32,7 +33,7 @@ class Pineappleshot extends AbstractWeapon {
       push();
       rotate(i * 90);
       triangle(0, 0, r * 0.4, -r * 0.4, r, 0);
-      triangle(0, 0, r * 0.4,  r * 0.4, r, 0);
+      triangle(0, 0, r * 0.4, r * 0.4, r, 0);
       pop();
     }
     fill(60);

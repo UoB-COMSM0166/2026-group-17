@@ -18,7 +18,8 @@ class Shibashot extends AbstractWeapon {
     if (typeof shibaImg !== "undefined" && shibaImg) {
       push();
       imageMode(CENTER);
-      image(shibaImg, cx, cy, 68, 68);
+      const scale = Math.min((r * 2.6) / shibaImg.width, (r * 2.6) / shibaImg.height);
+      image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
       pop();
       return;
     }
