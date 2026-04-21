@@ -2,7 +2,7 @@ class Bubblegumshot extends AbstractWeapon {
   constructor() {
     super({
       id: 'bubblegumshot', name: 'Bubblegumshot',
-      description: 'Sticky and explosive!',
+      description: 'A cute pink bubblegum-like gun with a sticky. \nStick to the opponent cannon, preventing movement and skipping the opponent\'s next turn.',
       damage: 9, 
       speed: 8, 
       blastRadius: 9, 
@@ -19,7 +19,7 @@ class Bubblegumshot extends AbstractWeapon {
 
    push();
    imageMode(CENTER);
-   image(bubblegumImg, x, y, size * 2.5, size * 2.5);
+   image(bubblegumImg, x, y, 60, 60);
    pop();
   }
   
@@ -58,7 +58,7 @@ class Bubblegumshot extends AbstractWeapon {
     ellipse(0, 0, r * 2.5, r * 2.2);
     //Main sticky bubble body
     fill(255, 100, 180, 140);
-    circle(0, 0, r * 1.8, r * 1.6);
+    ellipse(0, 0, r * 1.8, r * 1.6);
     //Inner bubble
     fill(255, 60, 150, 180);
     ellipse(0, 0, r * 1.0, r * 0.9);
@@ -111,12 +111,12 @@ class Bubblegumshot extends AbstractWeapon {
 
     //If it is within explosion ratius, apply sticky effect
     if(d <= this.explosionRadius){
-
-        target.stuckUntilTurn = Math.max(
+      const turnController = match.getTurnController();
+      //Opponent cannot act for next 1 full turn
+      target.stuckUntilTurn = Math.max(
         target.stuckUntilTurn, 
         turnController.turnNumber + 1
-        );
-      target.triggerHitFlash(10);
+      );
     }
   }
 }

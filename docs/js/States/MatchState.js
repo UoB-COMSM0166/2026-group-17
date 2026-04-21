@@ -1,6 +1,6 @@
 class MatchState extends State {
    #match;
-   #endDelayMs = 3000;
+   #endDelayMs = 1000;
    #matchOverTimer = 0;
 
    constructor(game, resolution, loadout0, loadout1, aiController) {

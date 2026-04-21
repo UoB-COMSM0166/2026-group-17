@@ -13,29 +13,39 @@ class TurnController {
    get maxTurns() { return this.#maxTurns; }
 
    advancePhase(players) {
-
+      //Ensure valid palyer list
       if(!Array.isArray(players) || players.length === 0) return;
-      let attempts = 0;   
+      let attempts = 0;
+      //Try to find a player who can act
+      //Attempt max two times for skipping   
       while(attempts < 2){
-      this.#updateActivePlayerId();
-         if (this.#activePlayerId === 0) this.#turnNumber++;
-           
+         const previousPlayer = this.#activePlayerId;
+         this.#activePlayerId = 1 - this.#activePlayerId;
          const currentPlayer = players?.[this.#activePlayerId];
          if(!currentPlayer) return;
-
-         const canAct = currentPlayer.canAct?.(this) ?? true;
+         // if(!currentPlayer) return;
+         //Check whether the player is affected by status effects
+         const canAct = currentPlayer.canAct(this);
     
-         if(canAct) return;
-
-         this.onSkipCallback?.(this.#activePlayerId);
-         attempts++;
+         if(previousPlayer === 1 && this.#activePlayerId === 0) {
+            this.#turnNumber++;
          }
-   }         
-   
+         
+         if(!canAct){
+            currentPlayer.stuckUntilTurn = 0;
+            //Player is skipping due to status effect
+            this.onSkipCallback?.(this.#activePlayerId);
+            attempts++;
+            continue;
+         }
+         return;
+      }    
+   }
+
    #updateActivePlayerId() {
       this.#activePlayerId = 1 - this.#activePlayerId;
    }
-
+         
    get isGameOver() {
       return this.#turnNumber > this.#maxTurns;
    }

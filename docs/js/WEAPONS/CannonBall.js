@@ -3,7 +3,7 @@ class CannonBall extends AbstractWeapon {
     super({
       id: 'cannon_ball',
       name: 'Cannon Ball',
-      description: 'Classic iron sphere.',
+      description: 'A heavy iron sphere used as a cannon projectile. \nIt increases the score based on explosion distance from the opponent\'s cannon on impact.',
       damage: 7,
       speed: 6,
       blastRadius: 5,
@@ -19,7 +19,7 @@ class CannonBall extends AbstractWeapon {
 
    push();
    imageMode(CENTER);
-   image(cannonballImg, x, y, size * 2.5, size * 2.5);
+   image(cannonballImg, x, y, 60, 60);
    pop();
   }
 

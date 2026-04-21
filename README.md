@@ -54,9 +54,29 @@ https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e
 
 During the early stages of the ideation process, our team began with a brainstorming session, where each member used Google Docs to independently research and record several game concepts that they were interested in developing. These initial ideas covered a range of gameplay styles, including action-based, strategy-focused, and arcade-inspired games.
 
-After discussing the feasibility and development complexity of each idea, we conducted a quick team vote and decided to take Pocket Tanks as our main gameplay reference. Its turn-based artillery combat, projectile physics, and destructible environment mechanics provided a strong and achievable foundation for our project, while also offering clear opportunities for further innovation.
+After discussing the feasibility and development complexity of each idea, we conducted a quick team vote and decided to take Pocket Tanks as our main gameplay reference. Its turn based artillery combat, projectile physics, and destructible environment mechanics provided a strong and achievable foundation for our project, while also offering clear opportunities for further innovation.
 
-We then went about creating paper prototypes of our initial concept (Figure 4) in order to flesh out the specific gameplay details. This proved especially helpful considering the complexity of the concept, as it enabled us to better define the gameplay loop, player interaction flow, and core mechanics at an early stage. Paper prototyping was also valuable in improving communication within the team, particularly in helping all members visualise the turn-based combat flow, aiming controls, and overall user experience before moving into implementation.
+We then went about creating paper prototypes of our initial concept (Figure X) in order to flesh out the specific gameplay details. This proved especially helpful considering the complexity of the concept, as it enabled us to better define the gameplay loop, player interaction flow, and core mechanics at an early stage. Paper prototyping was also valuable in improving communication within the team, particularly in helping all members visualise the turn-based combat flow, aiming controls, and overall user experience before moving into implementation.
+<p align="center">
+  <img src="./video/startgame.gif" width="600"/>
+</p>
+<p align="center">
+  <em>Figure X. Start page prototype.</em>
+</p>
+
+<p align="center">
+  <img src="./video/weaponshop.gif" width="600"/>
+</p>
+<p align="center">
+  <em>Figure X. Weapon selection prototype.</em>
+</p>
+
+<p align="center">
+  <img src="./video/maingame.gif" width="600"/>
+</p>
+<p align="center">
+  <em>Figure X. Main game demo prototype.</em>
+</p>
 
 
 ### 2.2 Early Stage Design
@@ -65,7 +85,7 @@ Having selected Pocket Tanks as our main reference, we then identified several k
 
 1. Destructible terrain allows the battlefield to change dynamically after each explosion, adding greater strategic depth.
 
-2. AI controlled opponent mode planned to support future single-player gameplay and extend system usability.
+2. AI controlled opponent mode planned to support future single player gameplay and extend system usability.
 
 3. Weapon shop and enhanced weapon system enables players to select a limited loadout before each match, increasing tactical planning and gameplay variety.
 
@@ -113,7 +133,7 @@ Examples of key user stories include:
 
 - As a player, I want destructible terrain so that each shot changes the battlefield and requires strategic decision-making.
 - As a player, I want to select weapons before the match so that I can plan my gameplay strategy in advance.
-- As a new player, I want tutorial pop-ups so that I can understand how to aim and fire correctly.
+- As a new player, I want tutorial pop ups so that I can understand how to aim and fire correctly.
 - As a new player, I want an Easy Mode with trajectory guidance so that I can quickly learn the controls and gameplay mechanics.
 - As an experienced player, I want Hard Mode random events so that each match feels more challenging and unpredictable.
 - As a colourblind player, I want distinguishable UI colours so that game information remains clear.
@@ -125,94 +145,427 @@ These user stories helped ensure that our system requirements remained closely a
 
 To ensure the entire team maintained a shared understanding of the system–user interactions and the overall gameplay flow, we developed a Use Case Diagram as part of our requirements engineering process.
 
-The diagram was particularly useful in modelling the main gameplay flow of HOT CANNONS, including game setup, difficulty selection, weapon selection, turn-based shooting, terrain updates, and match progression.
+The diagram was particularly useful in modelling the main gameplay flow of HOT CANNONS, including game setup, difficulty selection, weapon selection, turn based shooting, terrain updates, and match progression.
 
 This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
+![Use Case Diagram](images/use-case-diagram.png)
+*Figure X. Use case diagram for HOT CANNONS*
 
-### Design
+### 2.5 Use Case Specifications
 
-### Initial Design
-In the early stages of development, our primary goal was to establish a functional prototype centered on core mechanics: turn-based artillery combat and a destructible environment. We initially conceived a centralized architecture where a single manager coordinated the game's high-level flow. This initial design is illustrated in the class diagram below (Figure xx).
-
-<figure style="text-align:center;">
-  <img src="images/stage1.png"
-       alt="Initial design class diagram"
-       style="width:900px; height:auto;">
-
-  <figcaption>
-    <b>Figure x:</b> bInitial Design diagram
-  </figcaption>
-</figure>
-
-In the early development stage, a central **GameStateManager** class was responsible for coordinating most aspects of the gameplay loop, including terrain generation, turn handling, player management, event processing, and UI control. While this structure was effective for initial prototyping, the addition of projectile behaviour, scoring logic, explosion handling, and environmental systems gradually increased the responsibilities of this controller. Any modification in one module, such as the UI logic, could inadvertently affect other systems like the physics engine. This "ripple effect" made the codebase difficult to manage, hard to read, and prone to errors, ultimately motivating a refactor toward a more modular architecture.
-
----
-### Final Design
-
-To solve those problems, we transitioned to a State Pattern to decouple the various domains of the game. The final high-level architecture is illustrated in Figure x. Based on that, we created the overview behavioural diagram (see figure x).
-
-
-<figure style="text-align:center;">
-  <img src="images/stage3.png"
-       alt="Final design class diagram"
-       style="width:900px; height:auto;">
-
-  <figcaption>
-    <b>Figure x:</b> Figure x: Final design class diagram
-  </figcaption>
-</figure>
-
-<div style="width:100%; overflow-x:scroll; text-align:center;">
-  <img src="images/behaviouraldiagram.svg"
-       alt="behavioural diagram"
-       style="width:900px;height:420px; display:inline-block;">
-</div>
-
-<p style="text-align:center;">
-  <b>Figure x:</b> behavioural diagram
+<p><b>Easy Mode:</b><br>
+Players are given a visible trajectory preview to support aiming and power adjustment.
 </p>
 
----
-**Key Differences and Improvements:**
-* **State-Driven Lifecycle**: Unlike Stage 1, where all game logic was resident in memory simultaneously, the final design introduced an abstract `State` class. The `Game` class now only manages state transitions (e.g., switching from `MenuState` to `MatchState`). This ensures that heavy simulation logic, such as the terrain engine, is only instantiated during an active match and is disposed of when returning to the menu, significantly optimizing memory performance.
-* **Logic Decoupling**: By isolating the "Shop" and "Match" logic into separate state classes, we ensured that UI interactions in the shop cannot interfere with the complex physics updates during combat.
-* **Polymorphic Weaponry**: The final version utilizes **Polymorphism** to manage the weapon inventory. The player's loadout is stored in a unified `Weapon` array, allowing the system to handle diverse projectiles (like `ShibaShot` or `LazerShot`) through a single interface without modifying the core firing logic.
-
-### Class Diagrams
-To illustrate the structural growth and refactoring of the system, we have documented the class diagrams across three key development stages. These diagrams reflect the transition from a monolithic prototype to a modular, state-driven architecture.
-
-## Stage 1 - Initial Prototype
-
-In Stage 1, the GameStateManager was a "God Object" that tried to do everything—managing players, generating terrain, and controlling the UI all at once. This made the code risky to change. 
-<p style="text-align:center;">
-  <img src="images/stage1.svg" alt="Stage 1" width="600px" height="300px">
+<p><b>Hard Mode:</b><br>
+Players do not receive trajectory guidance. During the five-round match, random environmental effects such as wind, rain, and earthquakes may occur and interfere with shooting. The AI opponent also performs with stronger and more accurate shots.
 </p>
 
-**Figure x:** Stage 1 - Initial Prototype
+<table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+  <tr style="background-color:#2c3e50; color:white;">
+    <th style="padding:10px; border:1px solid #ddd;">Use-Case Section</th>
+    <th style="padding:10px; border:1px solid #ddd;">Easy Mode</th>
+    <th style="padding:10px; border:1px solid #ddd;">Hard Mode</th>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td><b>Description</b></td>
+    <td>A match flow in which players can learn and play the game with visual aiming support.</td>
+    <td>A more challenging match flow in which aiming support is removed and environmental effects increase uncertainty.</td>
+  </tr>
+
+  <tr>
+    <td><b>Basic Flow</b></td>
+    <td>Start the game, select a game mode, choose Easy Mode, select weapons in the shop, and play turn by turn until a winner is determined.</td>
+    <td>Start the game, select a game mode, choose Hard Mode, select weapons in the shop, and play turn by turn while dealing with random environmental interference until a winner is determined.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>1</td>
+    <td>Player starts the game and may view the tutorial before entering the match.</td>
+    <td>Player starts the game and may view the tutorial before entering the match.</td>
+  </tr>
+
+  <tr>
+    <td>2</td>
+    <td>Player selects the game mode and proceeds to the weapon shop to choose a loadout.</td>
+    <td>Player selects the game mode and proceeds to the weapon shop to choose a loadout.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>3</td>
+    <td>During a turn, the player may move the cannon, select a weapon, and adjust angle and power with the help of a trajectory preview.</td>
+    <td>During a turn, the player may move the cannon, select a weapon, and adjust angle and power without trajectory preview.</td>
+  </tr>
+
+  <tr>
+    <td>4</td>
+    <td>Player fires a projectile, the shot is resolved, terrain is updated, and the turn ends.</td>
+    <td>Player fires a projectile, but environmental effects may alter projectile behaviour before the turn ends.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>5</td>
+    <td>The next player or AI takes a turn. This continues until the win condition is met.</td>
+    <td>The next player or AI takes a turn with higher accuracy and difficulty.</td>
+  </tr>
+
+  <tr>
+    <td><b>Alternative Flow</b></td>
+    <td>A player may miss due to incorrect angle or power selection, but trajectory preview helps adjustment.</td>
+    <td>A player may miss due to lack of guidance or environmental interference.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>1</td>
+    <td>An explosion modifies the terrain and affects later shots.</td>
+    <td>Terrain changes plus environmental effects increase difficulty.</td>
+  </tr>
+
+  <tr>
+    <td>2</td>
+    <td>AI takes turns using the same logic as the player.</td>
+    <td>AI uses more accurate firing behaviour.</td>
+  </tr>
+
+  <tr style="background-color:#ecf0f1;">
+    <td>3</td>
+    <td>Game continues until a player’s health reaches zero.</td>
+    <td>Game continues with ongoing random disruptions.</td>
+  </tr>
+
+  <tr>
+    <td><b>End Condition</b></td>
+    <td>Game ends and results are displayed.</td>
+    <td>Game ends after a more difficult match and results are displayed.</td>
+  </tr>
+</table>
+
+### 3. Design
+
+### 3.1 Design Evolution
+In the early stages, our primary goal was to establish a functional prototype centered on core mechanics. However, as the project's complexity grew, we encountered significant engineering bottlenecks. The centralized `main` file became excessively long, making it difficult to coordinate and manage. Since each team member was responsible for developing different parts but all had to modify the same core file, the development process was plagued by frequent and complex merge conflicts. This initial structure not only slowed down progress but also increased the risk of accidental logic regressions，where one person's changes would inadvertently overwrite or break another’s code. To facilitate safer parallel development and better scalability, we moved from a centralized model to a Decentralized State Pattern.
+
+| Phase | Conceptual Architecture Diagram | Architectural Logic & Evolution |
+| :--- | :--- | :--- |
+| **Initial Design** | <img src="images/stage1.png" alt="Initial Design" height="280"> | **Centralized Design:** Initially, a central `GameStateManager` coordinated all aspects (terrain, turns, players, UI). This was effective for prototyping but led to a "ripple effect" where UI changes could inadvertently break the physics engine, making the codebase hard to maintain. |
+| **&darr;** | **Refactoring Path** | To resolve these dependencies, we transitioned to a modular gameplay layer guided by the State Pattern. |
+| **Final Design** | <img src="images/stage3.png" alt="Final Design" height="280"> | **Decentralized Design:** The final architecture isolates the application lifecycle into specific States (**Menu**, **Shop**, **Match**, **End**). This ensures that heavy simulation logic is only resident in memory when necessary, keeping each phase isolated and maintainable. |
 
 ---
 
-### Stage 2 - Refactored Prototype
+### 3.2 Key Differences and Architectural Improvements
+By comparing the initial and final designs, several critical improvements in software engineering quality were achieved:
 
+* **State-Driven Lifecycle & Memory Optimization**: Unlike the initial design where all logic was resident simultaneously, the final system uses the `Game` class to delegate behavior to the current `State`. This ensures that heavy simulation logic (e.g., the terrain engine) is only instantiated during an active match and disposed of upon returning to the menu, significantly optimizing memory performance.
+* **Modular Coordination in `Match` Class**: The core gameplay logic is now concentrated in the `Match` class, acting as a dedicated coordinator. Instead of a monolithic loop, it collaborates with specialized classes (`TurnController`, `ScoreBoard`, `ControlPanel`, `Terrain`). This modularity prevents logic "leakage" between domains, improving readability and allowing features to be extended independently.
+* **Polymorphic Weaponry System**: We utilized **Polymorphism** to handle the weapon inventory. All weapons inherit from `AbstractWeapon`, providing extension points for projectile behavior and rendering. Concrete classes (e.g., `Grapeshot`, `Lazershot`, `Submarinshot`) override these methods. This means the combat engine requires no hardcoded logic for specific weapons; behavior is delegated to the classes themselves, allowing for easy addition of new weapons without modifying the core firing logic.
+* **Encapsulation of Custom Behavior**: Overall, the refactor achieved a clear separation of concerns: state management handles progression between screens, the `Match` system coordinates the battle environment, and weapon subclasses encapsulate custom combat physics.
+
+### 3.3 How our design following Object Oriented Design Principle
+| **OOD Feature** | **Examples in our Project** |
+|---|---|
+| **Abstraction** | `State` provides the common lifecycle interface (`updateState()`, `drawState()`), while `AbstractWeapon` defines shared weapon behaviour such as `drawProjectile()`, `onImpact()`, and `drawExplosion()`. |
+| **Inheritance** | `MenuState`, `ShopState`, `MatchState`, and `EndState` inherit from `State`; weapon classes such as `Grapeshot`, `Lazershot`, and `Submarinshot` inherit from `AbstractWeapon`. |
+| **Polymorphism** |The combat system can call `beforeProjectileStep()`, `onImpact()`, or `drawExplosion()` on any weapon, and each weapon class can provide its own implementation.|
+| **Composition** | `Match` is composed of `Terrain`, `TurnController`, `ScoreBoard`, `ControlPanel`, `TrajectoryPreview`, weather systems, and active gameplay objects such as `Projectile` and `Explosion`.|
+| **Encapsulation** | Classes use private fields such as `#players`, `#currentShot`, `#position`, and `#weaponLoadout`, with access managed through methods like `fireCurrentWeapon()` and `advancePhase()`.|
+
+### 3.4 Class Diagrams
+
+"To illustrate the structural growth and refactoring of the system, we have documented the class diagrams across three key development stages. This progression reflects our iterative transition and demonstrates how our understanding of software architecture and effective teamwork evolved throughout the project.
+
+| Stage | Diagram | Description & Key Refinements |
+| :--- | :--- | :--- |
+| Stage 1: Initial Prototype | <img src="images/stage1.svg" alt="Stage 1" height="250"> | **The "God Object" Phase [[1]](#ref1):** In Stage 1, the `GameStateManager` was a "God Object" that tried to do everything, managing players, generating terrain, and controlling the UI all at once. This made the code risky to change. |
+| **Stage 2: Refactored Prototype** | <img src="images/stage2.svg" alt="Stage 2" height="250"> | **Decoupling Responsibilities:** We began breaking down the monolithic controller. Logic started shifting towards specialized classes to improve maintainability, though the game flow was still tightly coupled. |
+| **Stage 3: Final Implementation** | <img src="images/stage3.svg" alt="Stage 3" height="250"> | **Modular & State-Driven:** As the game grew, we refined these relationships. For example, while UI widgets like `AngleDialWidget` and `PowerAdjustWidget` existed from the start, they were moved in Stage 3 to be part of a dedicated `ControlPanel` inside the `Match` class. |
+
+> **Interactive View:** For more details, please open the [homework page](https://github.com/UoB-COMSM0166/2026-group-17/tree/main/homework).
+
+
+```mermaid
+classDiagram
+direction TB
+
+class Game
+class Effects
+
+class State
+class MenuState
+class ShopState
+class MatchState
+class EndState
+
+class StartMenu
+class WeaponShop
+class AIController
+
+class Match
+class PlayerCannon
+class Projectile
+class Explosion
+class PoisonCloud
+class ShibaImpactEffect
+class FloatingScore
+
+class ControlPanel
+class WeaponInventory
+class AngleDialWidget
+class ShootButton
+class PowerAdjustWidget
+class MovePadWidget
+class TrajectoryPreview
+
+class TurnController
+class TurnCounter
+class ScoreBoard
+class ScoreCalculator
+
+class Terrain
+class TerrainColumn
+
+class WindSystem
+class RainSystem
+class EarthquakeSystem
+
+class AbstractWeapon
+class CannonBall
+class Bubblegumshot
+class Earthworm
+class Grapeshot
+class ImpactGun
+class Lazershot
+class Pineappleshot
+class Shibashot
+class Starshot
+class Submarinshot
+
+Game --> Effects : owns
+Game --> State : currentState
+State <|-- MenuState
+State <|-- ShopState
+State <|-- MatchState
+State <|-- EndState
+
+MenuState --> StartMenu : uses
+MenuState --> ShopState : switches to
+
+ShopState --> WeaponShop : owns
+ShopState --> AIController : owns
+ShopState --> MatchState : switches to
+
+MatchState --> Match : owns
+MatchState --> EndState : switches to
+MatchState --> Effects : uses shake
+
+EndState --> Game : restart
+
+WeaponShop --> AbstractWeapon : displays/selects
+WeaponShop --> AIController : AI shop pick
+
+Match --> PlayerCannon : manages 2
+Match --> Terrain : owns
+Match --> ControlPanel : owns
+Match --> TurnController : owns
+Match --> TurnCounter : owns
+Match --> ScoreBoard : owns
+Match --> ScoreCalculator : owns
+Match --> TrajectoryPreview : owns
+Match --> WindSystem : owns
+Match --> RainSystem : owns
+Match --> EarthquakeSystem : owns
+Match --> AIController : uses
+Match --> Projectile : currentShot / secondaryShots
+Match --> Explosion : currentExplosions
+Match --> PoisonCloud : spawns
+Match --> ShibaImpactEffect : spawns
+Match --> FloatingScore : spawns
+
+ControlPanel --> AngleDialWidget : owns
+ControlPanel --> ShootButton : owns
+ControlPanel --> PowerAdjustWidget : owns
+ControlPanel --> MovePadWidget : owns
+ControlPanel --> WeaponInventory : owns
+
+WeaponInventory --> AbstractWeapon : displays
+TrajectoryPreview --> AbstractWeapon : reads weapon behavior
+TrajectoryPreview --> Terrain : simulates against
+TrajectoryPreview --> PlayerCannon : reads launch state
+
+Terrain --> ControlPanel : queries altitude
+Terrain *-- TerrainColumn : contains
+
+TurnController --> PlayerCannon : checks canAct
+ScoreCalculator --> PlayerCannon : scores hits
+ScoreBoard --> PlayerCannon : displays scores
+
+PlayerCannon --> Projectile : fires
+PlayerCannon o-- AbstractWeapon : weaponLoadout
+Projectile --> AbstractWeapon : weapon behavior
+Explosion --> AbstractWeapon : custom drawExplosion
+
+WindSystem --> Projectile : applyTo
+RainSystem --> Projectile : applyTo
+EarthquakeSystem --> Projectile : applyTo
+
+AbstractWeapon <|-- CannonBall
+AbstractWeapon <|-- Bubblegumshot
+AbstractWeapon <|-- Earthworm
+AbstractWeapon <|-- Grapeshot
+AbstractWeapon <|-- ImpactGun
+AbstractWeapon <|-- Lazershot
+AbstractWeapon <|-- Pineappleshot
+AbstractWeapon <|-- Shibashot
+AbstractWeapon <|-- Starshot
+AbstractWeapon <|-- Submarinshot
+
+AbstractWeapon --> Match : onImpact()
+AbstractWeapon --> Explosion : drawExplosion()
+AbstractWeapon --> Projectile : beforeProjectileStep()
+```
 <p style="text-align:center;">
-  <img src="images/stage2.svg" alt="Stage 1" width="600px" height="300px" >
+  <b>Figure x:</b> Class diagram
 </p>
 
-**Figure x:** Stage 2 - Refactored Prototype
+### 3.5 Behavior Diagrams
 
----
+While the Class Diagrams define the static structure, the following behavioral diagrams illustrate how our system interact with actors in real-time.
 
-### Stage 3 - Final Implementation
+#### Overwiew Behavior Diagram
+The first diagram provides a high-level overview of the entire game lifecycle. It maps the journey from the initial **Menu selection** through the **Weapon Shop** and into the active **Match**. 
 
-As the game grew, we refined these relationships without necessarily deleting the original components. For example, while UI widgets like AngleDialWidget and PowerAdjustWidget existed from the start, they were moved in Stage 3 to be part of a dedicated ControlPanel inside the Match class.
+```mermaid
+sequenceDiagram
+    actor P as Player
+    participant G as Game
+    participant MS as MenuState
+    participant SS as ShopState
+    participant WS as WeaponShop
+    participant AI as AIController
+    participant MTS as MatchState
+    participant M as Match
+    participant CP as ControlPanel
+    participant PC as PlayerCannon
+    participant PR as Projectile
+    participant AW as AbstractWeapon
+    participant EX as Explosion
+    participant T as Terrain
+    participant TC as TurnController
+    participant SB as ScoreBoard
+    participant ES as EndState
+
+    P->>G: Start game
+    G->>MS: load MenuState
+    P->>MS: select difficulty
+    MS->>G: switch to ShopState
+
+    G->>SS: load ShopState
+    SS->>WS: create weapon shop
+    SS->>AI: create AI controller
+
+    loop Weapon selection
+        P->>WS: hover / choose weapon
+        WS-->>P: show weapon info
+        AI->>WS: auto-pick weapon
+    end
+
+    P->>SS: click Start Battle
+    SS->>G: switch to MatchState
+
+    G->>MTS: load MatchState
+    MTS->>M: create Match
+    M->>T: generate terrain
+    M->>PC: create players
+    M->>CP: create control panel
+    M->>TC: initialize turn logic
+    M->>SB: initialize scoreboard
+
+    loop Each turn
+        P->>CP: adjust angle / power / weapon
+        P->>M: fire
+        M->>PC: fire current weapon
+        PC->>PR: create projectile
+        PR->>AW: use weapon behavior
+
+        loop Projectile flight
+            M->>PR: updatePhysics()
+            PR->>AW: beforeProjectileStep()
+            PR-->>M: position / collision result
+        end
+
+        alt Projectile hits terrain or player
+            M->>AW: onImpact()
+            AW->>EX: create explosion(s)
+            EX->>T: applyExplosion()
+            M->>SB: update score
+        else Projectile out of bounds
+            PR-->>M: OUT_OF_BOUNDS
+        end
+
+        M->>TC: advancePhase()
+        TC-->>M: next active player
+    end
+
+    alt Match finished
+        M->>MTS: matchResults
+        MTS->>G: switch to EndState
+        G->>ES: load EndState
+        ES-->>P: show winner and final scores
+    end
+
+```
 <p style="text-align:center;">
-  <img src="images/stage3.svg" alt="Stage 1" width="600px" height="300px" >
+  <b>Figure x:</b> Overview Behavior diagram
 </p>
 
-**Figure x:** Stage 3 - Final Implementation
 
-> For interactive SVG diagrams with **zoom & drag** functionality, please open the [interactive diagrams page](https://uob-comsm0166.github.io/2026-group-17/diagrams.html).
+#### Detailed Behavior Diagram
+The second diagram is a detailed Behavior Diagram, that focuses on the "Heart" of our game: battle execution and match completion.
+This diagram highlights the dynamic orchestration of objects during a single turn. It traces how a player's fire command triggers a chain reaction.
 
+```mermaid
+sequenceDiagram
+    actor Player
+    participant Match
+    participant PlayerCannon
+    participant Projectile
+    participant Weapon as AbstractWeapon/Subclass
+    participant Explosion
+    participant Terrain
+    participant TurnController
+    participant ScoreBoard
+
+    Player->>Match: fire weapon
+    Match->>PlayerCannon: fireCurrentWeapon()
+    PlayerCannon->>Projectile: new Projectile(...)
+    PlayerCannon-->>Match: projectile
+
+    loop update each frame
+        Match->>Projectile: updatePhysics(...)
+        Projectile->>Weapon: beforeProjectileStep(...)
+        Projectile-->>Match: flight result
+    end
+
+    alt terrain impact / player hit
+        Match->>Weapon: onImpact(match, impactEvent, shot)
+        Weapon->>Explosion: create explosion spec(s)
+        Match->>Explosion: spawnWeaponExplosion(...)
+        loop explosion update
+            Match->>Explosion: update(dt)
+            Explosion->>Terrain: applyExplosion(...)
+        end
+        Match->>ScoreBoard: add score
+    else out of bounds
+        Projectile-->>Match: OUT_OF_BOUNDS
+    end
+
+    Match->>TurnController: advancePhase(players)
+
+```
+<p style="text-align:center;">
+  <b>Figure x:</b> Detailed Behavior diagram
+</p>
 
 ### Implementation
 
@@ -264,18 +617,19 @@ After all weapons have been picked and the player either clicks or presses the c
 
 In the Match class, the AI's #location field is changed to MATCH and during turn transition, if the current player is player 2, then it's startThinking() method is called. The AIController's drawThinkIndicator() method is also called to draw animated dots above the player 2's cannon, while it is in its THINKING state.
 
-When it comes to the AI's aiming logic it reuses some of the mock shot calculation logic used for determining where to draw the trajectory preview curve in easy mode but without actually drawing the curve. Instead, it uses a nested loop to check every combination of ever 2° within an assumed reasonable shooting range of -100° to -175° with every 1.25 units of power within the range of 0 to 100 (which are mapped to the range 250 to 650 internally). An early exist from the loop is allowed, if the AI discovers a combination which resulsts in a minimum distance to the enemy of less than 5 pixels.
+To determine firing parameters, the AI tests trajectories across a range of angles (-95° to -179°) and power levels (0 - 100). Originally, it  did this via a brute-force approach that caused a significant frame-rate stutter of up to 1 second.
 
-After the AI finds its ideal combination of parameters they are passed through an applyDifficultyJitter() method which remaps their value randomly within a different range depending on the current difficulty - significantly larger on easy mode for a higher likelihood of misses - and then player 2's parameters are set to those values.
+The  solution involved refactoring the search into a two-pass coarse-to-fine algortithm. By first identifying a candidate region with large steps and then refining the search in that specif area, we acheived a 91% reduction in iterations while maintaining aiming accuracy. The resulting performance imact is virtually imperceptible.
 
-Unfortunately, the abovementioned nested loop caused the game to stutter for what appeared to be 0.5-1 second (possibly longer on slower computers), as can be seen in Figure X likely due to the amount of iterations required to complete the whole loop. The early exit helped but was insufficient in eliminating the issue and so a different way of achieving the same outcome had to be found.
+|Metric|Brute-Force (Original)|Coarse-to-Fine (Optimized)|
+|------|----------------------|--------------------------|
+|Search Strategy|Single high-res pass|Two-pass (Coarse → Fine)|
+|Angle Step|2°|8° (Coarse) / 2° (Fine)|
+|Power Step|1.25 units|40 (Coarse) / 5 (Fine)|
+Total Iterations|≈3000|≈270|
+Performance|<img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />|<img src="images/Smoother_AI_aiming.gif" alt="Game stutter" width="200" />|
 
-<div align="center">
-  <img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />
-  <br>
-  <em>Figure X: Visual stutter occurring during the AI aiming state transition.</em>
-</div>
-
+Another issue with AI behaviour was that it sometimes fired at terrain directly ahead of it, rather than over it as is visible in Figure X. This turned out to be a much simpler issue to deal with as it only required adjusting the applyDifficultyJitter() method to not decrease the angle, so any randomness applied to the angle can only turn the barrel closer to vertical or keep it the same. This change was only applied to Hard mode as the original behaviour was considered appropriate in Easy mode.
 
 
 ### Evaluation
@@ -378,71 +732,127 @@ $$\begin{cases}
 
 **SUS**
 
-### Process 
-### Role Allocation and Responsibility Management
-
-At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation. This allowed all members to contribute according to their strengths while maintaining motivation and a clear sense of responsibility.
-
-#### Team Members’ Strengths and Role Mapping
-
-| Category | Strengths / Experience | Main Responsibilities | Members |
-|----------|----------------------|----------------------|----------|
-| Development | Programming / system development experience | Core gameplay implementation, system development | 2 |
-| Testing | Testing experience | Testing, debugging, QA | 1 |
-| Design (Gameplay & UI) | Game design interest | Weapon functionality, UI design, mechanics | 1 |
-| Creative (Visual Art) | Illustration / visual design skills | Visual design, UI assets | 1 |
-| Project Management | Project management experience | Progress coordination, task management | 1 |
-
-#### Practical Role Allocation
-
-Specifically, members with testing and development experience mainly handled testing and coding tasks while also contributing flexibly to other areas when needed. In addition, responsibilities were assigned according to individual interests and strengths, including weapon design, game mode design, visual design, and basic programming.
-
-In particular, members skilled in drawing took responsibility for visual design, supporting the overall artistic expression of the game. Furthermore, some members focused on core gameplay implementation, system development, and documentation, while others contributed to more technically challenging areas such as physics and destructible terrain. As a result, a wide range of skills within the team was effectively utilized.
-
-#### Flexible Collaboration and Shared Development Approach
-
-In addition, we defined clear responsibilities across the entire project, ensuring that each member was accountable for their assigned area. However, while each member had their own role, these roles were designed as leadership responsibilities rather than isolated tasks. Each member was expected to take initiative and lead development within their area.
-
-At the same time, challenges and development tasks were not handled individually; instead, all team members worked collaboratively to solve problems and complete development tasks as a group. When necessary, tasks were also handled by small groups to improve both efficiency and stability in development.
-
-We also maintained flexibility by adjusting roles based on project progress, individual schedules, and skill levels.
-
-#### Outcomes
-
-Through this structure, responsibilities were clearly defined, which helped prevent overlooked tasks and ambiguity in ownership. At the same time, all members were able to contribute according to their strengths while maintaining high motivation and balanced participation throughout the game development process.
-
 ---
 
-### Team Workflow and Communication
+### Process 
+### Role allocation across the entire project
 
-We adopted an Agile development approach, specifically using the Scrum framework, to manage the development process. To support this, we conducted daily stand-up meetings. These meetings were held both online and in person depending on the situation, and were continued consistently throughout the project, including during the Easter holiday period.
+At the initial stage of the project, we identified and mapped each member’s strengths and experiences in order to design an effective role allocation.
 
-In each meeting, we first set clear goals, then reviewed task progress, balanced workload distribution, and discussed and resolved any issues. This routine helped strengthen each member’s sense of responsibility and ensured that the entire team remained aligned with the overall direction of the project.
+Specifically, members with creative strengths were responsible for visual design and video production, those with project management experience handled scheduling and task coordination, and members with a technical focus worked on gameplay implementation and AI development. Each member contributed to the foundation of the project by leveraging our strengths and experience.
 
-In addition, throughout the project we used a combination of tools to support collaboration, development, planning, and schedule management.
+<h3 align="center">Team Members’ Strengths and Role Mapping</h3>
 
-#### Tools Used
+<div align="center">
 
-To support collaboration and development, we used tools for version control, communication, planning, and schedule management.
+| Role | Strengths / Experience | Members |
+|----------|----------------------|----------|
+| co-Developer + Game designer | Programming / system development experience | Hsinman |
+| co-Developer + System Tester | Quality Assurance (QA) experience | Yuqi |
+| co-Developer + UI Designer | Programming / UI design experience | Yinuo |
+| co-Developer + Visual Designer | Drawing / artistic creativity skills | Yuxin |
+| co-Developer + Product Owner | Programming / system development experience | Nikolay |
+| co-Developer + Project Manager | Project management experience | Shiho |
+
+</div>
+---
+
+### Responsibility Management and Flexible Collaboration
+
+We defined clear ownership responsibilities across the entire project, ensuring that each member was accountable for a specific domain. Members were expected to take initiative in their area by conducting preliminary research, involving others when necessary, and driving development proactively.
+
+In addition to the overall project roles, we also defined specific responsibility areas within game development. Each member was responsible for implementing their assigned features while considering how they would be technically implemented. When difficulties arose, they were discussed during daily stand-up meetings, where members sought feedback and support from others. For example, during the mid-development stage, when integration between multiple features was required (such as the control panel and weapon pickup system), there was frequent exchange of questions about each other’s code and discussions regarding feature implementation.
+
+At the same time, challenges and development tasks were not handled individually. Instead, the entire team worked collaboratively to solve problems and progress development. For example, for large and labor-intensive tasks such as terrain initial design and weapon effect design, we formed small groups when necessary to improve development efficiency.
+
+To support collaboration and development, we used the following tools for version control, communication, planning, and scheduling. 
+
+<h3 align="center">Collaboration Tools Used</h3>
 
 | Category | Tool | Purpose |
 |----------|------|---------|
 | Version Control & Development | GitHub | Code sharing, storage, and integration |
 | Communication | Microsoft Teams | Daily stand-up meetings for progress tracking, goal setting, and task coordination |
 | Communication | WhatsApp | Team communication for discussing issues, development updates, and unexpected problems |
-| Project Planning | WBS (Work Breakdown Structure) | Task decomposition, role organisation, and overall progress tracking against the schedule |
-| Project Management | Kanban Board | Visualisation of task progress and workflow management |
+| Project Planning | Gantt chart (Excel) | Task decomposition, role organisation, and overall progress tracking against the schedule |
+| Project Management | Kanban Board (GitHub) | Visualization of detailed task progress and issue-handling progress |
 | Schedule Management | Outlook Calendar | Meeting scheduling and sharing individual availability, including during holiday periods |
 
-#### Kanban board
+<p align="center">
+  <img src="images/Meeting%20records.png" width="800">
+</p>
+
+### Shared Development Approach
+
+To support collaborative problem-solving and development, we adopted the agile methodology learned in class. Throughout the entire project period, including the Easter break, we conducted daily stand-up meetings both online and in person to review task progress and identify issues.
+
+In addition, we held in-person sessions approximately every two weeks, securing a meeting room to ensure focused on-site collaborative development time. During these sessions, we carried out pair programming and performed code merging through direct discussions in front of monitors with the relevant task owners, which contributed to improved development efficiency.
+
+<p align="center">
+  <img src="video/Inperson meeting gif.gif" width="500">
+</p>
+
+
+### Project Management Tools Usage and Challenges
+
+During meetings, the Gantt chart schedule was used as a visual tool to understand the current position within the overall project timeline. This enabled us to evaluate task distribution, monitor workload balance, and assess whether tasks were progressing as planned or at risk of delay. In addition, detailed tasks within each area of responsibility, as well as newly arising tasks identified during daily stand-up meetings and day-to-day communication, were individually registered by each member on the Kanban board for progress tracking. This must help prevent tasks that emerged spontaneously from being forgotten or overlooked.
+
+<h3 align="center">Gantt chart schedule</h3>
+
+<p align="center">
+  <img src="images/Gantt%20chart.png" width="600">
+</p>
+
+<h3 align="center">Kanban board</h3>
 
 <p align="center">
   <img src="images/Kanban%20Board.png" width="600">
 </p>
 
-#### WBS
+We went through a period of trial and error in how we used project management tools. During the development phase, we prioritised implementation work, which meant that updates to the Gantt chart and Kanban board were not always maintained consistently. As a result, task progress visibility decreased at certain stages, and we occasionally relied on individual memory and informal communication to track ongoing work. 
 
-During meetings, the Work Breakdown Structure (WBS) was used as a visual tool to review our current position within the overall project timeline. It enabled us to evaluate task distribution among team members, monitor workload balance, and assess whether tasks were progressing according to schedule or at risk of delay.
+This experience revealed that when these tools are treated as supplementary documentation, their accuracy rapidly deteriorates, reducing project visibility. As a result, it becomes difficult for all team members to maintain a shared understanding of game development progress and required tasks.
+
+---
+
+### Improvements in Project Management Process
+
+We frequently held both online and in-person meetings; however, in the early stages, discussions often took around two hours. To improve efficiency, we began preparing a one-slide agenda outlining the meeting objectives in advance and sharing it with all participants. This allowed everyone to align on the purpose of the meeting beforehand, enabling more efficient discussions and reducing meeting time to within one hour.
+
+The meetings followed the structured flow below:
+
+- Confirmation of the agenda and meeting objectives
+- Progress updates for each task (ensuring no member was without assigned work)
+- Identification of issues in each task
+- Discussion of possible solutions to the identified issues
+
+<h3 align="center">Daily Meeting Agenda Slide</h3>
+
+<p align="center">
+  <img src="images/DailyMeeting%20agenda.png" width="600">
+</p>
+
+In addition, since all members were continuously dedicating significant effort to game development tasks throughout the project period and signs of fatigue were observed, we implemented measures to ensure a balanced workload and reduce stress during breaks. Before holiday periods, each member’s schedule was shared in advance via Outlook calendars, allowing others to cover tasks as needed and minimizing unnecessary communication during that time.
+
+<p align="center">
+  <img src="images/Outlook calendar.png" width="700">
+</p>
+
+### Improvements in Version Control and development Process 
+
+In addition, during collaborative development, several issues occurred when merging individual members’ code into the main branch. For example, some pull requests were merged without being noticed or approved, resulting in certain functionalities not being reflected. In other cases, changes made to shared classes affected other members’ features, and code was pushed to the main branch in a non-functional state. As a result, the main branch was not consistently kept up to date, and these issues occurred multiple times. These problems were mainly caused by the lack of a clearly defined branching and review process during parallel development, as well as our tendency to prioritise completing our own tasks over reviewing others’ work.
+
+To address these problems, we established the following process during daily meetings and ensured that all team members strictly followed it: 
+
+<h3 align="center">Revised Git Merge Process</h3>
+
+<p align="center">
+  <img src="images/Merge%20process.png" width="500">
+</p>
+
+<p align="center">
+  <img src="images/Mergeprocess%20chat.png" width="600">
+</p>
 
 ---
 
@@ -453,10 +863,33 @@ During meetings, the Work Breakdown Structure (WBS) was used as a visual tool to
 ### Conclusion
 
 - 10% ~500 words
-
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
+  
+Our game provided valuable experience in developing a complete interactive game system, from core gameplay mechanics to visual feedback and user interaction. One of the most important lessons learned was the necessity of designing modular and extensible systems early on. For example, the explosion system (explosion.js) was initially intended to handle basic visual effects, but it gradually evolved into a central framework supporting multiple weapon behaviors, terrain interaction, and feedback effects. This highlighted the importance of anticipating future extensions when structuring core systems.
+
+A key challenge throughout the game was managing the interaction between different gameplay layers, particularly projectile physics, collision detection, and weapon-specific behaviors. Implementing features such as the StarShot required coordinating multiple systems: mid-air projectile splitting, secondary projectile handling, and delayed explosion upon impact. Debugging these interactions was complex, as errors often emerged from system integration rather than isolated components. This process reinforced the importance of clear responsibility boundaries between classes (e.g., projectile vs. explosion vs. match controller) and systematic debugging strategies.
+
+Another challenge was ensuring consistent visual and gameplay feedback. Effects such as explosions, trajectory previews, and impact animations needed to feel responsive and readable while remaining performant. Balancing clarity and visual richness required iterative refinement, particularly when multiple effects occurred simultaneously (e.g., explosions, terrain deformation, and screen shake).
+
+If development were to continue, immediate next steps would include improving game balancing and polish, such as refining weapon parameters, enhancing visual consistency across all effects, and optimizing performance for more complex interactions. Additionally, improving the user interface and feedback systems—for example, clearer hit indicators, smoother animations, and better onboarding—would significantly enhance player experience.
+
+For a potential sequel, our game could expand into a more advanced system with dynamic environments, more complex weapon interactions, and multiplayer capabilities. Introducing features such as destructible terrain variations, weapon synergies, or adaptive AI would deepen gameplay strategy. Furthermore, restructuring the codebase into a more scalable architecture (e.g., component-based systems or event-driven design) would better support long-term development and feature expansion.
+
 
 ### Contribution Statement
+
+
+*All members contributed equally; names are listed in alphabetical order and do not reflect level of contribution.*
+
+| Name    | Key contribution |
+|---------|----------------------------|
+| Hsinman | Control panel (power and angle adjustment, weapon selection, shooting button, cannon movement limit logic), Keyboard controler, background design |
+| Nikolay | AI player implementation, Terrain effects, Game results screen, Cannon trajectory logic, Turn controller logic, Cannon design |
+| Shiho   | Score calculation logic, Start screen (mode selection), Weapon and explosion effects (Bubblegumshot, Impactgun, Earthworm), Weapon character design |
+| Yinuo   | Weapon shop screen, Terrain effects,TrajectoryPreview logic，Weapon trajectory effects, Weapon and explosion effects (Lazershot, Grapshot, Submarineshot) |
+| Yuqi    | Random events (wind, acid rain, and earthquake effects), Tutorial screen, Test code, Weapon character design |
+| Yuxin   | Scoreboard display, Aiming and shooting interaction, Explosion logic, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
+
 
 - Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
@@ -469,3 +902,6 @@ You can delete this section in your own repo, it's just here for information. in
 - **Documentation** of code (5% of report grade)
   - Organise your code so that it could easily be picked up by another team in the future and developed further.
   - Is your repo clearly organised? Is code well commented throughout?
+
+### Rreference
+<a name="ref1"></a> [1] Wikipedia contributors. (2024). *God object*. Wikipedia, The Free Encyclopedia. Available at: [https://en.wikipedia.org/wiki/God_object](https://en.wikipedia.org/wiki/God_object) (Accessed: 20 April 2026).
