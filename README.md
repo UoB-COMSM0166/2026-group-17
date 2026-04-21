@@ -744,7 +744,7 @@ Specifically, members with creative strengths were responsible for visual design
 <h3 align="center">Team Members’ Strengths and Role Mapping</h3>
 
 | Role | Strengths / Experience | Members |
-|----------|----------------------|----------------------|----------|
+|----------|----------------------|----------|
 | co-Developer + Game designer | Programming / system development experience | Hsinman |
 | co-Developer + System Teser | Quality Assurance (QA) experience | Yuqi |
 | co-Developer + UI Designer | Programming / UI design experience | Yinuo |
