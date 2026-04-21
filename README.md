@@ -57,6 +57,26 @@ During the early stages of the ideation process, our team began with a brainstor
 After discussing the feasibility and development complexity of each idea, we conducted a quick team vote and decided to take Pocket Tanks as our main gameplay reference. Its turn-based artillery combat, projectile physics, and destructible environment mechanics provided a strong and achievable foundation for our project, while also offering clear opportunities for further innovation.
 
 We then went about creating paper prototypes of our initial concept (Figure 4) in order to flesh out the specific gameplay details. This proved especially helpful considering the complexity of the concept, as it enabled us to better define the gameplay loop, player interaction flow, and core mechanics at an early stage. Paper prototyping was also valuable in improving communication within the team, particularly in helping all members visualise the turn-based combat flow, aiming controls, and overall user experience before moving into implementation.
+<p align="center">
+  <img src="./video/startgame.gif" width="600"/>
+</p>
+<p align="center">
+  <em>Figure X. Start page prototype.</em>
+</p>
+
+<p align="center">
+  <img src="./video/weaponshop.gif" width="600"/>
+</p>
+<p align="center">
+  <em>Figure X. Weapon selection prototype.</em>
+</p>
+
+<p align="center">
+  <img src="./video/maingame.gif" width="600"/>
+</p>
+<p align="center">
+  <em>Figure X. Main game demo prototype.</em>
+</p>
 
 
 ### 2.2 Early Stage Design
