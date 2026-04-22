@@ -1,5 +1,7 @@
 class MatchState extends State {
    #match;
+   #endDelayMs = 1000;
+   #matchOverTimer = 0;
 
    constructor(game, resolution, loadout0, loadout1, aiController) {
       super(game, resolution);
@@ -11,8 +13,13 @@ class MatchState extends State {
    updateState(dt) {
       this.game.effects.updateShake();
       this.#match.updateMatch(dt, this.game.effects);
-      if (this.#match.isMatchOver)
+      if (this.#match.isMatchOver) {
+         this.#matchOverTimer += dt;
+         if (this.#matchOverTimer < this.#endDelayMs) return;
          this.game.switchState(new EndState(this.game, this.resolution, this.#match.matchResults));
+      } else {
+         this.#matchOverTimer = 0;
+      }
    }
 
    drawState() {

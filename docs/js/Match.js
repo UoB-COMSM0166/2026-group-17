@@ -8,6 +8,7 @@ class Match {
    #bgBottomColour;
    #players = [];
    #lastActivePlayerId = -1;
+   #tutorial;
    #wind;
    #rain;
    #earthquake;
@@ -50,6 +51,7 @@ class Match {
       this.#scoreBoard.setup();
       this.#controlPanel = new ControlPanel(color(20));
       this.#scoreCalculator = new ScoreCalculator();
+      this.#tutorial = new Tutorial(resolution, this.#controlPanel);
       this.#turnCounter = new TurnCounter(createVector(this.#width / 2, this.#height / 20));
       this.#terrain = new Terrain(this.#controlPanel, color(255, 0, 0));
       this.#terrain.generateInitialTerrain(floor(random(99999)));
@@ -65,6 +67,8 @@ class Match {
       this.#computerController.location = 'MATCH';
       this.#setModeBasedWeather();
       this.#shakeCallback = shakeCallback;
+      // Open tutorial on game start
+      this.#tutorial.openTutorial();
    }
 
    updateMatch(dt) {
@@ -95,9 +99,15 @@ class Match {
       this.#drawShotSequence();
       pop();
       this.#drawHUD();
+      // Draw tutorial overlay
+      this.#tutorial.draw();
    }
 
    onMousePressed(button) {
+      // Handle tutorial interaction first
+      if (this.#tutorial.isVisible) {
+         if (this.#tutorial.mousePressed()) return;
+      }
       if (!this.#inputActive()) return;
       this.#lastMouseButton = button?.left === true;
    }
@@ -225,7 +235,7 @@ class Match {
       const currentPID = this.#turnController.activePlayerId;
       if (currentPID !== this.#lastActivePlayerId) {
          this.#controlPanel.angleDial.needleRotation = this.#players[currentPID].barrelAngle + 90;
-         this.#controlPanel.powerAdjust.power = this.#players[currentPID].barrelPower / 7;
+         this.#controlPanel.powerAdjust.power = this.#players[currentPID].barrelPower / 9;
          this.#controlPanel.setMoveSteps(this.#players[currentPID].moveSteps);
          this.#controlPanel.setWeaponLoadouts(
             this.#players[currentPID].weaponLoadout ?? [],
@@ -301,12 +311,6 @@ class Match {
          case "starFragment":
             this.spawnWeaponExplosion(impactEvent.pos, "starFragment", shot, weapon);
             break;
-         case "impact":
-            this.spawnWeaponExplosion(impactEvent.pos, "impact", shot, weapon);
-            break;
-         case "earthworm":
-            this.spawnWeaponExplosion(impactEvent.pos, "earthworm", shot, weapon);
-            this.spawnEarthWorm(impactEvent.pos, weapon);
          default:
             this.spawnWeaponExplosion(impactEvent.pos, kind || "ball", shot, weapon);
       }
@@ -481,8 +485,8 @@ class Match {
          currentPlayer.barrelAngle = newAngle;
       }
       if (this.#controlPanel.powerAdjust.isFollowing || this.#controlPanel.powerAdjust.isKeyboardControlled){
-         const newPower = this.#controlPanel.powerAdjust.power * 7;
-         if(newPower > 0){
+         const newPower = this.#controlPanel.powerAdjust.power * 9;
+         if (newPower > 0) {
             currentPlayer.barrelPower = newPower;
          }
       }      
@@ -735,7 +739,7 @@ class Match {
    }
 
    #physicsDone() {
-         return !this.#currentShot &&
+      return !this.#currentShot &&
          this.#currentExplosions.length === 0 &&
          this.#secondaryShots.length === 0 &&
          this.#poisonClouds.length === 0 &&
@@ -789,15 +793,18 @@ class Match {
          winnerData: this.#scoreBoard.getHighestScorePlayerId()
       };
    }
+
    //Expose internal state for weapon effects
    //All player cannons in the match 
    getPlayers() {
       return this.#players;
    }
+
    //Controls turn order and turn number
    getTurnController() {
       return this.#turnController;
    }
+   
    //ID of the player who fired the last shot
    getLastShooterId() {
       return this.#lastShooterId;
