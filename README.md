@@ -15,7 +15,7 @@ You will be developing your game using [P5.js](https://p5js.org) a javascript li
 
 ## HOT CANNONS
 
-HOT CANNONS is a two-player, turn-based artillery game inspired by Pocket Tanks, featuring a wide variety of random events that make each match unpredictable and dynamic. These events include switches between Day Mode and Dark Mode that affect visibility, weather effects such as acid rain and strong winds that alter damage and projectile behavior, and teleportation events that suddenly relocate cannons to different positions on the map. In addition, players can purchase various types of shots in a shop screen, combining weapons adapted from Pocket Tanks with newly designed ones. This system encourages players to plan ahead and customize their loadouts according to their preferred playstyle. On each turn, players must carefully choose which shot to use based on terrain conditions, available resources, and their overall strategy. The combination of strategic decision-making and unpredictable events ensures that no two matches play out the same, encouraging players to return to the game repeatedly. Overall, HOT CANNONS delivers a strategic and highly replayable game experience by blending classic artillery mechanics with dynamic environments, player choice, and elements of randomness.
+HOT CANNONS is a single-player, turn-based artillery game inspired by Pocket Tanks, featuring a wide variety of random events that make each match unpredictable and dynamic. These events include switches between Day Mode and Dark Mode that affect visibility, weather effects such as acid rain and strong winds that alter damage and projectile behavior, and teleportation events that suddenly relocate cannons to different positions on the map. In addition, players can purchase various types of shots in a shop screen, combining weapons adapted from Pocket Tanks with newly designed ones. This system encourages players to plan ahead and customize their loadouts according to their preferred playstyle. On each turn, players must carefully choose which shot to use based on terrain conditions, available resources, and their overall strategy. The combination of strategic decision-making and unpredictable events ensures that no two matches play out the same, encouraging players to return to the game repeatedly. Overall, HOT CANNONS delivers a strategic and highly replayable game experience by blending classic artillery mechanics with dynamic environments, player choice, and elements of randomness.
 
 STRAPLINE. Add an exciting one sentence description of your game here.
 
@@ -567,33 +567,60 @@ sequenceDiagram
   <b>Figure x:</b> Detailed Behavior diagram
 </p>
 
+
 ### Implementation
-
-- 15% ~750 words
-
-During the development process the team encountered a number of challenges of varying complexity. Two major techical hurdles among those are highlighted below.
 
 #### Destructible terrain
 
-Terrain implementation began with the use of two classes - Terrain and TerrainColumn. Inside the terrain class an array of TerrainColumn object references was stored, each of which had a field storing the x and y positions of the column's top. The Terrain class would then use p5.js's noise() function to generate a y-position within a constrained range above the top of the control panel UI element which is positioned directly below the terrain. After that, the initial drawTerrain() method would use a custom shape drawn with vertices between p5.js's beginShape() and endShape() function calls. As the control panel element's top was initially flat there were only two vertices at the bottom and then as many as the width of the screen for the top of the terrain. When a circular explosion (the first type of explosion implemented in the game) affected terrain it would use the Pythagorean theorem to calculate the amount that each column's y-position should sink down and then that amount was added to the center.y coordinate of the circle to derive a new y-position for the top of each respective terrain column. 
+Terrain was implemented using composition where a `Terrain` class manages an array of `TerrainColumn` objects.
 
-The issue with the above approach was that floating terrain and overhangs were not possible as there could only ever be 1 non-bottom vertex in any column, when the goal was to have terrain without any support below it drift down until it settles on solid ground below. This prompted a comprehensive rework of the TerrainColumn class and to a lesser extent of the Terrain class. A pixels array was added to the TerrainColumn class to hold the y-position of each terrain pixel in the current column and the logic for calculating what part of the terrain to remove was moved to a removeExplodedPixels() method inside TerrainColumn which would use the dist() p5.js function in a comparison with the explosion circle's range to find out any pixels outside of the range of explosion in the current column and keep only them in the pixels array with the help of the Array.prototype.filter() method.
+ Each column stored its top position, with y-coordinates generated randomly within a constrained range. Rendering was handled by a custom vertex-based shape. While circular explosions could push down those y-coordinates using the Pythagorean theorem, this height-map approach inherently prevented the creation of overhangs.
 
-After an explosion, if a column was not completely destroyed then it would end up with one or more disconnected sequences of pixels which we decided to call spans. With this in mind the approach to drawing in the Terrain class was changed from using a custom shape to using the p5.js line() function - 1 line() call per span. To store the spans a new spans array was created in the TerrainColumn class. With this, static overhangs became possible.
+<div align="center">
+  <img src="images/Terrain_destruction_v1.gif" alt="Game stutter" width="200" />
+  <br>
+  <em>Phase 1: Terrain above destroyed terrain disappears completely</em>
+</div>
+<br>
 
-The next step was to implement the settling down animation for any chunks of terrain which have no immediate support below them immediately after an explosion. To facilitate that, a targetSpans array field and a startSettling() method were added so the final position after settling of each span at the end of the animation could be calculated and stored. An updateAnimation() method would then gradually increase the progress of the animation stored in a settleProgress number field from 0.0 to 1.0 by adding to it the value of the p5.js deltaTime global variable modulated by a constant scalar and update each span's top and bottom y-positions using the p5.js lerp() to interpolate between the spans and targetSpans positions. This was an oversight which required the addition of a startSpans array field, so the starting position in the lerp calls could be fixed and work correctly. After the settleProgress field's value would grow above 1 the columns were snapped into the correct position by assigning to the values of the spans array the same values as those from the targetSpans array. Finally, a rebuildPixelsFromSpans() method would be called to update the pixels array based on the settled spans' y-coordinates.
+This prompted a rework of the terrain logic. Each `TerrainColumn` was updated to store a pixels array. A `removeExplodedPixels()` method that utilized `p5.dist()` was implemented to find and preserve only pixels outside of the explosion range using the `Array.prototype.filter()` method.
 
-Thus, the initial terrain settling animation was complete. However, the way floating terrain chunks settled appeared uneven and it was decided that all columns should settle down with the same constant speed, so chunks would appear to maintain their shape while falling down and then the shape would gradually break down as each column reaches its respective solid ground below. Settling spans did not move with constant speed at the time because the lerp function calls were moving spans in different columns with different speed depending on the distance each span needed to travel to the bottom. For example, when settleProgress was 0.5 a span that was initially floating 100 pixels above its target position had moved 50 pixels, while a span which was initially 50 pixels above solid ground would have only moved down 25 pixels when settleProgress was 0.5.
+After an explosion, if a column wasn't completely destroyed, it would end up with 1 or more disconnected pairs of pixels' y-coordinates which we decided to call *spans*. Rendering then shifted from a single custom shape to individual `p5.line()` calls for each span which effectively enabled static overhangs.
 
-To achive the final desired behaviour one last update to the TerrainColumn class was required which changed the way the spans' positions were updated from using lerp() calls to simply adding the same original result of the multiplication between deltaTime and a constant speed directly to each span's top and bottom y-positions.
+<div align="center">
+  <img src="images/Terrain_destruction_v2.gif" alt="Game stutter" width="200" />
+  <br>
+  <em>Phase 2: Static overhanging terrain forms when terrain above is destroyed</em>
+</div>
+<br>
 
-With the above change the desired settling animation was achieved, however, one bug also appeared. It involved settled spans settling what appeared to be 1 pixel or so above their respective target position. This was fixed by replacing the two spans in the spans array which were supposed to be stacked on top of each other with a single span based on the first and last element of the pixels array immediately after the rebuildPixelsFromSpans() call had completed.
+The next phase focused on dynamic settling for floating terrain chuncks. A `startSettling()` method and a `targetSpans` array field were added, to calculate and store the settled positions of each span. An `updateAnimation()` method incremented a `settleProgress` field using `p5.deltaTime`. Then, `p5.lerp()` was used to interpolate between the spans and targetSpans positions, initially.
+
+This was an oversight fixed by adding a `startSpans` field to maintain a fixed reference point in the `lerp()` calls. Once `settleProgress` exceeded 1.0, columns snapped to their final positions and `rebuildPixelsFromSpans()` updated underlying pixel data. Thus, the initial terrain settling behaviour was completed.
+
+<div align="center">
+  <img src="images/Terrain_destruction_v3.gif" alt="Game stutter" width="200" />
+  <br>
+  <em>Phase 3: Floating terrain gradually settles in a flabby manner</em>
+</div>
+<br>
+
+ However, the `lerp()` logic caused uneven settling because spans moved at speeds proportional to their distance from the target solid ground position. To ensure chunks maintained shape during descent, the approach shifted to using constant velocity. By adding the product of `deltaTime` and a fixed speed scalar directly to the span coordinates, uniform motion across all columns was achieved.
+
+<div align="center">
+  <img src="images/Terrain_destruction_v4.gif" alt="Game stutter" width="200" />
+  <br>
+  <em>Phase 4: Floating terrain descends in a uniform manner</em>
+</div>
+<br>
+
+Finally, a bug was addressed where spans would sometimes settle 1 pixel above their target. This was resolved by merging post-settlement spans into a single consolidated span derived from the first and last element of the pixels array after `rebuildPixelsFromSpans()` completed. This finalised a system capable of convincing terrain destruction and settling.
 
 #### AI-controlled player
 
-During most of the development period, the game was a 2-player hot seater as the team was busy implementing other core features and fixing immersion-breaking bugs. This changed in the last week of the spring break as the game felt stable enough to implement a computer-controlled player to replace player 2.
+During most of the development period, the game was a 2-player hot seater as the team was busy implementing other core features and fixing immersion-breaking bugs. This changed late into the project when the game felt stable enough to implement logic controlling player 2's actions.
 
-The initial idea was for the AI behaviour to be fairly simple, considering the late stage it was being introduced in. Therefore, the initial version of the AI would pick weapons at random from the weapon shop screen, fire whatever the currently selected weapon is in its inventory and be unable to use the limited (3 moves per game) movement feature.
+AI behaviour was planned to be fairly simple, considering the late stage it was being introduced in. Therefore, the AI was programmed to pick weapons at random from the weapon shop screen, fire whatever the currently selected weapon is in its inventory and be unable to use the limited movement feature.
 
 In terms of its implementation in the code, the AI works as a finite-state machine:
 
@@ -611,25 +638,34 @@ stateDiagram-v2
     AIMING --> FIRING : findBestShotParams()
     FIRING --> IDLE : executeShot()
 ```
-An AIController object is first instantiated in the ShopState class with its #location field set to SHOP and it is passed to the WeaponShop class's update() method which calls the AIController's startThinking() method each time the current player in the shop is player 2 and also calls the same object's updateAI() method passig it a callback to the pickRandomWeapon() method, so the AIController can call it when the time is right.
+An `AIController` object is first instantiated in the `ShopState` class. Its `#location` field is set to *SHOP* and it is passed to the `WeaponShop` class's `update()` method which calls the `AIController`'s `startThinking()` method each time the current player in the shop is player 2 and also calls the `updateAI()` method passing it a callback to the `pickRandomWeapon()` method.
 
-After all weapons have been picked and the player either clicks or presses the correct button a reference to the same AIController object is passed from ShopState to MatchState and then from there to the Match class.
+After all weapons have been picked and the player issues the correct input a reference to the same `AIController` object is passed from `ShopState` to `MatchState` and then on to the `Match` class.
 
-In the Match class, the AI's #location field is changed to MATCH and during turn transition, if the current player is player 2, then it's startThinking() method is called. The AIController's drawThinkIndicator() method is also called to draw animated dots above the player 2's cannon, while it is in its THINKING state.
+In the `Match` class, the AI's `#location` field is changed to *MATCH* and during turn transition, if the current player is player 2, then it's `startThinking()` method is called. In the *THINKING* state the `AIController`'s `drawThinkIndicator()` method is also called to render animated dots above the player 2's cannon.
 
-To determine firing parameters, the AI tests trajectories across a range of angles (-95° to -179°) and power levels (0 - 100). Originally, it  did this via a brute-force approach that caused a significant frame-rate stutter of up to 1 second.
+To determine firing parameters, the AI tests trajectories across a range of angles (-95° to -179°) and power levels (0 - 100). Originally, it did this via a brute-force approach that caused a significant frame-rate stutter of up to 1 second.
 
-The  solution involved refactoring the search into a two-pass coarse-to-fine algortithm. By first identifying a candidate region with large steps and then refining the search in that specif area, we acheived a 91% reduction in iterations while maintaining aiming accuracy. The resulting performance imact is virtually imperceptible.
+That issue was solved by refactoring the search into a two-pass coarse-to-fine algortithm. By first identifying a candidate region with large steps and then refining the search in that specific area, we acheived a **91% reduction in iterations** while maintaining aiming accuracy. The resulting performance imact is virtually imperceptible.
 
-|Metric|Brute-Force (Original)|Coarse-to-Fine (Optimized)|
+**Trajector Search Algorithm Comparison Matrix**
+
+| Metric \ Implementation | Original | Optimised |
 |------|----------------------|--------------------------|
-|Search Strategy|Single high-res pass|Two-pass (Coarse → Fine)|
-|Angle Step|2°|8° (Coarse) / 2° (Fine)|
-|Power Step|1.25 units|40 (Coarse) / 5 (Fine)|
-Total Iterations|≈3000|≈270|
-Performance|<img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />|<img src="images/Smoother_AI_aiming.gif" alt="Game stutter" width="200" />|
+| Search Strategy | Single high-res pass | Two-pass (Coarse → Fine) |
+| Angle Step | 2° | 8° (Coarse) / 2° (Fine) |
+|Power Step| 1.25 units | 40 units (Coarse) / 5 units (Fine) |
+| Total Iterations | ≈3000 | ≈270 |
+| Visualisation |<img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />|<img src="images/Smoother_AI_aiming.gif" alt="Game stutter" width="200" />|
 
-Another issue with AI behaviour was that it sometimes fired at terrain directly ahead of it, rather than over it as is visible in Figure X. This turned out to be a much simpler issue to deal with as it only required adjusting the applyDifficultyJitter() method to not decrease the angle, so any randomness applied to the angle can only turn the barrel closer to vertical or keep it the same. This change was only applied to Hard mode as the original behaviour was considered appropriate in Easy mode.
+Another issue with AI behaviour was that it sometimes fired directy into nearby terrain as shown in Figure X. This turned out to be a simpler issue to deal with. The `applyDifficultyJitter()` was modified to ensure random adjustments only changed the firing angle towards the vertical. This change was only applied to Hard mode as the original behaviour was considered appropriate in Easy mode.
+
+<div align="center">
+  <img src="images/Aiming_jitter_causing_self_hit.gif" alt="Game stutter" width="200" />
+  <br>
+  <em>Figure X: AI-player hitting itself due to random angle jitter outcome</em>
+</div>
+<br>
 
 
 ### Evaluation
