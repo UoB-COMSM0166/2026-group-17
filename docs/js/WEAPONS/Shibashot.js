@@ -41,10 +41,14 @@ class Shibashot extends AbstractWeapon {
     if (typeof shibaImg !== "undefined" && shibaImg) {
       push();
       imageMode(CENTER);
-      const maxW = r * 2.5;
-      const maxH = r * 2.5;
+
+      const isControlPanel = (r === 14);
+      const maxW = isControlPanel ? r * 2.0 : r * 2.5;
+      const maxH = isControlPanel ? r * 2.0 : r * 2.5;
+
       const scale = Math.min(maxW / shibaImg.width, maxH / shibaImg.height);
       image(shibaImg, cx, cy, shibaImg.width * scale, shibaImg.height * scale);
+
       pop();
       return;
     }

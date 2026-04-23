@@ -47,10 +47,14 @@ class Starshot extends AbstractWeapon {
     if (typeof starImg !== "undefined" && starImg) {
       push();
       imageMode(CENTER);
-      const maxW = r * 2.4;
-      const maxH = r * 2.4;
+
+      const isControlPanel = (r === 14);
+      const maxW = isControlPanel ? r * 2.0 : r * 2.4;
+      const maxH = isControlPanel ? r * 2.0 : r * 2.4;
+
       const scale = Math.min(maxW / starImg.width, maxH / starImg.height);
       image(starImg, cx, cy, starImg.width * scale, starImg.height * scale);
+
       pop();
       return;
     }

@@ -45,10 +45,14 @@ class Pineappleshot extends AbstractWeapon {
     if (typeof pineappleImg !== "undefined" && pineappleImg) {
       push();
       imageMode(CENTER);
-      const maxW = r * 2.6;
-      const maxH = r * 2.6;
+
+      const isControlPanel = (r === 14);
+      const maxW = isControlPanel ? r * 2.1 : r * 2.6;
+      const maxH = isControlPanel ? r * 2.1 : r * 2.6;
+
       const scale = Math.min(maxW / pineappleImg.width, maxH / pineappleImg.height);
       image(pineappleImg, cx, cy, pineappleImg.width * scale, pineappleImg.height * scale);
+
       pop();
       return;
     }

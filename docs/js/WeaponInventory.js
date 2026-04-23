@@ -10,7 +10,7 @@ class WeaponInventory {
     #gap = 10;
     #plateOutlineColor;
     weapons = [];
-    
+
     constructor(posV = createVector(width / 3, height - height / 5), plateOutColor = color('teal')) {
         this.#positionVector = posV;
         this.#plateOutlineColor = plateOutColor;
@@ -51,16 +51,26 @@ class WeaponInventory {
         noStroke();
         textSize(16);
         text(activeWeapon?.name || "No Weapon",
-             this.#positionVector.x + this.#gap * 3, this.#positionVector.y);
+            this.#positionVector.x + this.#gap * 3, this.#positionVector.y);
 
         push();
         rectMode(CORNER);
         ellipseMode(RADIUS);
-        activeWeapon?.drawIcon?.(this.#positionVector.x - this.#gap * 6, this.#positionVector.y, 12);
+        const currentIconSize =
+            activeWeapon &&
+                ["pineapple", "shiba", "star"].includes(activeWeapon.id)
+                ? 24
+                : 12;
+
+        activeWeapon?.drawIcon?.(
+            this.#positionVector.x - this.#gap * 6,
+            this.#positionVector.y,
+            currentIconSize
+        );
         pop();
         pop();
 
-        if(this.#isExpanded) {
+        if (this.#isExpanded) {
             this.#drawWeaponPicker(baseAltitude);
         }
     }
@@ -126,7 +136,11 @@ class WeaponInventory {
             push();
             rectMode(CORNER);
             ellipseMode(RADIUS);
-            const iconSize = 40;
+            const iconSize =
+                ["pineapple", "shiba", "star"].includes(weapon.id)
+                    ? 24
+                    : 40;
+
             weapon?.drawIcon?.(boxX, boxY, iconSize);
             pop();
 
