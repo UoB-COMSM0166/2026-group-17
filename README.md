@@ -577,7 +577,7 @@ Terrain was implemented using composition where a `Terrain` class manages an arr
  Each column stored its top position, with y-coordinates generated randomly within a constrained range. Rendering was handled by a custom vertex-based shape. While circular explosions could push down those y-coordinates using the Pythagorean theorem, this height-map approach inherently prevented the creation of overhangs.
 
 <div align="center">
-  <img src="images/Terrain_destruction_v1.gif" alt="Game stutter" width="200" />
+  <img src="images/Terrain_destruction_v1.gif" alt="Terrain destruction 1" width="200" />
   <br>
   <em>Phase 1: Terrain above destroyed terrain disappears completely</em>
 </div>
@@ -588,7 +588,7 @@ This prompted a rework of the terrain logic. Each `TerrainColumn` was updated to
 After an explosion, if a column wasn't completely destroyed, it would end up with 1 or more disconnected pairs of pixels' y-coordinates which we decided to call *spans*. Rendering then shifted from a single custom shape to individual `p5.line()` calls for each span which effectively enabled static overhangs.
 
 <div align="center">
-  <img src="images/Terrain_destruction_v2.gif" alt="Game stutter" width="200" />
+  <img src="images/Terrain_destruction_v2.gif" alt="Terrain destruction 2" width="200" />
   <br>
   <em>Phase 2: Static overhanging terrain forms when terrain above is destroyed</em>
 </div>
@@ -599,7 +599,7 @@ The next phase focused on dynamic settling for floating terrain chuncks. A `star
 This was an oversight fixed by adding a `startSpans` field to maintain a fixed reference point in the `lerp()` calls. Once `settleProgress` exceeded 1.0, columns snapped to their final positions and `rebuildPixelsFromSpans()` updated underlying pixel data. Thus, the initial terrain settling behaviour was completed.
 
 <div align="center">
-  <img src="images/Terrain_destruction_v3.gif" alt="Game stutter" width="200" />
+  <img src="images/Terrain_destruction_v3.gif" alt="Terrain destruction 3" width="200" />
   <br>
   <em>Phase 3: Floating terrain gradually settles in a flabby manner</em>
 </div>
@@ -608,7 +608,7 @@ This was an oversight fixed by adding a `startSpans` field to maintain a fixed r
  However, the `lerp()` logic caused uneven settling because spans moved at speeds proportional to their distance from the target solid ground position. To ensure chunks maintained shape during descent, the approach shifted to using constant velocity. By adding the product of `deltaTime` and a fixed speed scalar directly to the span coordinates, uniform motion across all columns was achieved.
 
 <div align="center">
-  <img src="images/Terrain_destruction_v4.gif" alt="Game stutter" width="200" />
+  <img src="images/Terrain_destruction_v4.gif" alt="Terrain destruction 4" width="200" />
   <br>
   <em>Phase 4: Floating terrain descends in a uniform manner</em>
 </div>
@@ -656,12 +656,12 @@ That issue was solved by refactoring the search into a two-pass coarse-to-fine a
 | Angle Step | 2° | 8° (Coarse) / 2° (Fine) |
 |Power Step| 1.25 units | 40 units (Coarse) / 5 units (Fine) |
 | Total Iterations | ≈3000 | ≈270 |
-| Visualisation |<img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />|<img src="images/Smoother_AI_aiming.gif" alt="Game stutter" width="200" />|
+| Visualisation |<img src="images/Wind_particles_stutter.gif" alt="Game stutter" width="200" />|<img src="images/Smoother_AI_aiming.gif" alt="Smoother framerate" width="200" />|
 
 Another issue with AI behaviour was that it sometimes fired directy into nearby terrain as shown in Figure X. This turned out to be a simpler issue to deal with. The `applyDifficultyJitter()` was modified to ensure random adjustments only changed the firing angle towards the vertical. This change was only applied to Hard mode as the original behaviour was considered appropriate in Easy mode.
 
 <div align="center">
-  <img src="images/Aiming_jitter_causing_self_hit.gif" alt="Game stutter" width="200" />
+  <img src="images/Aiming_jitter_causing_self_hit.gif" alt="Aiming jitter self-hit" width="200" />
   <br>
   <em>Figure X: AI-player hitting itself due to random angle jitter outcome</em>
 </div>
@@ -765,8 +765,6 @@ $$\begin{cases}
 |Total|3.000|0.0098|Statistically significant difference|
 
 </div>
-
-**SUS**
 
 ---
 
@@ -912,7 +910,7 @@ If development were to continue, immediate next steps would include improving ga
 For a potential sequel, our game could expand into a more advanced system with dynamic environments, more complex weapon interactions, and multiplayer capabilities. Introducing features such as destructible terrain variations, weapon synergies, or adaptive AI would deepen gameplay strategy. Furthermore, restructuring the codebase into a more scalable architecture (e.g., component-based systems or event-driven design) would better support long-term development and feature expansion.
 
 
-### Contribution Statement
+### Contribution statement
 
 
 *All members contributed equally; names are listed in alphabetical order and do not reflect level of contribution.*
@@ -929,15 +927,35 @@ For a potential sequel, our game could expand into a more advanced system with d
 
 - Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
-### Additional Marks
 
-You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
+### AI statement
 
-- **Quality** of report writing, presentation, use of figures and visual material (5% of report grade) 
-  - Please write in a clear concise manner suitable for an interested layperson. Write as if this repo was publicly available.
-- **Documentation** of code (5% of report grade)
-  - Organise your code so that it could easily be picked up by another team in the future and developed further.
-  - Is your repo clearly organised? Is code well commented throughout?
+The team utilised AI tools in the project in two ways - to support learning and to generate assets.
 
-### Rreference
+#### AI for learning
+
+When met with certain problems which a team member lacked prior experience of solving and they struggled to come up with an original solution for too long, AI was consulted for advice and tips on an idiomatic approach to solve said challenge. Such prompts would explicitly ask that no code be generated. Doing this meant that while team members spent some time dealing with each problem on their own, no one was stuck trying to reinvent the wheel for an already solved problem for extended periods of time.
+
+Thus, the team's pace could keep with the schedule and members could focus their attention on addressing more complex development challenges. An example of a typical prompt used in this capacity can be seen in Figure X.
+
+<div align="center">
+  <img src="images/example_AI_prompt.PNG" alt="AI prompt for learning" />
+  <br>
+  <em>Figure X: Example of the style of AI prompt used for learning</em>
+</div>
+
+#### AI for asset generation
+
+The team decided to use AI-generated images for assets in the weapon shop screen as well as the projectile forms of some of the shots in the game. This usage was a mix between generation from scratch and generation based on hand-drawn sketches. A few examples of this usage can be seen on Figure XX.
+
+<div align="center">
+  <img src="images/Concept_art_to_AI_colorisation.png" alt="Concept and colored side-by-side" width="500" />
+  <br>
+  <em>Figure XX: Hand-drawn weapon concepts and their AI-generated colorisations</em>
+</div>
+<br>
+
+The rationale behind this usage was to save some much-needed time and with the understanding that graphic design and artistic proficiency are not the primary focus of the Software Engineering unit.
+
+### Reference
 <a name="ref1"></a> [1] Wikipedia contributors. (2024). *God object*. Wikipedia, The Free Encyclopedia. Available at: [https://en.wikipedia.org/wiki/God_object](https://en.wikipedia.org/wiki/God_object) (Accessed: 20 April 2026).
