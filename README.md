@@ -845,12 +845,6 @@ The number of valid samples for both the NASA-TLX and SUS questionnaires was 10.
 | User10 | 13.0 | 22.0 | 87.5 | 85.0 |
 | **Average** | **21.3** | **39.1** | **72.75** | **68.5** |
 
-### 5.3 Code Testing
-
-We tested the main gameplay systems using unit tests to check that the game behaves correctly in key situations. The tests covered AI behaviour, player firing, weapon selection, projectile physics, explosions, random events, turn control, and the weapon shop.
-The AI tests checked that the AI can think, pick weapons, aim, and fire correctly in both Easy and Hard modes. Player and projectile tests confirmed that weapons can be fired properly, movement is limited within the screen, Starshot splits into fragments, and explosions only damage terrain once. We also tested wind, rain, and earthquake effects to make sure they only affect projectiles when active.
-The turn controller and weapon shop tests checked that turns alternate correctly, stuck players can be skipped, the match ends after the correct number of rounds, and invalid or duplicate weapon selections are rejected.
-Overall, these tests helped confirm that the core game logic is stable.
 
 **NASA-TLX**
 
@@ -898,6 +892,15 @@ $$\begin{cases}
 | Effort | 0.0000 | 0.0078 | Statistically significant difference |
 | Frustration | 1.000 | 0.0625 | No statistically significant difference |
 | Total | 3.000 | 0.0098 | Statistically significant difference |
+
+
+### 5.3 Code Testing
+
+We tested the main gameplay systems using unit tests to check that the game behaves correctly in key situations. The tests covered AI behaviour, player firing, weapon selection, projectile physics, explosions, random events, turn control, and the weapon shop.
+The AI tests checked that the AI can think, pick weapons, aim, and fire correctly in both Easy and Hard modes. Player and projectile tests confirmed that weapons can be fired properly, movement is limited within the screen, Starshot splits into fragments, and explosions only damage terrain once. We also tested wind, rain, and earthquake effects to make sure they only affect projectiles when active.
+The turn controller and weapon shop tests checked that turns alternate correctly, stuck players can be skipped, the match ends after the correct number of rounds, and invalid or duplicate weapon selections are rejected.
+Overall, these tests helped confirm that the core game logic is stable.
+
 
 ## 6. Process
 
