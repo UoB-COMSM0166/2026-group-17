@@ -139,8 +139,8 @@
 ## Development Team
 
 <p align="center">
-  <a href="./images/group_newphoto.jpg">
-    <img src="./images/group_newphoto.jpg" alt="Group 17 team photo" width="900">
+  <a href="./images/team-collage.png">
+    <img src="./images/team-collage.png" alt="Group 17 team collage" width="900">
   </a>
 </p>
 
@@ -162,6 +162,18 @@ HOT CANNONS is a single-player, turn-based artillery game inspired by Pocket Tan
 ---
 
 ## 1. Introduction
+
+<p align="center">
+  <a href="./images/hot_cannons_mood_board.png">
+    <img src="./images/hot_cannons_mood_board.png" alt="HOT CANNONS opening poster mood board" width="760">
+  </a>
+</p>
+
+<p align="center"><em>Opening Poster. From classic artillery roots to unstable battlefields: the visual pitch behind HOT CANNONS.</em></p>
+
+| Pocket Tanks DNA | Our Twist | Design Direction |
+|---|---|---|
+| Turn-based artillery, destructible terrain, and weapon variety gave us a technically feasible but strategically rich foundation. | Instead of keeping matches stable and predictable, HOT CANNONS introduces random environmental and gameplay events that disrupt player plans. | We designed the game around replayability: every match asks players to adapt loadouts, aim, and tactics to changing terrain, visibility, and events. |
 
 HOT CANNONS reimagines the core appeal of classic artillery games as a more volatile, more tactical, and more expressive competitive experience. The original inspiration came from *Pocket Tanks*, which immediately stood out in our early research because its turn-based artillery combat, destructible terrain, and varied projectile behaviour offered a clear technical foundation while still leaving room for meaningful extension. From the beginning, our team was drawn not just to the simplicity of firing a shot across a 2D battlefield, but to the strategic tension created by terrain deformation, timing, and weapon choice.
 
@@ -1018,7 +1030,7 @@ To address these problems, we established the following process during daily mee
 
 In earlier stages, sustainability-related considerations appeared implicitly rather than as a deliberate design goal. For example, in our user stories, we included cases such as “as a player with visual impairments…”, which reflects an early concern for accessibility. However, these decisions were not initially framed within a sustainability context.
 
-It was only during the final workshop session that we explicitly reflected on sustainability as a whole. At this stage, the team revisited earlier design choices and systematically examined how different aspects of the game contribute to sustainability. To support this reflection, we conducted a collaborative brainstorming session using sticky notes, where each member contributed observations from multiple perspectives. These ideas were grouped and refined into key themes, following a simple process:
+It was only during the final workshop session that we explicitly reflected on sustainability as a whole. At this stage, the team revisited earlier design choices and systematically examined how different aspects of the game contribute to sustainability. To support this reflection, we used a workshop structure informed by the SusAF Taster workbook [3] and conducted a collaborative brainstorming session using sticky notes, where each member contributed observations from multiple perspectives. These ideas were grouped and refined into key themes, following a simple process:
 
 ```text
 [Brainstorming with Sticky Notes] → [Grouping by Dimensions] → [Mapping Impacts chain] → [Refining Relationships]
@@ -1163,3 +1175,7 @@ The repository currently contains a complete static weapon icon set and a partia
 
 <a id="ref1"></a>
 [1] Wikipedia contributors. (2024). *God object*. Wikipedia, The Free Encyclopedia. Available at: [https://en.wikipedia.org/wiki/God_object](https://en.wikipedia.org/wiki/God_object) (Accessed: 20 April 2026).
+
+[2] National Aeronautics and Space Administration (NASA). (2026). *NASA Task Load Index (TLX).* Available at: [https://www.nasa.gov/human-systems-integration-division/nasa-task-load-index-tlx/](https://www.nasa.gov/human-systems-integration-division/nasa-task-load-index-tlx/) (Accessed: 26 April 2026).
+
+[3] SusAF. *SusAF “Taster” - the sustainability awareness framework: The taster workbook.* Available at: [https://www.ida.liu.se/~TDDD96/info/SusAF%20Taster%20-%20workbook%20-%20V3%20-%20english.pdf](https://www.ida.liu.se/~TDDD96/info/SusAF%20Taster%20-%20workbook%20-%20V3%20-%20english.pdf) (Accessed: 26 April 2026).
