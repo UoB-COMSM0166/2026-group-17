@@ -892,9 +892,26 @@ To address these problems, we established the following process during daily mee
 
 ---
 
-- 15% ~750 words
+## Sustainability, ethics and accessibility
 
-- Teamwork. How did you work together, what tools and methods did you use? Did you define team roles? Reflection on how you worked together. Be honest, we want to hear about what didn't work as well as what did work, and importantly how your team adapted throughout the project.
+In earlier stages, sustainability-related considerations appeared implicitly rather than as a deliberate design goal. For example, in our user stories, we included cases such as “as a player with visual impairments…”, which reflects an early concern for accessibility. However, these decisions were not initially framed within a sustainability context.
+
+It was only during the final workshop session that we explicitly reflected on sustainability as a whole. At this stage, the team revisited earlier design choices and systematically examined how different aspects of the game contribute to sustainability. To support this reflection, we conducted a collaborative brainstorming session using sticky notes, where each member contributed observations from multiple perspectives. These ideas were grouped and refined into key themes, following a simple process:
+
+```id="flow_capture"
+[Brainstorming with Sticky Notes] → [Grouping by Dimensions] → [Mapping Impacts chain] → [Refining Relationships]
+```
+
+This structured reflection allowed us to recognize that many sustainability-related aspects had already been embedded in the system. **From an individual perspective**, features such as Easy Mode with trajectory preview and a clear user interface reduce the learning curve and minimize frustration, improving accessibility for a wide range of players. **From a societal and ethical perspective**, the game does not collect or store user data, does not identify users, and avoids discriminatory mechanisms, making it inclusive across different regions, age groups, and backgrounds. In addition, as a collaborative course project, it supported teamwork, communication, and the application of software engineering practices.
+
+**Environmental** considerations are reflected in the system’s lightweight design. *Hot Cannons* is a 2D game that runs locally without relying on high-performance graphics or persistent online services. As a result, it consumes relatively low computational resources and reduces network usage compared to large-scale online games. **From a technical perspective**, sustainability is supported through a modular architecture, where responsibilities are clearly separated across components such as game management, state handling, and extensible weapon systems. This structure enhances maintainability, scalability, and reusability, allowing new features to be added without major structural changes.
+
+While **economic** aspects were considered, they were not a primary driver in this project. The system naturally maintains low development and operational costs due to its simplicity and minimal infrastructure requirements; however, these factors are not strongly interconnected with other sustainability dimensions and therefore are not central to the overall analysis.
+
+This reflection process also led to a clearer understanding of sustainability as an ongoing concern rather than a one-time evaluation. As a result, we identified several directions for future improvement. These include enhancing inclusivity through additional language options, audio support, and adaptable color modes for users with different needs; introducing narrative elements with educational value to promote positive social impact; and incorporating green development principles more consciously in future iterations, such as optimizing performance and minimizing unnecessary resource consumption.
+
+Overall, the project demonstrates a transition from implicit to explicit sustainability awareness. By systematically reflecting on our design choices, we were able to connect technical decisions with broader individual, societal, and environmental impacts, awaring us to think the importance to be a responsible developer and how we can develop responsibly and sustainably.
+
 
 ### Conclusion
 
