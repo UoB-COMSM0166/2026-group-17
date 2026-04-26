@@ -1174,8 +1174,8 @@ The repository currently contains a complete static weapon icon set and a partia
 ## References
 
 <a id="ref1"></a>
-[1] Wikipedia contributors. (2024). *God object*. Wikipedia, The Free Encyclopedia. Available at: [https://en.wikipedia.org/wiki/God_object](https://en.wikipedia.org/wiki/God_object) (Accessed: 20 April 2026).
+[1] Wikipedia contributors. (2024). *God object*. Wikipedia, The Free Encyclopedia. Available at: [https://en.wikipedia.org/wiki/God_object](https://en.wikipedia.org/wiki/God_object).
 
-[2] National Aeronautics and Space Administration (NASA). (2026). *NASA Task Load Index (TLX).* Available at: [https://www.nasa.gov/human-systems-integration-division/nasa-task-load-index-tlx/](https://www.nasa.gov/human-systems-integration-division/nasa-task-load-index-tlx/) (Accessed: 26 April 2026).
+[2] National Aeronautics and Space Administration (NASA). (2026). *NASA Task Load Index (TLX).* Available at: [https://www.nasa.gov/human-systems-integration-division/nasa-task-load-index-tlx/](https://www.nasa.gov/human-systems-integration-division/nasa-task-load-index-tlx/).
 
-[3] SusAF. *SusAF “Taster” - the sustainability awareness framework: The taster workbook.* Available at: [https://www.ida.liu.se/~TDDD96/info/SusAF%20Taster%20-%20workbook%20-%20V3%20-%20english.pdf](https://www.ida.liu.se/~TDDD96/info/SusAF%20Taster%20-%20workbook%20-%20V3%20-%20english.pdf) (Accessed: 26 April 2026).
+[3] SusAF. *SusAF “Taster” - the sustainability awareness framework: The taster workbook.* Available at: [https://www.ida.liu.se/~TDDD96/info/SusAF%20Taster%20-%20workbook%20-%20V3%20-%20english.pdf](https://www.ida.liu.se/~TDDD96/info/SusAF%20Taster%20-%20workbook%20-%20V3%20-%20english.pdf).
