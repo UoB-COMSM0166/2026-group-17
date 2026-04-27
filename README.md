@@ -826,6 +826,7 @@ The number of valid samples for both the NASA-TLX and SUS questionnaires was 10.
 | User10 | 13.0 | 22.0 | 87.5 | 85.0 |
 | **Average** | **21.3** | **39.1** | **72.75** | **68.5** |
 
+
 **NASA-TLX**
 
 1. Descriptive statistics and visualisation
@@ -872,6 +873,15 @@ $$\begin{cases}
 | Effort | 0.0000 | 0.0078 | Statistically significant difference |
 | Frustration | 1.000 | 0.0625 | No statistically significant difference |
 | Total | 3.000 | 0.0098 | Statistically significant difference |
+
+
+### 5.3 Code Testing
+
+We tested the main gameplay systems using unit tests to check that the game behaves correctly in key situations. The tests covered AI behaviour, player firing, weapon selection, projectile physics, explosions, random events, turn control, and the weapon shop.
+The AI tests checked that the AI can think, pick weapons, aim, and fire correctly in both Easy and Hard modes. Player and projectile tests confirmed that weapons can be fired properly, movement is limited within the screen, Starshot splits into fragments, and explosions only damage terrain once. We also tested wind, rain, and earthquake effects to make sure they only affect projectiles when active.
+The turn controller and weapon shop tests checked that turns alternate correctly, stuck players can be skipped, the match ends after the correct number of rounds, and invalid or duplicate weapon selections are rejected.
+Overall, these tests helped confirm that the core game logic is stable.
+
 
 ## 6. Process
 
@@ -1047,20 +1057,39 @@ This reflection process also led to a clearer understanding of sustainability as
 
 Overall, the project demonstrates a transition from implicit to explicit sustainability awareness. By systematically reflecting on our design choices, we were able to connect technical decisions with broader individual, societal, and environmental impacts, making us more aware of the importance of being responsible developers and of how software can be designed more responsibly and sustainably.
 
+
 ## 8. Conclusion
 
 - 10% ~500 words
 - Reflect on the project as a whole. Lessons learnt. Reflect on challenges. Future work, describe both immediate next steps for your current game and also what you would potentially do if you had chance to develop a sequel.
 
-Our game provided valuable experience in developing a complete interactive game system, from core gameplay mechanics to visual feedback and user interaction. One of the most important lessons learned was the necessity of designing modular and extensible systems early on. For example, the explosion system (`explosion.js`) was initially intended to handle basic visual effects, but it gradually evolved into a central framework supporting multiple weapon behaviors, terrain interaction, and feedback effects. This highlighted the importance of anticipating future extensions when structuring core systems.
 
-A key challenge throughout the game was managing the interaction between different gameplay layers, particularly projectile physics, collision detection, and weapon-specific behaviors. Implementing features such as the StarShot required coordinating multiple systems: mid-air projectile splitting, secondary projectile handling, and delayed explosion upon impact. Debugging these interactions was complex, as errors often emerged from system integration rather than isolated components. This process reinforced the importance of clear responsibility boundaries between classes (e.g., projectile vs. explosion vs. match controller) and systematic debugging strategies.
+### 8.1 Project Reflection & Lessons Learnt
 
-Another challenge was ensuring consistent visual and gameplay feedback. Effects such as explosions, trajectory previews, and impact animations needed to feel responsive and readable while remaining performant. Balancing clarity and visual richness required iterative refinement, particularly when multiple effects occurred simultaneously (e.g., explosions, terrain deformation, and screen shake).
+Overall, this project provided valuable experience in building a complete game system from idea to implementation. One key lesson was the importance of designing a modular structure early on. Our transition from a centralized “God object” to a state-driven architecture greatly improved maintainability and made collaboration easier. It also showed how separating responsibilities across classes can reduce unexpected side effects when adding new features.
 
-If development were to continue, immediate next steps would include improving game balancing and polish, such as refining weapon parameters, enhancing visual consistency across all effects, and optimizing performance for more complex interactions. Additionally, improving the user interface and feedback systems, for example clearer hit indicators, smoother animations, and better onboarding, would significantly enhance player experience.
+Another important lesson was to anticipate future extensions. Systems such as explosions and weapons gradually became more complex than initially planned, requiring flexible design. This reinforced the need to think beyond immediate functionality and consider scalability from the beginning.
 
-For a potential sequel, our game could expand into a more advanced system with dynamic environments, more complex weapon interactions, and multiplayer capabilities. Introducing features such as destructible terrain variations, weapon synergies, or adaptive AI would deepen gameplay strategy. Furthermore, restructuring the codebase into a more scalable architecture (e.g., component-based systems or event-driven design) would better support long-term development and feature expansion.
+### 8.2 Teamwork & Challenges
+
+One of the main challenges was managing integration between different systems, such as projectile physics, terrain deformation, and weapon-specific behaviour. Issues often appeared when combining features rather than within individual components, making debugging more difficult.
+
+Team collaboration also presented challenges, especially with version control. Early on, unclear merge processes and inconsistent updates led to conflicts and occasional broken builds. Over time, we improved this by introducing clearer workflows and more structured communication.
+
+Despite these challenges, regular meetings and collaborative problem-solving helped the team maintain progress and improve coordination.
+
+### 8.3 Future Work: Immediate Next Steps
+
+If development were to continue, the immediate focus would be to expand and polish the current game experience. One important next step would be adding more weapon variety. At the moment, many weapons still follow a similar projectile-based shooting pattern, so future weapons could include straight-line attacks, delayed effects, bouncing shots, or other non-parabolic trajectories. This would make weapon choice more strategic and reduce repetition.
+
+Another short-term improvement would be to add more battlefield variety. Different terrain styles, map layouts, and environmental conditions could make each match feel more distinct. We would also continue refining weapon balance, visual feedback, UI clarity, and performance, especially when multiple effects happen at the same time.
+
+### 8.4 Future Work: Sequel Development
+
+For a potential sequel, HOT CANNONS could be developed into a larger online artillery game. This could include account login, online matchmaking, and multiplayer modes, allowing players to compete or cooperate beyond a local single-player setting. A sequel could also introduce long-term progression, such as unlockable weapons, player profiles, and seasonal challenges.
+
+At the same time, future development should consider sustainability and social impact more carefully. Instead of only focusing on aggressive combat, the sequel could include less destructive or more creative game modes, such as cooperative challenges, puzzle-based terrain tasks, or objective-based missions. This would broaden the player experience, reduce reliance on purely destructive mechanics, and make the game more inclusive and replayable.
+
 
 ## 9. Contribution Statement
 
