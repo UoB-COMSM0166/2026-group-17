@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://uob-comsm0166.github.io/2026-group-17/">
-    <img src="https://img.shields.io/badge/Live%20Demo-WIP-EDF734?style=plastic&logo=p5dotjs&logoColor=crimson&logoSize=auto&labelColor=lightslategrey" alt="Live Demo">
+    <img src="https://img.shields.io/badge/Live%20Demo-Play-00CC00?style=plastic&logo=p5dotjs&logoColor=crimson&logoSize=auto&labelColor=lightslategrey" alt="Live Demo">
   </a>
 </p>
 

@@ -15,16 +15,11 @@ class Tutorial {
    #controlPanel;
 
    constructor(positionVector, controlPanel) {
-      //this.#positionVector = positionVector;
-      //this.#movePad = new movePad(positionVector);
-      //this.#angleWidget = angleWidget;
-      //this.#powerWidget = powerWidget;
-      //this.#shootButton = shootButton;
       this.#controlPanel = controlPanel;
 
       this.Title = "TUTORIAL";
       this.Context = "Welcome to the game! Here's a quick tutorial to get you started:\n" + 
-                     "Moving the cannon, adjusting the angle and power, choosing the weapon, and shooting at your opponent can be both use keyboard or on-screen controls.";
+                     "Moving the cannon, adjusting the angle and power, choosing the weapon, and shooting at your opponent can all be done using the keyboard or on-screen controls.";
       this.Steps = [
          "Move your cannon: Use LEFT/RIGHT arrow keys.",
          "Adjust angle: Use A/D keys.",

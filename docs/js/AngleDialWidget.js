@@ -107,50 +107,54 @@ class AngleDialWidget {
    }
 
    //----------------keyboard control for angle dial-----------------
-   handleKeypressed(keyId){
+   handleKeypressed(keyId) {
+      const pressedKey = keyId.toLowerCase();
       const now = millis();
 
-      //a for left, d for right
-      if (keyId === 'a' || keyId === 'A') {
+      if (pressedKey === 'a') {
          this.#isFollowing = false;
          this.#leftHeld = true;
          this.#leftHoldTimer = now;
          this.#lastLeftRepeat = now;
          this.#needleRotation -= 1;
+         this.#rightHeld = false;
       }
-      else if (keyId === 'd' || keyId === 'D') {
+      else if (pressedKey === 'd') {
          this.#isFollowing = false;
          this.#rightHeld = true;
          this.#rightHoldTimer = now;
          this.#lastRightRepeat = now;
          this.#needleRotation += 1;
+         this.#leftHeld = false;
       }
    }
 
-   handleKeyReleased(keyId){
-      if (keyId === 'a' || keyId === 'A') this.#leftHeld = false;
-      else if (keyId === 'd' || keyId === 'D') this.#rightHeld = false;
+   handleKeyReleased(keyId) {
+      const releasedKey = keyId.toLowerCase();
+      if (releasedKey === 'a') this.#leftHeld = false;
+      if (releasedKey === 'd') this.#rightHeld = false;
    }
 
-   updateKeyboardControl(controlable = true){
+   updateKeyboardControl(controlable = true) {
       if (!controlable) return;
 
       const now = millis();
 
-      if (this.#leftHeld) {
-         const heldLongEnough =  now - this.#leftHoldTimer > this.#holdDelay;
-         const shouldRepeat = now - this.#lastLeftRepeat > this.#repeatInterval;
+      // Only allow turning if exactly one of the keys is registered as held
+      if (this.#leftHeld && this.#rightHeld) return;
 
-         if(heldLongEnough && shouldRepeat) {
+      if (this.#leftHeld) {
+         const heldLongEnough = now - this.#leftHoldTimer > this.#holdDelay;
+         const shouldRepeat = now - this.#lastLeftRepeat > this.#repeatInterval;
+         if (heldLongEnough && shouldRepeat) {
             this.#needleRotation -= 1;
             this.#lastLeftRepeat = now;
          }
       }
       else if (this.#rightHeld) {
-         const heldLongEnough =  now - this.#rightHoldTimer > this.#holdDelay;
+         const heldLongEnough = now - this.#rightHoldTimer > this.#holdDelay;
          const shouldRepeat = now - this.#lastRightRepeat > this.#repeatInterval;
-
-         if(heldLongEnough && shouldRepeat) {
+         if (heldLongEnough && shouldRepeat) {
             this.#needleRotation += 1;
             this.#lastRightRepeat = now;
          }
