@@ -1099,7 +1099,7 @@ At the same time, future development should consider sustainability and social i
 | Shiho | Score calculation logic, Start screen (mode selection), Weapon and explosion effects (Bubblegumshot, Impactgun, Earthworm), Weapon character design |
 | Yinuo | Weapon shop screen, Terrain effects, TrajectoryPreview logic, Weapon trajectory effects, Weapon and explosion effects (Lazershot, Grapshot, Submarineshot) |
 | Yuqi | Random events (wind, acid rain, and earthquake effects), Tutorial screen, Test code, Weapon character design |
-| Yuxin | Scoreboard display, Aiming and shooting interaction, Explosion logic, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
+| Yuxin | Scoreboard display, Aiming System, Explosion logic, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
 
 - Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
 
