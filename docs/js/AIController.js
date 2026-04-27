@@ -48,7 +48,7 @@ class AIController {
 
    startThinking() {
       if (this.#state !== AIController.States.IDLE) return;
-      if (this.#location === 'SHOP') this.#thinkTimer = random(50, 100);
+      if (this.#location === 'SHOP') this.#thinkTimer = random(500, 1000);
       else this.#thinkTimer = random(1000, 5000);
       this.#dotAnimationClock = 0;
       this.#state = AIController.States.THINKING;
