@@ -65,7 +65,7 @@
 - [5. Evaluation](#5-evaluation)
   - [5.1 Qualitative: Think Aloud](#51-qualitative-think-aloud)
   - [5.2 Quantitative: NASA Task Load Index (NASA-TLX) and System Usability Survey (SUS)](#52-quantitative-nasa-task-load-index-nasa-tlx-and-system-usability-survey-sus)
- - [5.3 Code Testing](#53-Code-Testing)
+  - [5.3 Code Testing](#53-Code-Testing)
 - [6. Process](#6-process)
   - [6.1 Role Allocation Across the Entire Project](#61-role-allocation-across-the-entire-project)
   - [6.2 Responsibility Management and Flexible Collaboration](#62-responsibility-management-and-flexible-collaboration)
