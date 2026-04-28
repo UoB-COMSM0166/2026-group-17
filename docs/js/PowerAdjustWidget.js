@@ -172,13 +172,15 @@ class PowerAdjustWidget {
    }
 
    //----------------keyboard control for angle dial-----------------
-   handleKeypressed(keyId){
+   handleKeypressed(keyId) {
       const now = millis();
+      const pressedKey = keyId.toLowerCase();
 
       //w for power up, s for power down
-      if ((keyId === 'w' || keyId === 'W')) {
+      if (pressedKey === 'w') {
          this.#isFollowing = false;
          this.#upHeld = true;
+         this.#downHeld = false;
          this.#upHoldTimer = now;
          this.#lastUpRepeat = now;
          this.power += 1;
@@ -186,36 +188,39 @@ class PowerAdjustWidget {
       else if (keyId === 's' || keyId === 'S') {
          this.#isFollowing = false;
          this.#downHeld = true;
+         this.#upHeld = false;
          this.#downHoldTimer = now;
          this.#lastDownRepeat = now;
          this.power -= 1;
       }
    }
 
-   handleKeyReleased(keyId){
-      if (keyId === 'w' || keyId === 'W') this.#upHeld = false;
-      else if (keyId === 's' || keyId === 'S') this.#downHeld = false;
+   handleKeyReleased(keyId) {
+      const releasedKey = keyId.toLowerCase();
+      if (releasedKey === 'w') this.#upHeld = false;
+      else if (releasedKey === 's') this.#downHeld = false;
    }
 
-   updateKeyboardControl(controlable = true){
+   updateKeyboardControl(controlable = true) {
       if (!controlable) return;
 
       const now = millis();
+      if (this.#upHeld && this.#downHeld) return;
 
       if (this.#upHeld && this.power < 100) {
-         const heldLongEnough =  now - this.#upHoldTimer > this.#holdDelay;
+         const heldLongEnough = now - this.#upHoldTimer > this.#holdDelay;
          const shouldRepeat = now - this.#lastUpRepeat > this.#repeatInterval;
 
-         if(heldLongEnough && shouldRepeat) {
+         if (heldLongEnough && shouldRepeat) {
             this.power += 1;
             this.#lastUpRepeat = now;
          }
       }
       else if (this.#downHeld && this.power > 0) {
-         const heldLongEnough =  now - this.#downHoldTimer > this.#holdDelay;
+         const heldLongEnough = now - this.#downHoldTimer > this.#holdDelay;
          const shouldRepeat = now - this.#lastDownRepeat > this.#repeatInterval;
 
-         if(heldLongEnough && shouldRepeat) {
+         if (heldLongEnough && shouldRepeat) {
             this.power -= 1;
             this.#lastDownRepeat = now;
          }

@@ -675,8 +675,8 @@ class Match {
 
       const iconSize =
          ["pineapple", "shiba", "star"].includes(weapon.id)
-            ? 20   
-            : 14;  
+            ? 20
+            : 14;
 
       weapon.drawIcon(48, 110, iconSize);
       pop();
@@ -756,7 +756,10 @@ class Match {
    #isAIPlayerTurn() { return this.#turnController.activePlayerId === 1 }
 
    #inputActive() {
-      return !this.#isAIPlayerTurn() && this.#physicsDone() && !this.#pendingTurnAdvance;
+      return !this.#isAIPlayerTurn() &&
+         this.#physicsDone() &&
+         !this.#pendingTurnAdvance &&
+         !this.#tutorial.isVisible;
    }
 
    #stopPlayerAtSteepSlope(player, follow) {
