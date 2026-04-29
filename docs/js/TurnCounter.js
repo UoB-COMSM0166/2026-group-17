@@ -1,3 +1,5 @@
+// The visual representation of game turns and events.
+// Manages "ROUND X" screen announcements and the floating feedback messages when a player is skipped.
 class TurnCounter {
    #position;
    #skipMessage = null;

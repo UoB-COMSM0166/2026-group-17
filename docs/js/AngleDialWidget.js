@@ -1,3 +1,5 @@
+// An interactive UI component for adjusting shot angles.
+// Supports click-to-follow mouse logic and keyboard-driven rotation
 class AngleDialWidget {
    //the outlook part
    static #needleColor;

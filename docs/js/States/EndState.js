@@ -1,3 +1,5 @@
+ // The "Game Over" screen. Displays final scores, announces the winner or a draw,
+ // and handles the logic for restarting the entire game
 class EndState extends State {
    #results;
 
@@ -32,6 +34,7 @@ class EndState extends State {
    }
 
    onKeyReleased(keyReleased) {
-      if (keyReleased === 'r' || keyReleased === 'R') window.location.reload();
+      keyReleased = keyReleased.toLowerCase();
+      if (keyReleased === 'r') window.location.reload();
    }
 }

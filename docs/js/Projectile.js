@@ -1,3 +1,6 @@
+// Manages the life cycle of a fired shot. Handles movement, environmental physics,
+// collision detection with players/terrain, and specialized weapon behaviors like splitting into fragments
+
 class Projectile {
    #position;
    #velocity;

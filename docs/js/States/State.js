@@ -1,3 +1,4 @@
+// The abstract base class for all game phases (e.g., MenuState, MatchState
 class State {
    constructor(game, resolution) {
       if (this.constructor === State)

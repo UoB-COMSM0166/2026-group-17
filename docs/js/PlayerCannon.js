@@ -1,3 +1,5 @@
+//The player-controlled cannon entity. Handles movement logic, weapon inventory management,
+// physics states (like airborne) and precise collision detection using local coordinate transformations
 class PlayerCannon {
    #position;
    #wheelRadius;

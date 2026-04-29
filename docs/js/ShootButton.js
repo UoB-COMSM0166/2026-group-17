@@ -1,3 +1,5 @@
+// The primary interaction point for committing to a shot.
+// Uses a standard Axis-Aligned Bounding Box for mouse hover detection
 class ShootButton {
    #positionVector;
    #fillColor;
@@ -23,49 +25,9 @@ class ShootButton {
          strokeWeight(2);
       }
       rect(this.#positionVector.x, this.#positionVector.y, width / 9, ctrlPanelBaseHeight / 3);
-
-      //fill('yellow');
-      //text(`ShootButton: ${this.#isHovered()}`, 120, 120);
-
       this.#drawText();
       pop();
-      /*const x = this.#positionVector.x;
-      const y = this.#positionVector.y;
-      const rShoot = (controlPanel.baseAltitude * 0.4);
-      this.#drawNeonShootButton(x, y, rShoot, this.#isHovered());
-      this.#drawText();*/
    }
-
-   /*#drawNeonShootButton(x, y, r, hovered) {
-       const ctx = drawingContext;
-
-   
-       push();
-       noFill();
-       ctx.shadowBlur = hovered ? 18 : 12;
-       ctx.shadowColor = "rgba(252, 240, 73, 0.9)";
-       stroke(255, 170, 40, 220);
-       strokeWeight(hovered ? 6 : 5);
-       circle(x, y, r * 2.0 - 20);
-       pop();
-
-       push();
-       noFill();
-       ctx.shadowBlur = hovered ? 22 : 16;
-       ctx.shadowColor = "rgba(120, 245, 255, 0.9)";
-       stroke(120, 245, 255, 200);
-       strokeWeight(hovered ? 6 : 5);
-       arc(x, y, r * 2.0 + 4, r * 2.0 + 4, -21,  328);
-       strokeWeight(1);
-       arc(x, y, r * 2.0 + 18, r * 2.0 + 18, 25, 104);
-       arc(x, y, r * 2.0 + 18, r * 2.0 + 18, 135, 235);
-       arc(x, y, r * 2.0 + 18, r * 2.0 + 18, 278,  10);
-       pop();
-
-       
-       //arc(x, y, r * 2.0 + 22, r * 2.0 + 22, -0.35, -0.05);
-       pop();
-   }*/
 
    #drawText() {
       push();

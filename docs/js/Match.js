@@ -1,3 +1,5 @@
+// The core gameplay engine. Coordinates all interactive elements during a battle, including terrain physics,
+// environmental weather effects (wind/rain/earthquakes), player turn logic, weapon projectile lifecycles, and scoring calculations
 class Match {
    static #GRAVITY;
    static #ZERO_VECTOR;
@@ -101,6 +103,19 @@ class Match {
       this.#drawHUD();
       // Draw tutorial overlay
       this.#tutorial.draw();
+      this.#drawDebugPlayerText();
+   }
+
+   #drawDebugPlayerText() {                     // REMOVE LATER
+      push();
+      noStroke();
+      textFont('Verdana');
+      textSize(20);
+      fill('darkgoldenrod');
+      text(`Angle: ${this.#players[0].barrelAngle}`, 50, 140);
+      fill('firebrick');
+      text(`Power: ${this.#players[0].barrelPower}`, 50, 162);
+      pop()
    }
 
    onMousePressed(button) {
@@ -124,27 +139,29 @@ class Match {
 
    onKeyPressed(inputKey, keyId) {
       if (!this.#inputActive()) return;
-      if (inputKey === 'a' || inputKey === 'A' || inputKey === 'd' || inputKey === 'D') {
+      inputKey = inputKey.toLowerCase();
+      if (inputKey === 'a' || inputKey === 'd') {
          this.#controlPanel.angleDial.handleKeypressed(inputKey);
       }
-      if (inputKey === 'w' || inputKey === 'W' || inputKey === 's' || inputKey === 'S') {
+      if (inputKey === 'w' || inputKey === 's') {
          this.#controlPanel.powerAdjust.handleKeypressed(inputKey);
       }
    }
 
    onKeyReleased(inputKey, keyId) {
-      if (inputKey === 'a' || inputKey === 'A' || inputKey === 'd' || inputKey === 'D') {
+      if (!this.#inputActive()) return;
+      inputKey = inputKey.toLowerCase();
+      if (inputKey === 'a' || inputKey === 'd') {
          this.#controlPanel.angleDial.handleKeyReleased(inputKey);
       }
-      if (inputKey === 'w' || inputKey === 'W' || inputKey === 's' || inputKey === 'S') {
+      if (inputKey === 'w' || inputKey === 's') {
          this.#controlPanel.powerAdjust.handleKeyReleased(inputKey);
       }
-      if (!this.#inputActive()) return;
       if (inputKey === 'Space' || keyId === 32) this.#executeCannonShot();
       if (keyId === 37) this.#executeCannonMovement('left');
       if (keyId === 39) this.#executeCannonMovement('right');
-      if (inputKey === 'q' || inputKey === 'Q') this.#switchCurrentWeapon(-1);
-      if (inputKey === 'e' || inputKey === 'E') this.#switchCurrentWeapon(1);
+      if (inputKey === 'q') this.#switchCurrentWeapon(-1);
+      if (inputKey === 'e') this.#switchCurrentWeapon(1);
    }
 
    #setModeBasedWeather() {
@@ -274,6 +291,10 @@ class Match {
       this.#currentShot = null;
    }
 
+
+   /* Complex Impact Handler:
+      Determines what happens when a shot hits something. It checks for 
+      weapon-specific overrides (like Star splitting) vs. standard explosions */
    #handleShotImpact(impactEvent, shot) {
       if (shot === this.#currentShot) {
          this.#currentShot = null;

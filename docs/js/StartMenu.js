@@ -1,3 +1,5 @@
+// Manages the visual layout and interaction logic for the intial screen.
+// Handles difficulty selection ("easy"/"hard"), and displays "Help" info, if corresponding button is clicked
 class StartMenu {
    constructor(width, height) {
       this.width = width;
@@ -174,6 +176,11 @@ class StartMenu {
       pop();
    }
 
+
+   
+   /* Processes clicks on the menu buttons.
+      Returns the selected mode string to trigger a state change  
+      or null if the click was handled internally (like opening/closing Help) */
    handleMousePressed() {
       if (this.showHelpPopup) {
          const closeBtn = {

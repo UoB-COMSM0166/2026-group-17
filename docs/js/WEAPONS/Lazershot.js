@@ -1,4 +1,3 @@
-
 class Lazershot extends AbstractWeapon {
   constructor() {
     super({

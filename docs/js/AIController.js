@@ -1,4 +1,4 @@
-// Class that controlls the computer controller player and uses an FSM to track its current state
+// Controls the computer player and uses an FSM setup to track its current state
 class AIController {
    static States = Object.freeze(
       { IDLE: 'IDLE', SHOPPING: 'SHOPPING', THINKING: 'THINKING', AIMING: 'AIMING', FIRING: 'FIRING' });
@@ -93,7 +93,7 @@ class AIController {
          angleStep: 8,
          powerStep: 40,
          angleRange: [-95, -179],
-         powerRange: [250, 650]
+         powerRange: [250, 800]
       }
       // Run a coarse and a fine pass with a varying amount of steps for both angle and power
       passParams = this.#runPass(passParams, worldState);

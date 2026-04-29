@@ -1,3 +1,6 @@
+// Represents a 1-pixel wide vertical slice of the terrain.
+// It manages individual "pixels" of soil and groups them into "spans"
+// (pairs of top and bottom y-coordinates) to handle gravity and settling after an explosion
 class TerrainColumn {
    static #fallSpeed = 0.03;
    #xPosition;

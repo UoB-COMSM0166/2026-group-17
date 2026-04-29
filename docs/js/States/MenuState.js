@@ -1,3 +1,6 @@
+/* The initial state of the game.
+   Manages the main menu UI and handles the logic for starting the game
+   by transitioning to the ShopState based on user input */
 class MenuState extends State {
    #startMenu;
 
