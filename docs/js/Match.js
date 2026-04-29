@@ -103,19 +103,6 @@ class Match {
       this.#drawHUD();
       // Draw tutorial overlay
       this.#tutorial.draw();
-      this.#drawDebugPlayerText();
-   }
-
-   #drawDebugPlayerText() {                     // REMOVE LATER
-      push();
-      noStroke();
-      textFont('Verdana');
-      textSize(20);
-      fill('darkgoldenrod');
-      text(`Angle: ${this.#players[0].barrelAngle}`, 50, 140);
-      fill('firebrick');
-      text(`Power: ${this.#players[0].barrelPower}`, 50, 162);
-      pop()
    }
 
    onMousePressed(button) {
