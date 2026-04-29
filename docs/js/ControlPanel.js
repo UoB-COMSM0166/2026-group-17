@@ -1,3 +1,5 @@
+// The main HUD controller.  Manages the layout and rendering of all interactive widgets (dials, buttons, inventory)
+// and defines the physical "boundary" shape that the terrain sits upon
 class ControlPanel {
    #baseAltitude = height * 0.25;
    #backgroundColor;

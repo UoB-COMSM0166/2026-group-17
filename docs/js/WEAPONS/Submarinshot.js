@@ -1,4 +1,3 @@
-
 class Submarinshot extends AbstractWeapon {
   constructor() {
     super({

@@ -1,3 +1,6 @@
+/* Handles the visual expansion and physical impact of a weapon hit.
+  Supports multiple visual "kinds" (shiba, pineapple, star) and manages
+  the timing for when terrain should actually be destroyed */
 class Explosion {
    #position;
    #terrain;

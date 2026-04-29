@@ -1,8 +1,15 @@
+/**
+ * The entry point for the p5.js sketch.
+ * Manages global asset loading and bridges p5.js lifecycle events 
+ * (setup, draw, input) to the central Game controller
+ */
+
 let game;
 let pineappleImg, starImg, shibaImg, bubblegumImg, cannonballImg, earthwormImg;
 let grapeImg, lazerImg, submarineImg, impactgunImg;
 
 async function setup() {
+   // Asynchronously load all weapon images before initializing the game state
    const [pineapple, star, shiba, bubblegum, cannonball, earthworm, impactgun, grape, lazer, submarine] = await Promise.all([
       loadImage("weapons/pineapple.png"),
       loadImage("weapons/star.png"),
@@ -36,6 +43,8 @@ function draw() {
    game?.update(deltaTime);
    game?.drawGame();
 }
+
+// The functions below forward p5.js interaction events to the active Game instance
 
 function mousePressed() {
    game?.handleMousePressed(mouseX, mouseY, mouseButton);

@@ -1,4 +1,3 @@
-
 class Grapeshot extends AbstractWeapon {
   constructor() {
     super({

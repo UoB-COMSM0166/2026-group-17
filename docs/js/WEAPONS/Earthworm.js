@@ -1,4 +1,3 @@
-// 3. Earthworm
 class Earthworm extends AbstractWeapon {
   constructor() {
     super({

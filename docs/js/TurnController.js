@@ -1,3 +1,5 @@
+// Manages game phases, turn progression, and status-effect skips.
+// Ensures the game flows correctly from  player to player and tracks when the maximum turn limit is reached
 class TurnController {
    #turnNumber = 1;
    #maxTurns = 5;

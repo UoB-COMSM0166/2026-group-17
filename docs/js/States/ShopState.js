@@ -1,3 +1,6 @@
+// Manages the weapon selection phase before a match.
+// Coordinates between the WeaponShop UI and the AIController to finalize 
+// loadouts for both players before transitioning to MatchState.
 class ShopState extends State {
    #weaponShop;
    #aiController;
@@ -16,14 +19,11 @@ class ShopState extends State {
       this.#weaponShop.draw();
    }
 
+   // Switch to match state via mouse click
    onMousePressed(cursorX, cursorY, button) {
       this.#weaponShop.handleClick(cursorX, cursorY);
       if (this.#weaponShop.isStartButtonClicked(cursorX, cursorY)) {
-         const loadout0 = this.#weaponShop.getLoadout(0);
-         const loadout1 = this.#weaponShop.getLoadout(1);
-         // Transition to match
-         this.game.switchState(new MatchState(
-            this.game, this.resolution, loadout0, loadout1, this.#aiController));
+         this.#transitionToMatch();
       }
    }
 
@@ -31,12 +31,18 @@ class ShopState extends State {
       this.#weaponShop.handleMouseMove(cursorX, cursorY);
    }
 
+   // Transition to match via pressing a key
    onKeyReleased(inputKey, keyId) {
       if (inputKey === ENTER && this.#weaponShop.isDone()) {
-         const loadout0 = this.#weaponShop.getLoadout(0);
-         const loadout1 = this.#weaponShop.getLoadout(1);
-         this.game.switchState(new MatchState(
-            this.game, this.resolution, loadout0, loadout1, this.#aiController));
+         this.#transitionToMatch();
       }
    }
+
+   // Helper method to bundle the loadouts and move to the main gameplay loop.
+   #transitionToMatch() {
+      const loadout0 = this.#weaponShop.getLoadout(0);
+      const loadout1 = this.#weaponShop.getLoadout(1);
+      this.game.switchState(new MatchState(this.game, this.resolution, loadout0, loadout1, this.#aiController));
+   }
+
 }

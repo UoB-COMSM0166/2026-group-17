@@ -1,3 +1,4 @@
+// store for static utility methods that need to be available across different classes
 class DrawUtils {
 
    constructor() {

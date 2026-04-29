@@ -1,3 +1,5 @@
+// Manages the destructible terrain using a column-based system.
+// Handles initial generation via Perlin noise and terrain deformation from explosions
 class Terrain {
    #controlPanel;
    #baseColor;
@@ -30,6 +32,8 @@ class Terrain {
       }
    }
 
+   // Calculates the steepness of the terrain at a point.
+   // Used by PlayerCannon to restrict movement on steep slopes
    getSlopeAngleAt(x, sampleOffset = 5) {
       const leftX = constrain(x - sampleOffset, 0, width - 1);
       const rightX = constrain(x + sampleOffset, 0, width - 1);
