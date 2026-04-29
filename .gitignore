@@ -1,3 +1,4 @@
 **/.DS_Store
 **/.idea/
-**/.vscode/
+**/.vscode/docs/tests/node_modules/
+docs/tests/.npm-cache/
