@@ -1095,8 +1095,6 @@ At the same time, future development should consider sustainability and social i
 
 ## 9. Contribution Statement
 
-*All members contributed equally; names are listed in alphabetical order and do not reflect level of contribution.*
-
 | Name | Key contribution |
 |---|---|
 | Hsinman | Control panel (power and angle adjustment, weapon selection, shooting button, cannon movement limit logic), Keyboard controler, background design |
@@ -1106,7 +1104,7 @@ At the same time, future development should consider sustainability and social i
 | Yuqi | Random events (wind, acid rain, and earthquake effects), Tutorial screen, Test code, Weapon character design |
 | Yuxin | Scoreboard display, Aiming System, Explosion logic, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
 
-- Provide a table of everyone's contribution, which *may* be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Please let us know as soon as possible if there are any issues with teamwork as soon as they are apparent and we will do our best to help your team work harmoniously together.
+*All members contributed equally*
 
 ## 10. AI Statement
 
