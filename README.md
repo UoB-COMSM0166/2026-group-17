@@ -31,21 +31,22 @@
 
 ---
 
-<p align="center">
-  <font size="7" color="#FF4500"><b>LIFE IS LIKE HOT CANNON</b></font><br>
-  <br>
-  <font size="5" color="#505050"><b>EVERY TURN BRINGS</b></font>
-</p>
-
-<p align="center">
-  <font size="5">
-    <code><b>RANDOMNESS</b></code> &nbsp; 
-    <code><b>STORATEGY</b></code> &nbsp; 
-    <code><b>AI RIVALS</b></code> &nbsp; 
+<div align="center">
+  <h1>
+    <font color="#FF4500" size="7">EVERY SHOT CHANGES THE BATTLEFIELD</font>
+    <font color="#FF4500" size="7">EVERY TURN DEMANDS A NEW PLAN</font>
+  </h1>
+  <p>
+    <font size="5">
+      <code><strong>RANDOMNESS</strong></code> &nbsp; 
+      <code><strong>STRATEGY</strong></code> &nbsp; 
+      <code><strong>AI RIVALS</strong></code>
+    </font>
   </p>
-</font>
 
-<hr>
+</div>
+
+---
 
 ## Table of Contents
 
