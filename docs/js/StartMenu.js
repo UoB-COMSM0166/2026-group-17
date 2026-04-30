@@ -44,20 +44,20 @@ class StartMenu {
    }
 
    drawButton(button) {
-      //Change button color when mouse is over it
+      // Change button color when mouse is over it
       if (this.isMouseOver(button)) {
          fill(70, 130, 180);
       }
       else {
          fill(200);
       }
-      //Set the outline color of the rectangle
+      // Set the outline color of the rectangle
       stroke(0);
-      //Set the thickness of the rectangle's outline
+      // Set the thickness of the rectangle's outline
       strokeWeight(3);
       rectMode(CENTER);
       rect(button.x, button.y, button.w, button.h, 10);
-      //Disable the outline for the text
+      // Disable the outline for the text
       noStroke();
       fill(0);
       textSize(32);
@@ -199,7 +199,7 @@ class StartMenu {
          return null;
       }
       let selectedMode = null;
-      //Check if any button is clicked
+      // Check if any button is clicked
       for (let button of this.buttons) {
          if (this.isMouseOver(button)) {
             if (button.mode === "help") {
@@ -210,15 +210,15 @@ class StartMenu {
             break;
          }
       }
-      //Save selected mode to class property
+      // Save selected mode to class property
       this.selectedMode = selectedMode;
-      //Return selected mode
+      // Return selected mode
       return selectedMode;
    }
    
    isMouseOver(button) {
-      //Check if the mouse cursor is inside the button's rectangular area
-      //Return true if the mouse is over the button
+      // Check if the mouse cursor is inside the button's rectangular area
+      // Return true if the mouse is over the button
       return mouseX > button.x - button.w / 2 &&
          mouseX < button.x + button.w / 2 &&
          mouseY > button.y - button.h / 2 &&

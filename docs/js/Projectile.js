@@ -1,6 +1,5 @@
 // Manages the life cycle of a fired shot. Handles movement, environmental physics,
 // collision detection with players/terrain, and specialized weapon behaviors like splitting into fragments
-
 class Projectile {
    #position;
    #velocity;
@@ -147,7 +146,6 @@ class Projectile {
    }
 
    #refineImpactPosition(dt, isInsidePredicate) {
-      // const oldPosition = p5.Vector.sub(this.#position, this.#velocity.copy().mult(dt));
       const oldPosition = this.#previousPosition;
       let low = 0, high = 1, testPosition;
       // binary search to close in on precise position on terrain surface

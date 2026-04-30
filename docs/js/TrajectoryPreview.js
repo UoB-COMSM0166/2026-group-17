@@ -46,7 +46,6 @@ class TrajectoryPreview {
       const { gravity, wind, rain, terrain, enemy } = params;
       const weapon = params.player.currentWeapon;
       const path = [];
-      //const stepForce = p5.Vector.add(gravity, wind).add(rain).mult(TrajectoryPreview.simTimeStep);
       const stepForce = p5.Vector.mult(gravity, TrajectoryPreview.simTimeStep);
       const mockShot = { position: launchPos, velocity: launchVel, age: 0, state: {} };
       for (let i = 0; i < TrajectoryPreview.maxSteps; i++) {

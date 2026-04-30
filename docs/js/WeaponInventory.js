@@ -1,5 +1,4 @@
 //for weapon inventory management and display
-
 class WeaponInventory {
     #positionVector;
     #isExpanded = false;

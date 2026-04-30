@@ -99,7 +99,7 @@ class PoisonCloud {
             );
         }
 
-        // bottom haze贴地效果
+        // bottom haze
         fill(120, 40, 150, alphaBase * 0.45);
         ellipse(this.x, this.y + 10, this.radius * 0.95, this.radius * 0.42);
 

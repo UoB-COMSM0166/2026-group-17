@@ -185,7 +185,7 @@ class PowerAdjustWidget {
          this.#lastUpRepeat = now;
          this.power += 1;
       }
-      else if (keyId === 's' || keyId === 'S') {
+      else if (keyId === 's') {
          this.#isFollowing = false;
          this.#downHeld = true;
          this.#upHeld = false;
