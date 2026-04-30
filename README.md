@@ -3,6 +3,17 @@
 > 2026 COMSM0166 Group 17 Project Report
 
 <p align="center">
+  <b>LOOK HERE!</b><br>
+  👇👇👇<br>
+  <a href="https://www.youtube.com/watch?v=KWjRQYWBdjI">
+    <img src="https://img.youtube.com/vi/KWjRQYWBdjI/0.jpg" alt="Click to Watch" width="100%" style="border: 5px solid red; max-width: 1000px;">
+  </a><br>
+  ⬆️ <b>CLICK THE IMAGE ABOVE TO WATCH VIDEO</b> ⬆️
+</p>
+
+
+
+<p align="center">
   <a href="https://uob-comsm0166.github.io/2026-group-17/">
     <img src="https://img.shields.io/badge/Live%20Demo-Play-00CC00?style=plastic&logo=p5dotjs&logoColor=crimson&logoSize=auto&labelColor=lightslategrey" alt="Live Demo">
   </a>
@@ -19,6 +30,22 @@
 **Demo Video:** [Open attached gameplay demo](https://github.com/user-attachments/assets/d481b491-efc3-44cc-9b79-187f7e841b5e)
 
 ---
+
+<p align="center">
+  <font size="7" color="#FF4500"><b>LIFE IS LIKE HOT CANNON</b></font><br>
+  <br>
+  <font size="5" color="#505050"><b>EVERY TURN BRINGS</b></font>
+</p>
+
+<p align="center">
+  <font size="5">
+    <code><b>RANDOMNESS</b></code> &nbsp; 
+    <code><b>STORATEGY</b></code> &nbsp; 
+    <code><b>AI RIVALS</b></code> &nbsp; 
+  </p>
+</font>
+
+<hr>
 
 ## Table of Contents
 
@@ -151,7 +178,7 @@ HOT CANNONS is a single-player, turn-based artillery game inspired by Pocket Tan
   </a>
 </p>
 
-<p align="center"><em>Opening Poster. From classic artillery roots to unstable battlefields: the visual pitch behind HOT CANNONS.</em></p>
+<p align="center"><em>Idea Poster. From classic artillery roots to unstable battlefields: the visual pitch behind HOT CANNONS.</em></p>
 
 | Pocket Tanks DNA | Our Twist | Design Direction |
 |---|---|---|
@@ -169,7 +196,7 @@ The result is a single-player, turn-based artillery game in which every round ha
 
 During the early stages of the ideation process, our team began with a brainstorming session, where each member used Google Docs to independently research and record several game concepts that they were interested in developing. These initial ideas covered a range of gameplay styles, including action-based, strategy-focused, and arcade-inspired games.
 
-After discussing the feasibility and development complexity of each idea, we conducted a quick team vote and decided to take Pocket Tanks as our main gameplay reference. Its turn based artillery combat, projectile physics, and destructible environment mechanics provided a strong and achievable foundation for our project, while also offering clear opportunities for further innovation.
+After discussing the feasibility and development complexity of each idea, we conducted a quick team vote and decided to take Pocket Tanks as our main gameplay reference. Its turn-based artillery combat, projectile physics, and destructible environment mechanics provided a strong and achievable foundation for our project, while also offering clear opportunities for further innovation.
 
 We then went about creating paper prototypes of our initial concept in order to flesh out the specific gameplay details. This proved especially helpful considering the complexity of the concept, as it enabled us to better define the gameplay loop, player interaction flow, and core mechanics at an early stage. Paper prototyping was also valuable in improving communication within the team, particularly in helping all members visualise the turn-based combat flow, aiming controls, and overall user experience before moving into implementation.
 
@@ -264,7 +291,7 @@ These user stories helped ensure that our system requirements remained closely a
 
 To ensure the entire team maintained a shared understanding of the system-user interactions and the overall gameplay flow, we developed a Use Case Diagram as part of our requirements engineering process.
 
-The diagram was particularly useful in modelling the main gameplay flow of HOT CANNONS, including game setup, difficulty selection, weapon selection, turn based shooting, terrain updates, and match progression.
+The diagram was particularly useful in modelling the main gameplay flow of HOT CANNONS, including game setup, difficulty selection, weapon selection, turn-based shooting, terrain updates, and match progression.
 
 This enabled the team to maintain a clear high-level view of the system behaviour and better understand the relationships between the core gameplay features and planned user interactions.
 
