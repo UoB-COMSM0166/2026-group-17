@@ -1,4 +1,4 @@
-//Tutorial page tha shows up when a match starts
+//Tutorial page that shows up when a match starts
 class Tutorial {
    #currentStep = 0;
    #movePad;
