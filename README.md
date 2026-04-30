@@ -953,7 +953,7 @@ In addition, we held in-person sessions approximately every two weeks, securing 
 
 ### 6.4 Project Management Tools Usage and Challenges
 
-During meetings, the Gantt chart schedule was used as a visual tool to understand the current position within the overall project timeline. This enabled us to evaluate task distribution, monitor workload balance, and assess whether tasks were progressing as planned or at risk of delay. In addition, detailed tasks within each area of responsibility, as well as newly arising tasks identified during daily stand-up meetings and day-to-day communication, were individually registered by each member on the Kanban board for progress tracking. This must help prevent tasks that emerged spontaneously from being forgotten or overlooked.
+During meetings, the Gantt chart schedule was used as a visual tool to understand the current position within the overall project timeline. This enabled us to evaluate task distribution, monitor workload balance, and assess whether tasks were progressing as planned or at risk of delay. In addition, detailed tasks within each area of responsibility, as well as newly arising tasks identified during daily stand-up meetings and day-to-day communication, were individually registered by each member on the Kanban board for progress tracking. This helped prevent tasks that emerged spontaneously from being forgotten or overlooked.
 
 <a id="fig-18"></a>
 <p align="center">
