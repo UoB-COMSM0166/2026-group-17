@@ -832,7 +832,7 @@ The number of valid samples for both the NASA-TLX and SUS questionnaires was 10.
 
 1. Descriptive statistics and visualisation
 
-> The distributions of the six dimensions differed between the easy and hard levels. Overall, the easy level appeared to have lower scores, and the average scores showed the same pattern.
+The distributions of the six dimensions differed between the easy and hard levels. Overall, the easy level appeared to have lower scores, and the average scores showed the same pattern.
 
 <a id="fig-14"></a>
 <p align="center">
@@ -852,7 +852,7 @@ The number of valid samples for both the NASA-TLX and SUS questionnaires was 10.
 
 2. Wilcoxon signed-rank test
 
-> At the 95% confidence level, the Wilcoxon signed-rank test results suggested that level significantly affected Performance, Effort and the overall NASA-TLX score. However, the differences in Mental Demand, Physical Demand, Temporal Demand, and Frustration between the easy and hard levels were not statistically significant difference.
+At the 95% confidence level, the Wilcoxon signed-rank test results suggested that level significantly affected Performance, Effort and the overall NASA-TLX score. However, the differences in Mental Demand, Physical Demand, Temporal Demand, and Frustration between the easy and hard levels were not statistically significant difference.
 
 <p align="center">
 
@@ -871,10 +871,15 @@ $$\begin{cases}
 | Physical Demand | 5.500 | 0.6875 | No statistically significant difference |
 | Temporal Demand | 4.500 | 0.5625 | No statistically significant difference |
 | Performance | 0.000 | 0.0078 | Statistically significant difference |
-| Effort | 0.0000 | 0.0078 | Statistically significant difference |
+| Effort | 0.000 | 0.0078 | Statistically significant difference |
 | Frustration | 1.000 | 0.0625 | No statistically significant difference |
 | Total | 3.000 | 0.0098 | Statistically significant difference |
 
+</p>
+
+3. Conclusion
+
+The results show that Mental Demand and Frustration did not differ significantly between the easy and hard levels, suggesting that the hard level may not have introduced a substantial increase in perceived challenge. Additionally, participants reported lower satisfaction in performance in the hard condition, which aligns with our expectations. In response to these results, random events, such as rain and earthquakes, have been implemented to enhance variability, strategic complexity, and overall player engagement.
 
 ### 5.3 Code Testing
 
