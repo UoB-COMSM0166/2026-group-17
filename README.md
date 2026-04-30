@@ -1104,7 +1104,7 @@ At the same time, future development should consider sustainability and social i
 | Yuqi | Random events (wind, acid rain, and earthquake effects), Tutorial screen, Test code, Weapon character design |
 | Yuxin | Scoreboard display, Aiming System, Explosion logic, Turn display, Weapon trajectory effects, Weapon and explosion effects (ShibaShot, Pineappleshot, Starshoot), Weapon character design |
 
-*All members contributed equally*
+*All members contributed equally
 
 ## 10. AI Statement
 
