@@ -27,7 +27,6 @@ class ScoreCalculator {
       if (distance > explosion.maxRadius || isNaN(distance)) return 0;
       //Base score decreases as distance increases
       const base = max(0, map(distance, 0, explosion.maxRadius, 200, 0));
-
       let bonus = 0;
       //Bonus score depending on how close the hit is
       if (distance < explosion.maxRadius * 0.2) bonus = 80;

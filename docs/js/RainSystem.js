@@ -15,12 +15,9 @@ class RainSystem {
     }
 
     applyTo(projectile, dt) {
-
         if (!this.isActive) return;
-
         // rain drag
         projectile.velocity.y += this.intensity * 15 * dt;
-
         // slight air resistance
         projectile.velocity.mult(0.995);
     }
@@ -75,30 +72,24 @@ class RainSystem {
     }
 
     spawnSplash(x, y) {
-
         this.splashes.push({
             x: x,
             y: y,
             life: 10
         });
-
     }
 
     drawSplashes() {
 
         for (let s of this.splashes) {
-
             stroke(200, 220, 255, s.life * 20);
             line(s.x - 2, s.y, s.x - 4, s.y - 3);
             line(s.x + 2, s.y, s.x + 4, s.y - 3);
-
             s.life--;
         }
-
         this.splashes = this.splashes.filter(s => s.life > 0);
     }
     getRainLevel() {
-
         if (this.intensity < 0.9) {
             return "Light";
         }

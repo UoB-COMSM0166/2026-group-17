@@ -152,7 +152,6 @@ class PlayerCannon {
    get barrelPower() { return this.#barrelPower; }
    get lastFiredPower() { return this.#savedBarrelPower; }
    set barrelAngle(a) { this.#barrelAngle = a; }
-   //Debug will delete
    set barrelPower(p) { 
       this.#barrelPower = p;
    }

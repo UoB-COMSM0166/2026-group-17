@@ -44,7 +44,7 @@ function draw() {
    game?.drawGame();
 }
 
-// The functions below forward p5.js interaction events to the active Game instance
+// Functions below forward p5.js interaction events to the active Game instance
 
 function mousePressed() {
    game?.handleMousePressed(mouseX, mouseY, mouseButton);

@@ -1,4 +1,4 @@
-//Tutorial page show up when the game starts.
+//Tutorial page tha shows up when a match starts
 class Tutorial {
    #currentStep = 0;
    #movePad;

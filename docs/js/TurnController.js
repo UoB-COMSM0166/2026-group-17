@@ -25,7 +25,6 @@ class TurnController {
          this.#activePlayerId = 1 - this.#activePlayerId;
          const currentPlayer = players?.[this.#activePlayerId];
          if(!currentPlayer) return;
-         // if(!currentPlayer) return;
          //Check whether the player is affected by status effects
          const canAct = currentPlayer.canAct(this);
     
