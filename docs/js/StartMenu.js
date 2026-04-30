@@ -21,7 +21,6 @@ class StartMenu {
    toggleHelpPopup() {
       this.showHelpPopup = !this.showHelpPopup;
    }
-   
    draw() {
       // Whole start menu screen
       DrawUtils.drawLinearGradient(this.bgTop, this.bgBottom);
@@ -157,7 +156,7 @@ class StartMenu {
       text("2. Player 2 / AI turn", x + 25, y);
       y += gap * 1.6;
       textStyle(BOLD);
-      text("Highest points after 5 rounds wins.", x, y);
+      text("Highest power after 5 rounds wins.", x, y);
 
       // close button
       fill(235, 140, 25);
@@ -216,7 +215,7 @@ class StartMenu {
       //Return selected mode
       return selectedMode;
    }
-
+   
    isMouseOver(button) {
       //Check if the mouse cursor is inside the button's rectangular area
       //Return true if the mouse is over the button
