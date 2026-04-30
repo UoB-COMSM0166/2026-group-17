@@ -7,6 +7,6 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "vitest": "latest"
+    "vitest": "3.0.5"
   }
 }
