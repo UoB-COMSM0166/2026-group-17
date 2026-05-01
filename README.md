@@ -32,18 +32,7 @@
 ---
 
 <div align="center">
-  <h1>
-    <font color="#FF4500" size="7">EVERY SHOT CHANGES THE BATTLEFIELD</font>
-    <font color="#FF4500" size="7">EVERY TURN DEMANDS A NEW PLAN</font>
-  </h1>
-  <p>
-    <font size="5">
-      <code><strong>RANDOMNESS</strong></code> &nbsp; 
-      <code><strong>STRATEGY</strong></code> &nbsp; 
-      <code><strong>AI RIVALS</strong></code>
-    </font>
-  </p>
-
+  <img src="./images/hot-cannons-report-banner.svg" alt="HOT CANNONS report title banner" width="1000">
 </div>
 
 ---

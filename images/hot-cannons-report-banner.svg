@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="340" viewBox="0 0 1600 340" role="img" aria-labelledby="title desc">
+  <title id="title">HOT CANNONS report banner</title>
+  <desc id="desc">Pure typography banner for the HOT CANNONS report with two slogan lines and the words Randomness and Strategy.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#17120d"/>
+      <stop offset="50%" stop-color="#2c1b10"/>
+      <stop offset="100%" stop-color="#4a2c17"/>
+    </linearGradient>
+    <linearGradient id="headline" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff7a18"/>
+      <stop offset="55%" stop-color="#ffb347"/>
+      <stop offset="100%" stop-color="#fff3dc"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="340" fill="url(#bg)"/>
+  <circle cx="1460" cy="54" r="120" fill="#ffffff" opacity="0.05"/>
+  <circle cx="180" cy="290" r="110" fill="#ff8b2c" opacity="0.06"/>
+
+  <rect x="88" y="68" width="10" height="202" rx="5" fill="#ff8b2c"/>
+  <rect x="114" y="68" width="3" height="202" rx="1.5" fill="#fff1db" opacity="0.75"/>
+
+  <text x="150" y="110" fill="#f3e9dc" font-family="Avenir Next, Avenir, Helvetica, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="5">HOT CANNONS</text>
+  <text x="150" y="172" fill="url(#headline)" font-family="Avenir Next, Avenir, Helvetica, Arial, sans-serif" font-size="54" font-weight="900" letter-spacing="1.4">EVERY SHOT CHANGES THE BATTLEFIELD</text>
+  <text x="150" y="228" fill="#fff4e7" font-family="Avenir Next, Avenir, Helvetica, Arial, sans-serif" font-size="42" font-weight="800" letter-spacing="1.1">EVERY TURN DEMANDS A NEW PLAN</text>
+
+  <text x="150" y="288" fill="#ffb25c" font-family="Avenir Next, Avenir, Helvetica, Arial, sans-serif" font-size="24" font-weight="900" letter-spacing="4.6">RANDOMNESS</text>
+  <text x="390" y="288" fill="#f7eee3" font-family="Avenir Next, Avenir, Helvetica, Arial, sans-serif" font-size="24" font-weight="900" letter-spacing="4.6">STRATEGY</text>
+</svg>
